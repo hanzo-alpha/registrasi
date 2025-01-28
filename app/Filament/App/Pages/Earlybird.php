@@ -9,14 +9,13 @@ use App\Enums\JenisKelamin;
 use App\Enums\PaymentStatus;
 use App\Enums\StatusBayar;
 use App\Enums\StatusDaftar;
+use App\Enums\StatusPendaftaran;
 use App\Enums\StatusRegistrasi;
 use App\Enums\TipeBayar;
 use App\Enums\TipeKartuIdentitas;
 use App\Enums\UkuranJersey;
 use App\Models\Pembayaran;
-use App\Models\Registrasi;
 use App\Services\MidtransAPI;
-use Awcodes\Shout\Components\Shout;
 use Exception;
 use Filament\Actions\Action;
 use Filament\Forms;
@@ -34,7 +33,6 @@ use Filament\Support\Facades\FilamentView;
 
 use function Filament\Support\is_app_url;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Blade;
@@ -48,32 +46,31 @@ use Livewire\Attributes\On;
 use Parfaitementweb\FilamentCountryField\Forms\Components\Country;
 use Throwable;
 
-class Pendaftaran extends Page implements HasForms
+class Earlybird extends Page implements HasForms
 {
     use CanUseDatabaseTransactions;
     use HasUnsavedDataChangesAlert;
     use InteractsWithFormActions;
     use InteractsWithForms;
-
     public ?Model $record = null;
-
     public ?array $data = [];
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
     protected static ?string $activeNavigationIcon = 'heroicon-s-document-text';
-    protected static ?string $slug = 'pendaftaran';
-    protected static string $view = 'filament.app.pages.pendaftaran';
-    protected ?string $heading = 'Pendaftaran Online Peserta Bantaeng Trail Run 2025';
+    protected static ?string $slug = 'earlybird';
+    protected static string $view = 'filament.app.pages.earlybird';
+    protected static ?string $navigationLabel = 'Pendaftaran Early Bird';
+    protected ?string $heading = 'Pendaftaran Earlybird Online Peserta Bantaeng Trail Run 2025';
     protected ?string $subheading = 'Silahkan lengkapi data peserta di bawah ini.';
-    protected static bool $shouldRegisterNavigation = false;
+
+    public static function getNavigationBadge(): ?string
+    {
+        return (string) \App\Models\Earlybird::count();
+    }
 
     public static function formOtomatis(): array
     {
         return [
-            Shout::make('Informasi')
-                ->columnSpanFull()
-                ->content('Bagi 100 Pendaftar Pertama (Early Bird) untuk kategori 8K dan 15K akan mendapatkan keuntungan potongan harga. Jika sudah melebihi 100 pendaftar, akan dikenakan harga normal.')
-                ->icon('heroicon-o-information-circle'),
             Forms\Components\Wizard::make([
                 Forms\Components\Wizard\Step::make('Data Pribadi Peserta')
                     ->icon('heroicon-o-user')
@@ -81,7 +78,7 @@ class Pendaftaran extends Page implements HasForms
                     ->schema([
                         Section::make('Data Peserta')
                             ->schema([
-                                Forms\Components\TextInput::make('uuid_registrasi')
+                                Forms\Components\TextInput::make('uuid_earlybird')
                                     ->label('Kode Peserta')
                                     ->required()
                                     ->hidden()
@@ -99,7 +96,7 @@ class Pendaftaran extends Page implements HasForms
                                     )
                                     ->maxLength(255),
                                 Forms\Components\TextInput::make('nama_lengkap')
-                                    ->label('Nama Peserta')
+                                    ->label('Nama Lengkap Peserta')
                                     ->required()
                                     ->autofocus()
                                     ->maxLength(255),
@@ -146,9 +143,9 @@ class Pendaftaran extends Page implements HasForms
                                     ->label('Golongan Darah')
                                     ->options(GolonganDarah::class)
                                     ->required(),
-                                Forms\Components\TextInput::make('kewarganegaraan')
-                                    ->label('Kewarganegaraan')
-                                    ->required(),
+                                Forms\Components\TextInput::make('komunitas')
+                                    ->label('Komunitas (Optional)')
+                                    ->maxLength(255),
                             ])->columns(2),
                     ]),
                 Forms\Components\Wizard\Step::make('Data Alamat Peserta')
@@ -206,29 +203,9 @@ class Pendaftaran extends Page implements HasForms
                     ->schema([
                         Section::make('Data Pendaftaran')
                             ->schema([
-                                Forms\Components\TextInput::make('jumlah_peserta')
-                                    ->label('Jumlah Peserta Yang Didaftarkan')
-                                    ->required()
-                                    ->numeric()
-                                    ->default(1)
-                                    ->dehydrated()
-                                    ->maxLength(255),
-                                Forms\Components\TextInput::make('komunitas')
-                                    ->label('Komunitas (Optional)')
-                                    ->maxLength(255),
                                 Forms\Components\Select::make('kategori_lomba')
                                     ->label('Kategori Lomba')
-                                    ->relationship(
-                                        name: 'kategori',
-                                        titleAttribute: 'nama',
-                                        modifyQueryUsing: function (Builder $query) {
-                                            if (Registrasi::count() > 100) {
-                                                return $query->whereNotIn('id', [1, 3]);
-                                            }
-
-                                            return $query->whereNotIn('id', [2, 4]);
-                                        },
-                                    )
+                                    ->relationship('kategori', 'nama')
                                     ->native(false)
                                     ->required(),
                                 Forms\Components\Select::make('ukuran_jersey')
@@ -239,14 +216,16 @@ class Pendaftaran extends Page implements HasForms
                                     ->required(),
                             ])->columns(2),
                     ]),
-            ])->submitAction(new HtmlString(Blade::render(<<<BLADE
+            ])->submitAction(new HtmlString(Blade::render(
+                <<<BLADE
                 <x-filament::button
                     type="submit"
                     size="sm"
                 >
                     Submit
                 </x-filament::button>
-            BLADE)))
+            BLADE,
+            )))
                 ->columnSpanFull(),
         ];
     }
@@ -260,7 +239,7 @@ class Pendaftaran extends Page implements HasForms
     public function detailTransaction($result)
     {
         $orderId = $result['order_id'] ?? null;
-        $registrasi = Registrasi::where('uuid_registrasi', $orderId)->first();
+        $registrasi = \App\Models\Earlybird::where('uuid_earlybird', $orderId)->first();
         $pembayaran = $registrasi->pembayaran;
 
         $uuidPembayaran = $pembayaran->uuid_pembayaran ?? Str::uuid()->toString();
@@ -299,7 +278,7 @@ class Pendaftaran extends Page implements HasForms
             default => StatusRegistrasi::PROSES,
         };
 
-        $registrasi->status_registrasi = $statusRegistrasi;
+        $registrasi->status_earlybird = $statusRegistrasi;
 
         $statusDaftar = (StatusRegistrasi::BERHASIL === $statusRegistrasi)
             ? StatusDaftar::TERDAFTAR
@@ -310,6 +289,7 @@ class Pendaftaran extends Page implements HasForms
         $pembayaran->status_transaksi = $transactionStatus;
         $pembayaran->detail_transaksi = $result;
         $pembayaran->status_daftar = $statusDaftar;
+        $pembayaran->status_pendaftaran = StatusPendaftaran::EARLYBIRD;
         $pembayaran->lampiran = null;
         $pembayaran->save();
         $registrasi->save();
@@ -326,7 +306,8 @@ class Pendaftaran extends Page implements HasForms
                     . Number::format((int) $grossAmount, locale: 'id'),
                 )
                 ->icon('heroicon-o-x-circle')
-                ->send();
+                ->send()
+                ->sendToDatabase(auth()->user());
         }
 
         if (StatusBayar::PENDING === $status) {
@@ -341,7 +322,8 @@ class Pendaftaran extends Page implements HasForms
                     ),
                 )
                 ->icon('heroicon-o-information-circle')
-                ->send();
+                ->send()
+                ->sendToDatabase(auth()->user());
         }
 
         if (StatusBayar::GAGAL === $status) {
@@ -356,7 +338,8 @@ class Pendaftaran extends Page implements HasForms
                     ),
                 )
                 ->icon('heroicon-o-x-mark')
-                ->send();
+                ->send()
+                ->sendToDatabase(auth()->user());
         }
 
         return Notification::make()
@@ -368,7 +351,8 @@ class Pendaftaran extends Page implements HasForms
                 Number::format((int) $grossAmount, locale: 'id'),
             )
             ->icon('heroicon-o-check-circle')
-            ->send();
+            ->send()
+            ->sendToDatabase(auth()->user());
     }
 
     /**
@@ -404,6 +388,11 @@ class Pendaftaran extends Page implements HasForms
 
     }
 
+    public function getModel(): string
+    {
+        return \App\Models\Earlybird::class;
+    }
+
     public function getRecord(): ?Model
     {
         return $this->record;
@@ -416,14 +405,14 @@ class Pendaftaran extends Page implements HasForms
             ->columns(2);
     }
 
-    public function getModel(): string
-    {
-        return Registrasi::class;
-    }
-
     public function getFormStatePath(): ?string
     {
         return 'data';
+    }
+
+    protected function getRedirectUrl(): string
+    {
+        return Earlybird::getUrl();
     }
 
     /**
@@ -431,30 +420,31 @@ class Pendaftaran extends Page implements HasForms
      */
     protected function handleRecordCreation(array $data): Model
     {
-        $data['uuid_registrasi'] = \Str::uuid()->toString();
+        $data['uuid_earlybird'] = \Str::uuid()->toString();
         $uuidPembayaran = \Str::uuid()->toString();
-        $data['status_registrasi'] ??= StatusRegistrasi::BELUM_BAYAR;
+        $data['status_earlybird'] ??= StatusRegistrasi::BELUM_BAYAR;
         $data['provinsi'] ??= '74';
         $biaya = biaya_pendaftaran($data['kategori_lomba']);
-        $data['jumlah_peserta'] ??= 1;
-        $totalHarga = (int) $data['jumlah_peserta'] * $biaya;
-        $namaKegiatan = 'Pendaftaran Bantaeng Trail Run 2025 Kategori Lomba - ' . $data['kategori_lomba'];
+        $qty = 1;
+        $totalHarga = $qty * $biaya;
+        $kategori = \App\Models\KategoriLomba::find($data['kategori_lomba']);
+        $namaKegiatan = 'Pendaftaran Early Bird Bantaeng Trail Run 2025 Kategori Lomba - ' . $kategori->nama;
         $merchant = 'Freelethics Bantaeng';
 
         midtrans_config();
 
         $transactions = [
-            'order_id' => $data['uuid_registrasi'],
+            'order_id' => $data['uuid_earlybird'],
             'gross_amount' => $totalHarga,
         ];
 
         $items = [
             'id' => \Str::uuid()->toString(),
             'price' => $biaya,
-            'quantity' => (int) $data['jumlah_peserta'],
+            'quantity' => $qty,
             'name' => $namaKegiatan,
             'merchant_name' => $merchant,
-            'category' => $data['kategori_lomba'],
+            'category' => $kategori->nama,
         ];
 
         $customers = [
@@ -478,12 +468,6 @@ class Pendaftaran extends Page implements HasForms
             'customers' => $customers,
         ];
 
-        $data['is_earlybird'] = true;
-
-        if (Registrasi::count() > 100) {
-            $data['is_earlybird'] = false;
-        }
-
         $record = new ($this->getModel())($data);
 
         $record->save();
@@ -494,7 +478,7 @@ class Pendaftaran extends Page implements HasForms
             'nama_kegiatan' => $namaKegiatan,
             'ukuran_jersey' => $data['ukuran_jersey'],
             'kategori_lomba' => $data['kategori_lomba'],
-            'jumlah' => $data['jumlah_peserta'],
+            'jumlah' => $qty,
             'satuan' => 'Peserta',
             'harga_satuan' => $biaya,
             'total_harga' => $totalHarga,
@@ -503,6 +487,7 @@ class Pendaftaran extends Page implements HasForms
             'status_transaksi' => PaymentStatus::PENDING,
             'status_daftar' => StatusDaftar::TERDAFTAR,
             'keterangan' => null,
+            'status_pendaftaran' => StatusPendaftaran::EARLYBIRD,
             'detail_transaksi' => $detailTransaksi,
             'lampiran' => null,
         ]);
@@ -544,7 +529,7 @@ class Pendaftaran extends Page implements HasForms
                 ->model($this->getModel())
                 ->statePath($this->getFormStatePath())
                 ->columns($this->hasInlineLabels() ? 1 : 2)
-                ->inlineLabel($this->hasInlineLabels()), ),
+                ->inlineLabel($this->hasInlineLabels())),
         ];
     }
 
@@ -567,10 +552,5 @@ class Pendaftaran extends Page implements HasForms
         return [
             $this->getCreateFormAction(),
         ];
-    }
-
-    protected function getRedirectUrl(): string
-    {
-        return Pendaftaran::getUrl();
     }
 }

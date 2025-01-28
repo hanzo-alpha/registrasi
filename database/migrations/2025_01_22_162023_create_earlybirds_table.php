@@ -28,12 +28,9 @@ return new class () extends Migration {
             $table->string('nama_kontak_darurat');
             $table->string('nomor_kontak_darurat');
             $table->string('golongan_darah');
-            $table->string('kewarganegaraan');
             $table->string('ukuran_jersey');
-            $table->unsignedBigInteger('jumlah_peserta');
             $table->string('kategori_lomba')->nullable();
             $table->string('komunitas')->nullable();
-            $table->unsignedTinyInteger('is_earlybird')->nullable()->default(0);
             $table->string('status_earlybird')->nullable();
             $table->timestamps();
         });

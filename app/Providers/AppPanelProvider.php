@@ -30,6 +30,7 @@ class AppPanelProvider extends PanelProvider
             ->topNavigation()
             ->topbar(true)
             ->spa()
+            ->databaseNotifications()
             ->databaseTransactions()
 //            ->darkMode(true)
             ->defaultThemeMode(ThemeMode::Dark)

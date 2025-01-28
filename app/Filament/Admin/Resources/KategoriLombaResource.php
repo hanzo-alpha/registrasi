@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources;
 
+use App\Enums\StatusPendaftaran;
 use App\Filament\Admin\Resources\KategoriLombaResource\Pages;
 use App\Models\KategoriLomba;
 use Filament\Forms;
@@ -27,6 +28,10 @@ class KategoriLombaResource extends Resource
                     ->maxLength(255),
                 Forms\Components\TextInput::make('harga')
                     ->numeric(),
+                Forms\Components\ColorPicker::make('warna'),
+                Forms\Components\Select::make('kategori')
+                    ->options(StatusPendaftaran::class)
+                    ->native(false),
                 Forms\Components\TextInput::make('deskripsi')
                     ->maxLength(255),
             ]);
@@ -41,6 +46,11 @@ class KategoriLombaResource extends Resource
                 Tables\Columns\TextColumn::make('harga')
                     ->numeric()
                     ->sortable(),
+                Tables\Columns\ColorColumn::make('warna'),
+                Tables\Columns\TextColumn::make('kategori')
+                    ->searchable()
+                    ->sortable()
+                    ->badge(),
                 Tables\Columns\TextColumn::make('deskripsi')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')

@@ -72,7 +72,6 @@ return [
     */
 
     'links' => [
-        '/home/u620101454/domains/bantaengtrailrun.com/public_html/registrasi' => storage_path('app/public'),
         public_path('storage') => storage_path('app/public'),
     ],
 

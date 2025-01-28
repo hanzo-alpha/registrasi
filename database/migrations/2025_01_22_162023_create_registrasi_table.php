@@ -31,10 +31,8 @@ return new class () extends Migration {
             $table->string('golongan_darah');
             $table->string('kewarganegaraan');
             $table->string('ukuran_jersey');
-            $table->unsignedBigInteger('jumlah_peserta');
             $table->foreignId('kategori_lomba')->nullable();
             $table->string('komunitas')->nullable();
-            $table->unsignedTinyInteger('is_earlybird')->nullable()->default(0);
             $table->string('status_registrasi')->nullable();
             $table->string('status_pendaftaran')->nullable()->default(StatusPendaftaran::EARLYBIRD);
             $table->timestamps();

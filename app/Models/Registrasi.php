@@ -11,6 +11,7 @@ use App\Enums\StatusRegistrasi;
 use App\Enums\TipeKartuIdentitas;
 use App\Enums\UkuranJersey;
 use App\Traits\HasWilayah;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -38,14 +39,12 @@ class Registrasi extends Model
         'nama_kontak_darurat',
         'nomor_kontak_darurat',
         'golongan_darah',
-        'kewarganegaraan',
         'ukuran_jersey',
         'jumlah_peserta',
         'kategori_lomba',
         'komunitas',
         'status_registrasi',
         'status_pendaftaran',
-        'is_earlybird',
         'uuid_registrasi',
     ];
 
@@ -53,7 +52,8 @@ class Registrasi extends Model
 
     public function pembayaran(): HasOne
     {
-        return $this->hasOne(Pembayaran::class, 'registrasi_id', 'id');
+        return $this->hasOne(Pembayaran::class, 'registrasi_id', 'id')
+            ->where('status_pendaftaran', StatusPendaftaran::NORMAL);
     }
 
     public function kategori(): BelongsTo
@@ -61,9 +61,9 @@ class Registrasi extends Model
         return $this->belongsTo(KategoriLomba::class, 'kategori_lomba', 'id');
     }
 
-    public function earlybird(): HasOne
+    public function scopeKategoriLomba(Builder $query, string $kategoriLomba): Builder
     {
-        return $this->hasOne(RegistrasiEarlybird::class, 'registrasi_id', 'id');
+        return $query->where('kategori_lomba', $kategoriLomba);
     }
 
     protected function casts(): array
@@ -77,7 +77,6 @@ class Registrasi extends Model
             'status_registrasi' => StatusRegistrasi::class,
             'jenis_kelamin' => JenisKelamin::class,
             'status_pendaftaran' => StatusPendaftaran::class,
-            'is_earlybird' => 'boolean',
         ];
     }
 }

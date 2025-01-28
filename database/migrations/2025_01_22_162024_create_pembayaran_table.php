@@ -1,13 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
+use App\Enums\StatusPendaftaran;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class () extends Migration {
     public function up(): void
     {
-        Schema::create('pembayaran', function (Blueprint $table) {
+        Schema::create('pembayaran', function (Blueprint $table): void {
             $table->id();
             $table->uuid('uuid_pembayaran')->nullable()->index()->default(Str::uuid()->toString());
             $table->foreignId('registrasi_id')->index()->nullable();
@@ -18,11 +21,11 @@ return new class extends Migration {
             $table->string('satuan')->nullable()->default('peserta');
             $table->double('harga_satuan')->nullable()->default(0);
             $table->double('total_harga')->nullable()->default(0);
-
             $table->string('tipe_pembayaran')->nullable();
             $table->string('status_pembayaran')->nullable();
             $table->string('status_transaksi')->nullable();
             $table->boolean('status_daftar')->nullable()->default(false);
+            $table->string('status_pendaftaran')->nullable()->default(StatusPendaftaran::EARLYBIRD);
             $table->string('keterangan')->nullable();
             $table->json('detail_transaksi')->nullable();
             $table->string('lampiran')->nullable();

@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Providers;
 
+use App\Filament\App\Pages\Earlybird;
 use App\Filament\App\Pages\Pendaftaran;
 use Filament\Forms\Components\Field;
 use Filament\Forms\Components\Placeholder;
@@ -20,9 +23,15 @@ use Illuminate\View\View;
 
 class AppServiceProvider extends ServiceProvider
 {
-    public function register(): void
+    public function register(): void {}
+
+    public function boot(): void
     {
-        //
+        $this->configureCommands();
+        $this->configureModels();
+        $this->translatableComponents();
+        $this->configureVite();
+        $this->registerFilamentHook();
     }
 
     protected function translatableComponents(): void
@@ -48,6 +57,7 @@ class AppServiceProvider extends ServiceProvider
             fn(array $scopes): View => view('payment-js', ['scopes' => $scopes]),
             scopes: [
                 Pendaftaran::class,
+                Earlybird::class,
             ],
         );
     }
@@ -55,7 +65,7 @@ class AppServiceProvider extends ServiceProvider
     private function configureModels(): void
     {
         Model::unguard();
-        Model::shouldBeStrict(! app()->isProduction());
+        Model::shouldBeStrict( ! app()->isProduction());
     }
 
     private function configureVite(): void
@@ -63,14 +73,5 @@ class AppServiceProvider extends ServiceProvider
         Vite::useWaterfallPrefetching(concurrency: 10);
         Vite::useAggressivePrefetching();
         Vite::usePrefetchStrategy('waterfall', ['concurrency' => 1]);
-    }
-
-    public function boot(): void
-    {
-        $this->configureCommands();
-        $this->configureModels();
-        $this->translatableComponents();
-        $this->configureVite();
-        $this->registerFilamentHook();
     }
 }

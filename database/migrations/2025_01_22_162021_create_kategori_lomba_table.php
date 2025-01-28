@@ -14,6 +14,7 @@ return new class () extends Migration {
             $table->string('nama');
             $table->double('harga')->nullable();
             $table->string('warna')->nullable();
+            $table->string('kategori')->nullable();
             $table->string('deskripsi')->nullable();
             $table->timestamps();
         });

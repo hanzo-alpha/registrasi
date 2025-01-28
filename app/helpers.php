@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Models\KategoriLomba;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 
@@ -184,7 +185,7 @@ if ( ! function_exists('replace_nama_file_excel')) {
 if ( ! function_exists('biaya_pendaftaran')) {
     function biaya_pendaftaran($kategoriLomba): int|float|null
     {
-        $biayaPendaftaran = \App\Models\KategoriLomba::find($kategoriLomba);
+        $biayaPendaftaran = KategoriLomba::find($kategoriLomba);
         return $biayaPendaftaran->harga;
     }
 }

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Enums\JenisBayar;
 use App\Enums\PaymentStatus;
 use App\Enums\StatusBayar;
 use App\Enums\StatusDaftar;
@@ -38,6 +37,8 @@ class Pembayaran extends Model
         'keterangan',
         'detail_transaksi',
         'lampiran',
+        'is_earlybird',
+        'status_pendaftaran',
     ];
 
     public function uniqueIds(): array
@@ -53,6 +54,16 @@ class Pembayaran extends Model
     public function registrasi(): BelongsTo
     {
         return $this->belongsTo(Registrasi::class);
+    }
+
+    public function earlybird(): BelongsTo
+    {
+        return $this->belongsTo(Earlybird::class);
+    }
+
+    public function kategori(): BelongsTo
+    {
+        return $this->belongsTo(KategoriLomba::class);
     }
 
     protected function casts(): array

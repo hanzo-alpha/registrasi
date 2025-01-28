@@ -39,7 +39,7 @@ class AdminPanelProvider extends PanelProvider
             ->profile(Profile::class, false)
             ->databaseNotifications()
             ->databaseTransactions()
-            ->viteTheme('resources/css/filament/admin/theme.css')
+//            ->viteTheme('resources/css/filament/admin/theme.css')
             ->colors([
                 'danger' => Color::Rose,
                 'gray' => Color::Gray,
