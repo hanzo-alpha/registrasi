@@ -6,7 +6,6 @@ namespace App\Filament\App\Pages;
 
 use App\Enums\GolonganDarah;
 use App\Enums\JenisKelamin;
-use App\Enums\KategoriLomba;
 use App\Enums\PaymentStatus;
 use App\Enums\StatusBayar;
 use App\Enums\StatusDaftar;
@@ -17,6 +16,7 @@ use App\Enums\UkuranJersey;
 use App\Models\Pembayaran;
 use App\Models\Registrasi;
 use App\Services\MidtransAPI;
+use Awcodes\Shout\Components\Shout;
 use Exception;
 use Filament\Actions\Action;
 use Filament\Forms;
@@ -34,6 +34,7 @@ use Filament\Support\Facades\FilamentView;
 
 use function Filament\Support\is_app_url;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Blade;
@@ -67,6 +68,10 @@ class Pendaftaran extends Page implements HasForms
     public static function formOtomatis(): array
     {
         return [
+            Shout::make('Informasi')
+                ->columnSpanFull()
+                ->content('Bagi 100 Pendaftar Pertama (Early Bird) untuk kategori 8K dan 15K akan mendapatkan keuntungan potongan harga. Jika sudah melebihi 100 pendaftar, akan dikenakan harga normal.')
+                ->icon('heroicon-o-information-circle'),
             Forms\Components\Wizard::make([
                 Forms\Components\Wizard\Step::make('Data Pribadi Peserta')
                     ->icon('heroicon-o-user')
@@ -151,11 +156,13 @@ class Pendaftaran extends Page implements HasForms
                         Section::make('Data Alamat Peserta')
                             ->schema([
                                 Forms\Components\TextInput::make('alamat')
+                                    ->required()
                                     ->columnSpanFull(),
                                 Country::make('negara')
+                                    ->required()
                                     ->searchable(),
                                 Forms\Components\Select::make('provinsi')
-                                    ->nullable()
+                                    ->required()
                                     ->options(Province::pluck('name', 'code'))
                                     ->dehydrated()
                                     ->live(onBlur: true)
@@ -209,11 +216,24 @@ class Pendaftaran extends Page implements HasForms
                                     ->maxLength(255),
                                 Forms\Components\Select::make('kategori_lomba')
                                     ->label('Kategori Lomba')
-                                    ->options(KategoriLomba::class)
+                                    ->relationship(
+                                        name: 'kategori',
+                                        titleAttribute: 'nama',
+                                        modifyQueryUsing: function (Builder $query) {
+                                            if (Registrasi::count() > 100) {
+                                                return $query->whereNotIn('id', [1, 3]);
+                                            }
+
+                                            return $query->whereNotIn('id', [2, 4]);
+                                        },
+                                    )
+                                    ->native(false)
                                     ->required(),
                                 Forms\Components\Select::make('ukuran_jersey')
                                     ->label('Ukuran Jersey')
+                                    ->native(false)
                                     ->options(UkuranJersey::class)
+                                    ->enum(UkuranJersey::class)
                                     ->required(),
                             ])->columns(2),
                     ]),
@@ -455,6 +475,12 @@ class Pendaftaran extends Page implements HasForms
             'items' => $items,
             'customers' => $customers,
         ];
+
+        $data['is_earlybird'] = true;
+
+        if (Registrasi::count() > 100) {
+            $data['is_earlybird'] = false;
+        }
 
         $record = new ($this->getModel())($data);
 

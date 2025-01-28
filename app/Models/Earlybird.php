@@ -6,20 +6,19 @@ namespace App\Models;
 
 use App\Enums\GolonganDarah;
 use App\Enums\JenisKelamin;
-use App\Enums\StatusPendaftaran;
+use App\Enums\KategoriLomba;
 use App\Enums\StatusRegistrasi;
 use App\Enums\TipeKartuIdentitas;
 use App\Enums\UkuranJersey;
 use App\Traits\HasWilayah;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-class Registrasi extends Model
+class Earlybird extends Model
 {
     use HasWilayah;
 
-    protected $table = 'registrasi';
+    protected $table = 'earlybird';
 
     protected $fillable = [
         'nama_lengkap',
@@ -43,27 +42,14 @@ class Registrasi extends Model
         'jumlah_peserta',
         'kategori_lomba',
         'komunitas',
-        'status_registrasi',
-        'status_pendaftaran',
+        'status_earlybird',
         'is_earlybird',
-        'uuid_registrasi',
+        'uuid_earlybird',
     ];
-
-    protected $with = ['kategori'];
 
     public function pembayaran(): HasOne
     {
-        return $this->hasOne(Pembayaran::class, 'registrasi_id', 'id');
-    }
-
-    public function kategori(): BelongsTo
-    {
-        return $this->belongsTo(KategoriLomba::class, 'kategori_lomba', 'id');
-    }
-
-    public function earlybird(): HasOne
-    {
-        return $this->hasOne(RegistrasiEarlybird::class, 'registrasi_id', 'id');
+        return $this->hasOne(Pembayaran::class, 'earlybird_id', 'id');
     }
 
     protected function casts(): array
@@ -73,10 +59,10 @@ class Registrasi extends Model
             'uuid_registrasi' => 'string',
             'ukuran_jersey' => UkuranJersey::class,
             'tipe_kartu_identitas' => TipeKartuIdentitas::class,
+            'kategori_lomba' => KategoriLomba::class,
             'golongan_darah' => GolonganDarah::class,
             'status_registrasi' => StatusRegistrasi::class,
             'jenis_kelamin' => JenisKelamin::class,
-            'status_pendaftaran' => StatusPendaftaran::class,
             'is_earlybird' => 'boolean',
         ];
     }

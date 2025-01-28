@@ -56,12 +56,13 @@ class AppPanelProvider extends PanelProvider
             ->brandLogo(asset('frontend/running/Logo_7.png'))
             ->darkModeBrandLogo(asset('frontend/running/Logo_8.png'))
             ->brandLogoHeight('2.5em')
+            ->favicon(asset('frontend/running/favicon.png'))
             ->plugins([
                 BreezyCore::make()
                     ->myProfile(
                         navigationGroup: 'Pengaturan',
                     ),
-                FilamentWebhookClientPlugin::make(),
+                //                FilamentWebhookClientPlugin::make(),
             ])
             ->discoverResources(in: app_path('Filament/App/Resources'), for: 'App\\Filament\\App\\Resources')
             ->discoverPages(in: app_path('Filament/App/Pages'), for: 'App\\Filament\\App\\Pages')

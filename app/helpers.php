@@ -2,25 +2,24 @@
 
 declare(strict_types=1);
 
-use App\Enums\KategoriLomba;
-use App\Supports\Helpers;
 use Carbon\Carbon;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
-if (!function_exists('date_format')) {
+if ( ! function_exists('date_format')) {
     function date_format($date, $format): string
     {
         return Carbon::createFromFormat('Y-m-d', $date)->format($format);
     }
 }
 
-if (!function_exists('midtrans_config')) {
+if ( ! function_exists('midtrans_config')) {
     function midtrans_config(): string
     {
         // Set your Merchant Server Key
-        \Midtrans\Config::$serverKey = config('midtrans.is_production',
-            false) ? config('midtrans.production.server_key') : config('midtrans.sb.server_key');
+        \Midtrans\Config::$serverKey = config(
+            'midtrans.is_production',
+            false,
+        ) ? config('midtrans.production.server_key') : config('midtrans.sb.server_key');
         // Set to Development/Sandbox Environment (default). Set to true for Production Environment (accept real transaction).
         \Midtrans\Config::$isProduction = config('midtrans.is_production', false);
         // Set sanitization on (default)
@@ -32,7 +31,7 @@ if (!function_exists('midtrans_config')) {
     }
 }
 
-if (!function_exists('payment_notification')) {
+if ( ! function_exists('payment_notification')) {
     function payment_notification(string $serverKey, bool $isProduction = false): string
     {
         \Midtrans\Config::$isProduction = $isProduction ?: false;
@@ -47,32 +46,32 @@ if (!function_exists('payment_notification')) {
         $order_id = $notif->order_id;
         $fraud = $notif->fraud_status;
 
-        if ($transaction === 'capture') {
-            if ($type === 'credit_card') {
-                if ($fraud === 'accept') {
-                    return 'Transaction order_id: '.$order_id.' successfully captured using '.$type;
+        if ('capture' === $transaction) {
+            if ('credit_card' === $type) {
+                if ('accept' === $fraud) {
+                    return 'Transaction order_id: ' . $order_id . ' successfully captured using ' . $type;
                 }
             }
         } else {
-            if ($transaction === 'settlement') {
+            if ('settlement' === $transaction) {
                 // TODO set payment status in merchant's database to 'Settlement'
-                $message = 'Transaction order_id: '.$order_id.' successfully transfered using '.$type;
+                $message = 'Transaction order_id: ' . $order_id . ' successfully transfered using ' . $type;
             } else {
-                if ($transaction === 'pending') {
+                if ('pending' === $transaction) {
                     // TODO set payment status in merchant's database to 'Pending'
-                    $message = 'Waiting customer to finish transaction order_id: '.$order_id.' using '.$type;
+                    $message = 'Waiting customer to finish transaction order_id: ' . $order_id . ' using ' . $type;
                 } else {
-                    if ($transaction === 'deny') {
+                    if ('deny' === $transaction) {
                         // TODO set payment status in merchant's database to 'Denied'
-                        $message = 'Payment using '.$type.' for transaction order_id: '.$order_id.' is denied.';
+                        $message = 'Payment using ' . $type . ' for transaction order_id: ' . $order_id . ' is denied.';
                     } else {
-                        if ($transaction === 'expire') {
+                        if ('expire' === $transaction) {
                             // TODO set payment status in merchant's database to 'expire'
-                            $message = 'Payment using '.$type.' for transaction order_id: '.$order_id.' is expired.';
+                            $message = 'Payment using ' . $type . ' for transaction order_id: ' . $order_id . ' is expired.';
                         } else {
-                            if ($transaction === 'cancel') {
+                            if ('cancel' === $transaction) {
                                 // TODO set payment status in merchant's database to 'Denied'
-                                $message = 'Payment using '.$type.' for transaction order_id: '.$order_id.' is canceled.';
+                                $message = 'Payment using ' . $type . ' for transaction order_id: ' . $order_id . ' is canceled.';
                             }
                         }
                     }
@@ -83,11 +82,11 @@ if (!function_exists('payment_notification')) {
     }
 }
 
-if (!function_exists('tanggal_ke_kalimat')) {
+if ( ! function_exists('tanggal_ke_kalimat')) {
     function tanggal_ke_kalimat($tanggal): string
     {
         // Validasi input
-        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $tanggal)) {
+        if ( ! preg_match('/^\d{4}-\d{2}-\d{2}$/', $tanggal)) {
             return 'Format tanggal tidak valid!';
         }
 
@@ -120,15 +119,15 @@ if (!function_exists('tanggal_ke_kalimat')) {
         $tahun_kalimat = terbilang((int) $tahun);
 
         // Gabungkan bagian-bagian tanggal menjadi kalimat
-        return $hari_kalimat.' '.$bulan_kalimat.' Tahun '.$tahun_kalimat;
+        return $hari_kalimat . ' ' . $bulan_kalimat . ' Tahun ' . $tahun_kalimat;
     }
 }
 
-if (!function_exists('terbilang')) {
+if ( ! function_exists('terbilang')) {
     function terbilang($angka): string
     {
         // Validasi input
-        if (!is_numeric($angka)) {
+        if ( ! is_numeric($angka)) {
             return 'Masukan harus berupa angka!';
         }
 
@@ -148,51 +147,49 @@ if (!function_exists('terbilang')) {
             return $angka_huruf[$angka];
         }
         if ($angka < 20) {
-            return terbilang($angka - 10).' Belas';
+            return terbilang($angka - 10) . ' Belas';
         }
         if ($angka < 100) {
-            return terbilang($angka / 10).' Puluh '.terbilang($angka % 10);
+            return terbilang($angka / 10) . ' Puluh ' . terbilang($angka % 10);
         }
         if ($angka < 200) {
-            return 'Seratus '.terbilang($angka - 100);
+            return 'Seratus ' . terbilang($angka - 100);
         }
         if ($angka < 1000) {
-            return terbilang($angka / 100).' Ratus '.terbilang($angka % 100);
+            return terbilang($angka / 100) . ' Ratus ' . terbilang($angka % 100);
         }
         if ($angka < 2000) {
-            return 'Seribu '.terbilang($angka - 1000);
+            return 'Seribu ' . terbilang($angka - 1000);
         }
         if ($angka < 1000000) {
-            return terbilang($angka / 1000).' Ribu '.terbilang($angka % 1000);
+            return terbilang($angka / 1000) . ' Ribu ' . terbilang($angka % 1000);
         }
         if ($angka < 1000000000) {
-            return terbilang($angka / 1000000).' Juta '.terbilang($angka % 1000000);
+            return terbilang($angka / 1000000) . ' Juta ' . terbilang($angka % 1000000);
         }
         if ($angka < 1000000000000) {
-            return terbilang($angka / 1000000000).' Miliar '.terbilang($angka % 1000000000);
+            return terbilang($angka / 1000000000) . ' Miliar ' . terbilang($angka % 1000000000);
         }
-        return terbilang($angka / 1000000000000).' Triliun '.terbilang($angka % 1000000000000);
+        return terbilang($angka / 1000000000000) . ' Triliun ' . terbilang($angka % 1000000000000);
     }
 }
 
-if (!function_exists('replace_nama_file_excel')) {
+if ( ! function_exists('replace_nama_file_excel')) {
     function replace_nama_file_excel($namafile): string
     {
         return str_replace(['/', "\\", ':', '*', '?', '«', '<', '>', '|'], '-', $namafile);
     }
 }
 
-if (!function_exists('biaya_pendaftaran')) {
-    function biaya_pendaftaran(string $kategoriLomba): int
+if ( ! function_exists('biaya_pendaftaran')) {
+    function biaya_pendaftaran($kategoriLomba): int|float|null
     {
-        $format = 'Rp. ';
-        $biayaPendaftaran = ($kategoriLomba === KategoriLomba::DELAPAN_K->value ) ? 200000 : 250000;
-        return $biayaPendaftaran;
-//        return $format . Number::format($biayaPendaftaran, 0, null, 'id');
+        $biayaPendaftaran = \App\Models\KategoriLomba::find($kategoriLomba);
+        return $biayaPendaftaran->harga;
     }
 }
 
-if (!function_exists('cek_batas_input')) {
+if ( ! function_exists('cek_batas_input')) {
     function cek_batas_input($date): bool
     {
         $date = $date instanceof Carbon ? $date : Carbon::parse($date)->format('Y-m-d');
@@ -201,7 +198,7 @@ if (!function_exists('cek_batas_input')) {
     }
 }
 
-if (!function_exists('hitung_umur')) {
+if ( ! function_exists('hitung_umur')) {
     function hitung_umur($date, $format = false): string|int
     {
         $date = $date instanceof Carbon ? $date->format('Y-m-d') : Carbon::parse($date)->format('Y-m-d');
@@ -216,7 +213,7 @@ if (!function_exists('hitung_umur')) {
     }
 }
 
-if (!function_exists('list_tahun')) {
+if ( ! function_exists('list_tahun')) {
     function list_tahun(): array
     {
         $year_range = range(date('Y'), date('Y') - 3);
@@ -225,11 +222,11 @@ if (!function_exists('list_tahun')) {
     }
 }
 
-if (!function_exists('getModelList')) {
+if ( ! function_exists('getModelList')) {
     function getModelList(): array
     {
         $modelList = [];
-        $path = app_path().'/Models';
+        $path = app_path() . '/Models';
         $results = scandir($path);
 
         foreach ($results as $result) {
@@ -249,14 +246,14 @@ if (!function_exists('getModelList')) {
     }
 }
 
-if (!function_exists('convertNameBasedOnModelName')) {
+if ( ! function_exists('convertNameBasedOnModelName')) {
     function convertNameBasedOnModelName(Stringable|string $name): Stringable|string
     {
         return Str::of($name)->prepend('Bantuan')->camel()->ucfirst();
     }
 }
 
-if (!function_exists('list_bulan')) {
+if ( ! function_exists('list_bulan')) {
     function list_bulan($short = false): array
     {
         if ($short) {
@@ -293,7 +290,7 @@ if (!function_exists('list_bulan')) {
     }
 }
 
-if (!function_exists('bulan_to_integer')) {
+if ( ! function_exists('bulan_to_integer')) {
     function bulan_to_integer($bulan, $short = false): ?string
     {
         $bulan = Str::upper($bulan);
@@ -334,7 +331,7 @@ if (!function_exists('bulan_to_integer')) {
     }
 }
 
-if (!function_exists('bulan_to_string')) {
+if ( ! function_exists('bulan_to_string')) {
     function bulan_to_string(int|string $bulan, $short = false): string
     {
         $bulan = is_int($bulan) ? $bulan : (int) $bulan;
@@ -372,7 +369,7 @@ if (!function_exists('bulan_to_string')) {
         };
     }
 
-    if (!function_exists('convertToRoman')) {
+    if ( ! function_exists('convertToRoman')) {
         function convertToRoman($integer): string
         {
             // Convert the integer into an integer (just to make sure)

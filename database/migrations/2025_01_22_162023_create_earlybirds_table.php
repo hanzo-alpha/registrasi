@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use App\Enums\StatusPendaftaran;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -10,9 +9,9 @@ use Illuminate\Support\Facades\Schema;
 return new class () extends Migration {
     public function up(): void
     {
-        Schema::create('registrasi', function (Blueprint $table): void {
+        Schema::create('earlybird', function (Blueprint $table): void {
             $table->id();
-            $table->uuid('uuid_registrasi')->nullable()->default(Str::uuid()->toString());
+            $table->uuid('uuid_earlybird')->nullable()->default(Str::uuid()->toString());
             $table->string('nama_lengkap');
             $table->string('email');
             $table->string('no_telp');
@@ -32,17 +31,16 @@ return new class () extends Migration {
             $table->string('kewarganegaraan');
             $table->string('ukuran_jersey');
             $table->unsignedBigInteger('jumlah_peserta');
-            $table->foreignId('kategori_lomba')->nullable();
+            $table->string('kategori_lomba')->nullable();
             $table->string('komunitas')->nullable();
             $table->unsignedTinyInteger('is_earlybird')->nullable()->default(0);
-            $table->string('status_registrasi')->nullable();
-            $table->string('status_pendaftaran')->nullable()->default(StatusPendaftaran::EARLYBIRD);
+            $table->string('status_earlybird')->nullable();
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('registrasi');
+        Schema::dropIfExists('earlybird');
     }
 };
