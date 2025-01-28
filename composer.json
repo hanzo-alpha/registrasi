@@ -92,6 +92,21 @@
             "@pint",
             "@pest",
             "@phpstan"
+        ],
+        "cache-app": [
+            "@php artisan optimize",
+            "@php artisan icons:cache",
+            "@php artisan filament:cache-components"
+        ],
+        "clearcache-app": [
+            "@php artisan optimize:clear",
+            "@php artisan filament:clear-cached-components"
+        ],
+        "clear-jobs": [
+            "@php artisan queue:flush",
+            "@php artisan queue:clear",
+            "@php artisan queue:prune-batches",
+            "@php artisan queue:prune-failed"
         ]
     },
     "extra": {

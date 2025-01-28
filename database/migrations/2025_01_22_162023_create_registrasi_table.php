@@ -33,6 +33,7 @@ return new class () extends Migration {
             $table->unsignedBigInteger('jumlah_peserta');
             $table->string('kategori_lomba')->nullable();
             $table->string('komunitas')->nullable();
+            $table->unsignedTinyInteger('is_earlybird')->nullable()->default(0);
             $table->string('status_registrasi')->nullable();
             $table->timestamps();
         });
