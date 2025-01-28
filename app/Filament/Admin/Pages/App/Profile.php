@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Filament\Pages\App;
+declare(strict_types=1);
+
+namespace App\Filament\Admin\Pages\App;
 
 use App\Filament\Actions\GeneratePasswordAction;
 use Filament\Forms\Components\Section;

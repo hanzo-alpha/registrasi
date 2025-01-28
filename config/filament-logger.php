@@ -1,23 +1,25 @@
 <?php
+
+declare(strict_types=1);
 return [
     'datetime_format' => 'd/m/Y H:i:s',
     'date_format' => 'd/m/Y',
 
     'activity_resource' => \Z3d0X\FilamentLogger\Resources\ActivityResource::class,
-	'scoped_to_tenant' => true,
-	'navigation_sort' => null,
+    'scoped_to_tenant' => true,
+    'navigation_sort' => null,
 
     'resources' => [
         'enabled' => true,
         'log_name' => 'Resource',
         'logger' => \Z3d0X\FilamentLogger\Loggers\ResourceLogger::class,
         'color' => 'success',
-		
+
         'exclude' => [
-            //App\Filament\Resources\UserResource::class,
+            //App\Filament\Admin\Resources\UserResource::class,
         ],
         'cluster' => null,
-        'navigation_group' =>'Settings',
+        'navigation_group' => 'Settings',
     ],
 
     'access' => [

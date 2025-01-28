@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use App\Enums\GolonganDarah;
@@ -39,9 +41,15 @@ class Registrasi extends Model
         'ukuran_jersey',
         'jumlah_peserta',
         'kategori_lomba',
+        'komunitas',
         'status_registrasi',
         'uuid_registrasi',
     ];
+
+    public function pembayaran(): HasOne
+    {
+        return $this->hasOne(Pembayaran::class, 'registrasi_id', 'id');
+    }
 
     protected function casts(): array
     {
@@ -55,10 +63,5 @@ class Registrasi extends Model
             'status_registrasi' => StatusRegistrasi::class,
             'jenis_kelamin' => JenisKelamin::class,
         ];
-    }
-
-    public function pembayaran(): HasOne
-    {
-        return $this->hasOne(Pembayaran::class, 'registrasi_id', 'id');
     }
 }

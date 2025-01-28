@@ -1,9 +1,13 @@
 <?php
 
-namespace App\Filament\Resources;
+declare(strict_types=1);
+
+namespace App\Filament\Admin\Resources;
 
 use App\Filament\Actions\GeneratePasswordAction;
-use App\Filament\Resources\UserResource\Pages;
+use App\Filament\Admin\Resources\UserResource\Pages\CreateUser;
+use App\Filament\Admin\Resources\UserResource\Pages\EditUser;
+use App\Filament\Admin\Resources\UserResource\Pages\ListUsers;
 use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Components\TextInput;
@@ -55,12 +59,12 @@ class UserResource extends Resource
                         TextInput::make('password')
                             ->label(__('filament-panels::pages/auth/edit-profile.form.password.label'))
                             ->password()
-                            ->required(fn ($livewire) => $livewire instanceof Pages\CreateUser)
+                            ->required(fn($livewire) => $livewire instanceof CreateUser)
                             ->revealable(filament()->arePasswordsRevealable())
                             ->rule(Password::default())
                             ->autocomplete('new-password')
-                            ->dehydrated(fn ($state): bool => filled($state))
-                            ->dehydrateStateUsing(fn ($state): string => Hash::make($state))
+                            ->dehydrated(fn($state): bool => filled($state))
+                            ->dehydrateStateUsing(fn($state): string => Hash::make($state))
                             ->live(debounce: 500)
                             ->same('passwordConfirmation')
                             ->suffixActions([
@@ -71,7 +75,7 @@ class UserResource extends Resource
                             ->password()
                             ->revealable(filament()->arePasswordsRevealable())
                             ->required()
-                            ->visible(fn (Get $get): bool => filled($get('password')))
+                            ->visible(fn(Get $get): bool => filled($get('password')))
                             ->dehydrated(false),
                     ]),
             ]);
@@ -97,7 +101,7 @@ class UserResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -112,16 +116,16 @@ class UserResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+
         ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListUsers::route('/'),
-            'create' => Pages\CreateUser::route('/create'),
-            'edit' => Pages\EditUser::route('/{record}/edit'),
+            'index' => ListUsers::route('/'),
+            'create' => CreateUser::route('/create'),
+            'edit' => EditUser::route('/{record}/edit'),
         ];
     }
 }

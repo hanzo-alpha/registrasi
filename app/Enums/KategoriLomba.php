@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Enums;
 
 use Filament\Support\Contracts\HasColor;
@@ -32,7 +34,7 @@ enum KategoriLomba: string implements HasLabel, HasIcon, HasColor
     {
         return match ($this) {
             self::DELAPAN_K => 'heroicon-o-map-pin',
-            self::LIMABELAS_K => 'heroicon-o-map    ',
+            self::LIMABELAS_K => 'heroicon-o-map-pin',
         };
     }
 

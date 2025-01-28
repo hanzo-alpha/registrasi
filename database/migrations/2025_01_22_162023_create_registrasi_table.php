@@ -1,13 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class () extends Migration {
     public function up(): void
     {
-        Schema::create('registrasi', function (Blueprint $table) {
+        Schema::create('registrasi', function (Blueprint $table): void {
             $table->id();
             $table->uuid('uuid_registrasi')->nullable()->default(Str::uuid()->toString());
             $table->string('nama_lengkap');
@@ -30,6 +32,7 @@ return new class extends Migration {
             $table->string('ukuran_jersey');
             $table->unsignedBigInteger('jumlah_peserta');
             $table->string('kategori_lomba')->nullable();
+            $table->string('komunitas')->nullable();
             $table->string('status_registrasi')->nullable();
             $table->timestamps();
         });

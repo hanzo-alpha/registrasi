@@ -1,48 +1,43 @@
 <?php
 
-namespace App\Providers\Filament;
+declare(strict_types=1);
 
-use App\Filament\Pages\App\Profile;
-use App\Filament\Pages\Auth\Login;
-use Filament\Http\Middleware\Authenticate;
+namespace App\Providers;
+
+use Filament\Enums\ThemeMode;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
-use Filament\Widgets;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
-use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Jeffgreco13\FilamentBreezy\BreezyCore;
 use Tapp\FilamentWebhookClient\FilamentWebhookClientPlugin;
 
-class AdminPanelProvider extends PanelProvider
+class AppPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
         return $panel
-            ->id('admin')
-            ->path('admin')
-            ->login(Login::class)
-            ->passwordReset()
-            ->sidebarCollapsibleOnDesktop()
-//            ->sidebarFullyCollapsibleOnDesktop()
+            ->default()
+            ->id('app')
+            ->path('app')
+            ->topNavigation()
+            ->topbar(true)
             ->spa()
-            ->profile(Profile::class, false)
-            ->databaseNotifications()
             ->databaseTransactions()
-            ->viteTheme('resources/css/filament/admin/theme.css')
+//            ->darkMode(true)
+            ->defaultThemeMode(ThemeMode::Dark)
             ->colors([
                 'danger' => Color::Rose,
                 'gray' => Color::Gray,
                 'info' => Color::Blue,
-                'primary' => Color::Lime,
+                'primary' => Color::Yellow,
                 'success' => Color::Emerald,
                 'warning' => Color::Orange,
                 'secondary' => Color::Blue,
@@ -55,8 +50,12 @@ class AdminPanelProvider extends PanelProvider
                 'red' => Color::Red,
                 'green' => Color::Green,
                 'amber' => Color::Amber,
-                'yellow' => Color::Yellow,
+                'lime' => Color::Lime,
             ])
+            ->font('Montserrat')
+            ->brandLogo(asset('frontend/running/Logo_7.png'))
+            ->darkModeBrandLogo(asset('frontend/running/Logo_8.png'))
+            ->brandLogoHeight('2.5em')
             ->plugins([
                 BreezyCore::make()
                     ->myProfile(
@@ -64,27 +63,21 @@ class AdminPanelProvider extends PanelProvider
                     ),
                 FilamentWebhookClientPlugin::make(),
             ])
-            ->resources([
-                config('filament-logger.activity_resource')
-            ])
-            ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
-            ->globalSearchFieldKeyBindingSuffix()
-            ->font('Poppins')
-            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
-            ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
+            ->discoverResources(in: app_path('Filament/App/Resources'), for: 'App\\Filament\\App\\Resources')
+            ->discoverPages(in: app_path('Filament/App/Pages'), for: 'App\\Filament\\App\\Pages')
             ->pages([
-                Pages\Dashboard::class,
+                //                Pages\Dashboard::class,
             ])
-            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
+            ->discoverWidgets(in: app_path('Filament/App/Widgets'), for: 'App\\Filament\\App\\Widgets')
             ->widgets([
-                Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
+                //                Widgets\AccountWidget::class,
+                //                Widgets\FilamentInfoWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
                 StartSession::class,
-                AuthenticateSession::class,
+                //                AuthenticateSession::class,
                 ShareErrorsFromSession::class,
                 VerifyCsrfToken::class,
                 SubstituteBindings::class,
@@ -92,7 +85,7 @@ class AdminPanelProvider extends PanelProvider
                 DispatchServingFilamentEvent::class,
             ])
             ->authMiddleware([
-                Authenticate::class,
+                //                Authenticate::class,
             ]);
     }
 }

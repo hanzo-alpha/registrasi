@@ -1,9 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\App\Pages;
 
 use App\Enums\GolonganDarah;
-use App\Enums\JenisBayar;
 use App\Enums\JenisKelamin;
 use App\Enums\KategoriLomba;
 use App\Enums\PaymentStatus;
@@ -30,6 +31,9 @@ use Filament\Pages\Concerns\InteractsWithFormActions;
 use Filament\Pages\Page;
 use Filament\Support\Exceptions\Halt;
 use Filament\Support\Facades\FilamentView;
+
+use function Filament\Support\is_app_url;
+
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Blade;
@@ -42,7 +46,6 @@ use KodePandai\Indonesia\Models\Province;
 use Livewire\Attributes\On;
 use Parfaitementweb\FilamentCountryField\Forms\Components\Country;
 use Throwable;
-use function Filament\Support\is_app_url;
 
 class Pendaftaran extends Page implements HasForms
 {
@@ -82,8 +85,8 @@ class Pendaftaran extends Page implements HasForms
                                             ->icon('heroicon-s-clipboard-document-check')
                                             ->action(function ($livewire, $state): void {
                                                 $livewire->js(
-                                                    'window.navigator.clipboard.writeText("'.$state.'");
-                                        $tooltip("'.__('Copied to clipboard').'", { timeout: 1500 });',
+                                                    'window.navigator.clipboard.writeText("' . $state . '");
+                                        $tooltip("' . __('Copied to clipboard') . '", { timeout: 1500 });',
                                                 );
                                             }),
                                     )
@@ -201,6 +204,9 @@ class Pendaftaran extends Page implements HasForms
                                     ->default(1)
                                     ->dehydrated()
                                     ->maxLength(255),
+                                Forms\Components\TextInput::make('komunitas')
+                                    ->label('Komunitas (Optional)')
+                                    ->maxLength(255),
                                 Forms\Components\Select::make('kategori_lomba')
                                     ->label('Kategori Lomba')
                                     ->options(KategoriLomba::class)
@@ -273,7 +279,7 @@ class Pendaftaran extends Page implements HasForms
 
         $registrasi->status_registrasi = $statusRegistrasi;
 
-        $statusDaftar = ($statusRegistrasi === StatusRegistrasi::BERHASIL)
+        $statusDaftar = (StatusRegistrasi::BERHASIL === $statusRegistrasi)
             ? StatusDaftar::TERDAFTAR
             : StatusDaftar::BELUM_TERDAFTAR;
 
@@ -294,8 +300,9 @@ class Pendaftaran extends Page implements HasForms
                 ->title('Belum ada Pembayaran')
                 ->danger()
                 ->body(
-                    'Transaksi dengan order id: '.$orderId.' belum melakukan pembayaran sebesar Rp. '
-                    .Number::format((int) $grossAmount, locale: 'id'))
+                    'Transaksi dengan order id: ' . $orderId . ' belum melakukan pembayaran sebesar Rp. '
+                    . Number::format((int) $grossAmount, locale: 'id'),
+                )
                 ->icon('heroicon-o-x-circle')
                 ->send();
         }
@@ -305,11 +312,11 @@ class Pendaftaran extends Page implements HasForms
                 ->title('Menunggu Pembayaran')
                 ->warning()
                 ->body(
-                    'Transaksi dengan order id: '.$orderId.' masih menunggu pembayaran sebesar Rp. '
-                    .Number::format(
+                    'Transaksi dengan order id: ' . $orderId . ' masih menunggu pembayaran sebesar Rp. '
+                    . Number::format(
                         (int) $grossAmount,
                         locale: 'id',
-                    )
+                    ),
                 )
                 ->icon('heroicon-o-information-circle')
                 ->send();
@@ -320,11 +327,11 @@ class Pendaftaran extends Page implements HasForms
                 ->title('Pembayaran Gagal')
                 ->danger()
                 ->body(
-                    'Transaksi dengan order id: '.$orderId.' gagal melakukan pembayaran sebesar Rp. '
-                    .Number::format(
+                    'Transaksi dengan order id: ' . $orderId . ' gagal melakukan pembayaran sebesar Rp. '
+                    . Number::format(
                         (int) $grossAmount,
                         locale: 'id',
-                    )
+                    ),
                 )
                 ->icon('heroicon-o-x-mark')
                 ->send();
@@ -333,10 +340,11 @@ class Pendaftaran extends Page implements HasForms
         return Notification::make()
             ->title('Pembayaran Berhasil')
             ->success()
-            ->body('Transaksi dengan order id: '.$orderId.' telah berhasil dilakukan pada '.
-                Carbon::parse($transactionTime)->format('d/m/Y H:i:s').'. sebesar Rp. '.
-                Number::format((int) $grossAmount, locale: 'id')
-               )
+            ->body(
+                'Transaksi dengan order id: ' . $orderId . ' telah berhasil dilakukan pada ' .
+                Carbon::parse($transactionTime)->format('d/m/Y H:i:s') . '. sebesar Rp. ' .
+                Number::format((int) $grossAmount, locale: 'id'),
+            )
             ->icon('heroicon-o-check-circle')
             ->send();
     }
@@ -408,7 +416,7 @@ class Pendaftaran extends Page implements HasForms
         $biaya = biaya_pendaftaran($data['kategori_lomba']);
         $data['jumlah_peserta'] ??= 1;
         $totalHarga = (int) $data['jumlah_peserta'] * $biaya;
-        $namaKegiatan = 'Pendaftaran Bantaeng Trail Run 2025 Kategori Lomba - '.$data['kategori_lomba'];
+        $namaKegiatan = 'Pendaftaran Bantaeng Trail Run 2025 Kategori Lomba - ' . $data['kategori_lomba'];
         $merchant = 'Freelethics Bantaeng';
 
         midtrans_config();
@@ -508,7 +516,7 @@ class Pendaftaran extends Page implements HasForms
                 ->model($this->getModel())
                 ->statePath($this->getFormStatePath())
                 ->columns($this->hasInlineLabels() ? 1 : 2)
-                ->inlineLabel($this->hasInlineLabels()),),
+                ->inlineLabel($this->hasInlineLabels()), ),
         ];
     }
 
