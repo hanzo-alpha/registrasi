@@ -96,12 +96,13 @@
         ],
         "cache-app": [
             "@php artisan optimize",
+            "@php artisan filament:optimize",
             "@php artisan icons:cache",
             "@php artisan filament:cache-components"
         ],
         "clearcache-app": [
             "@php artisan optimize:clear",
-            "@php artisan filament:clear-cached-components"
+            "@php artisan filament:optimize-clear"
         ],
         "clear-jobs": [
             "@php artisan queue:flush",
