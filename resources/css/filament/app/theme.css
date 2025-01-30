@@ -10,17 +10,17 @@
     border-right: 1px solid #18181B;
 }
 
-.fi-main-ctn {
-    background-image: url('../../../../public/frontend/running/Background Earlybird.png');
-    background-repeat: no-repeat;
-    background-position: center center;
-    background-size: cover;
-}
+/*.fi-main-ctn {*/
+/*    background-image: url('../../../../public/frontend/running/Background Earlybird.png');*/
+/*    background-repeat: no-repeat;*/
+/*    background-position: center center;*/
+/*    background-size: cover;*/
+/*}*/
 
-.fi-header-heading {
-    @apply text-black dark:text-black
-}
+/*.fi-header-heading {*/
+/*    @apply text-black dark:text-black*/
+/*}*/
 
-.fi-header-subheading {
-    @apply text-black dark:text-black
-}
+/*.fi-header-subheading {*/
+/*    @apply text-black dark:text-black*/
+/*}*/

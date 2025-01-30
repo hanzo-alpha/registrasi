@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use App\Filament\Admin\Pages\App\Profile;
 use App\Filament\Admin\Pages\Auth\Login;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -36,7 +35,6 @@ class AdminPanelProvider extends PanelProvider
             ->sidebarCollapsibleOnDesktop()
 //            ->sidebarFullyCollapsibleOnDesktop()
             ->spa()
-//            ->profile(Profile::class, false)
             ->databaseNotifications()
             ->databaseTransactions()
 //            ->viteTheme('resources/css/filament/admin/theme.css')

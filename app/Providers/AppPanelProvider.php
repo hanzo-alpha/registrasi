@@ -33,7 +33,6 @@ class AppPanelProvider extends PanelProvider
             ->spa()
             ->databaseNotifications()
             ->databaseTransactions()
-//            ->darkMode(true)
             ->defaultThemeMode(ThemeMode::Dark)
             ->colors([
                 'danger' => Color::Rose,
@@ -61,6 +60,9 @@ class AppPanelProvider extends PanelProvider
             ->favicon(asset('frontend/running/favicon.png'))
             ->plugins([
                 BreezyCore::make()
+                    ->enableTwoFactorAuthentication(
+                        force: false,
+                    )
                     ->myProfile(
                         navigationGroup: 'Pengaturan',
                     ),
