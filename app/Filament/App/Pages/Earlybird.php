@@ -14,6 +14,7 @@ use App\Enums\StatusRegistrasi;
 use App\Enums\TipeBayar;
 use App\Enums\TipeKartuIdentitas;
 use App\Enums\UkuranJersey;
+use App\Models\KategoriLomba;
 use App\Models\Pembayaran;
 use App\Services\MidtransAPI;
 use Exception;
@@ -424,12 +425,12 @@ class Earlybird extends Page implements HasForms
         $uuidPembayaran = \Str::uuid()->toString();
         $data['status_earlybird'] ??= StatusRegistrasi::BELUM_BAYAR;
         $data['provinsi'] ??= '74';
-        $biaya = biaya_pendaftaran($data['kategori_lomba']);
+        $biaya = biaya_pendaftaran($data['kategori_lomba']) ?? 0;
         $qty = 1;
         $totalHarga = $qty * $biaya;
-        $kategori = \App\Models\KategoriLomba::find($data['kategori_lomba']);
+        $kategori = KategoriLomba::find($data['kategori_lomba']);
         $namaKegiatan = 'Pendaftaran Early Bird Bantaeng Trail Run 2025 Kategori Lomba - ' . $kategori->nama;
-        $merchant = 'Freelethics Bantaeng';
+        $merchant = 'Freeletics Bantaeng';
 
         midtrans_config();
 
