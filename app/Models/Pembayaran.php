@@ -58,12 +58,12 @@ class Pembayaran extends Model
 
     public function earlybird(): BelongsTo
     {
-        return $this->belongsTo(Earlybird::class);
+        return $this->belongsTo(Earlybird::class, 'registrasi_id', 'id');
     }
 
     public function kategori(): BelongsTo
     {
-        return $this->belongsTo(KategoriLomba::class);
+        return $this->belongsTo(KategoriLomba::class, 'kategori_lomba', 'id');
     }
 
     protected function casts(): array
