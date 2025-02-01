@@ -26,7 +26,13 @@ class RegistrasiResource extends Resource
 {
     protected static ?string $model = Registrasi::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-document-plus';
+    protected static ?string $label = 'Pendaftaran Normal';
+    protected static ?string $modelLabel = 'Pendaftaran Normal';
+    protected static ?string $pluralLabel = 'Pendaftaran Normal';
+    protected static ?string $pluralModelLabel = 'Pendaftaran Normal';
+    protected static ?string $navigationLabel = 'Pendaftaran Normal';
+    protected static ?string $navigationGroup = 'Pendaftaran';
 
     protected static ?string $recordTitleAttribute = 'nama_lengkap';
 

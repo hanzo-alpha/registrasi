@@ -23,6 +23,14 @@ class PembayaranResource extends Resource
     protected static ?string $model = Pembayaran::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-credit-card';
+    protected static ?string $label = 'Pembayaran';
+    protected static ?string $modelLabel = 'Pembayaran';
+    protected static ?string $pluralLabel = 'Pembayaran';
+    protected static ?string $pluralModelLabel = 'Pembayaran';
+    protected static ?string $navigationLabel = 'Pembayaran';
+    protected static ?string $navigationGroup = 'Pendaftaran';
+
+    protected static ?string $recordTitleAttribute = 'nama_kegiatan';
 
     public static function form(Form $form): Form
     {

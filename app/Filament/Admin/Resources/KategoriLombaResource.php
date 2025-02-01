@@ -17,7 +17,15 @@ class KategoriLombaResource extends Resource
 {
     protected static ?string $model = KategoriLomba::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-tag';
+    protected static ?string $label = 'Kategori Lomba';
+    protected static ?string $modelLabel = 'Kategori Lomba';
+    protected static ?string $pluralLabel = 'Kategori Lomba';
+    protected static ?string $pluralModelLabel = 'Kategori Lomba';
+    protected static ?string $navigationLabel = 'Kategori Lomba';
+    protected static ?string $navigationGroup = 'Master';
+
+    protected static ?string $recordTitleAttribute = 'nama';
 
     public static function form(Form $form): Form
     {

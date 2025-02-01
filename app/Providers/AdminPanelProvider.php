@@ -67,6 +67,12 @@ class AdminPanelProvider extends PanelProvider
             ->resources([
                 config('filament-logger.activity_resource'),
             ])
+            ->navigationGroups([
+                'Pendaftaran',
+                'Master',
+                'Settings',
+                'Webhooks',
+            ])
             ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
             ->globalSearchFieldKeyBindingSuffix()
             ->font('Poppins')

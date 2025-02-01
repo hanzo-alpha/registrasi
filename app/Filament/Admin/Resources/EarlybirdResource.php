@@ -24,7 +24,15 @@ class EarlybirdResource extends Resource
 {
     protected static ?string $model = Earlybird::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-document-plus';
+    protected static ?string $label = 'Pendaftaran Earlybird';
+    protected static ?string $modelLabel = 'Pendaftaran Earlybird';
+    protected static ?string $pluralLabel = 'Pendaftaran Earlybird';
+    protected static ?string $pluralModelLabel = 'Pendaftaran Earlybird';
+    protected static ?string $navigationLabel = 'Pendaftaran Earlybird';
+    protected static ?string $navigationGroup = 'Pendaftaran';
+
+    protected static ?string $recordTitleAttribute = 'nama_lengkap';
 
     public static function form(Form $form): Form
     {
