@@ -33,8 +33,8 @@ enum StatusPendaftaran: string implements HasLabel, HasIcon, HasDescription, Has
     public function getColor(): ?string
     {
         return match ($this) {
-            self::EARLYBIRD => 'success',
-            self::NORMAL => 'danger',
+            self::EARLYBIRD => 'primary',
+            self::NORMAL => 'secondary',
         };
     }
 
