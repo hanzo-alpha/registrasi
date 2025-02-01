@@ -12,6 +12,10 @@ use App\Filament\Admin\Resources\EarlybirdResource\Pages;
 use App\Models\Earlybird;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Infolists\Components\Group;
+use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -142,6 +146,52 @@ class EarlybirdResource extends Resource
             ]);
     }
 
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist->schema([
+            Group::make()->schema([
+                Section::make('Data Peserta')->schema([
+                    TextEntry::make('nama_lengkap'),
+                    TextEntry::make('email'),
+                    TextEntry::make('no_telp'),
+                    TextEntry::make('jenis_kelamin')
+                        ->badge(),
+                    TextEntry::make('tempat_lahir'),
+                    TextEntry::make('tanggal_lahir')->date('d M Y'),
+                    TextEntry::make('alamat')->columnSpanFull(),
+                    TextEntry::make('negara'),
+                    TextEntry::make('prov.name'),
+                    TextEntry::make('kab.name'),
+                    TextEntry::make('kec.name'),
+                    TextEntry::make('tipe_kartu_identitas')->badge(),
+                    TextEntry::make('nomor_kartu_identitas'),
+                    TextEntry::make('nama_kontak_darurat'),
+                    TextEntry::make('nomor_kontak_darurat'),
+                    TextEntry::make('golongan_darah')->badge(),
+                ])->columns(2),
+            ])->columnSpan(2),
+            Group::make()->schema([
+                Section::make('Status Peserta')->schema([
+
+                    TextEntry::make('ukuran_jersey')->badge(),
+                    TextEntry::make('kategori.nama')->badge(),
+                    TextEntry::make('komunitas')->badge(),
+                    TextEntry::make('status_earlybird')->badge(),
+                ])->columns(2),
+                Section::make('Pembayaran')->schema([
+                    TextEntry::make('pembayaran.tipe_pembayaran')
+                        ->label('Tipe Bayar')->badge(),
+                    TextEntry::make('pembayaran.status_pembayaran')
+                        ->label('Status Pembayaran')->badge(),
+                    TextEntry::make('pembayaran.status_pendaftaran')
+                        ->label('Status Pendaftaran')->badge(),
+                    TextEntry::make('pembayaran.status_transaksi')
+                        ->label('Status Transaksi')->badge(),
+                ])->columns(2),
+            ])->columns(1),
+        ])->columns(3);
+    }
+
     public static function table(Table $table): Table
     {
         return $table
@@ -151,59 +201,74 @@ class EarlybirdResource extends Resource
                 Tables\Columns\TextColumn::make('email')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('no_telp')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('jenis_kelamin')
                     ->searchable()
                     ->sortable()
                     ->badge()
-                    ->toggleable(),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('tempat_lahir')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('tanggal_lahir')
                     ->date()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('alamat')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('negara')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('prov.name')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('kab.name')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('kec.name')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('tipe_kartu_identitas')
                     ->searchable()
                     ->sortable()
                     ->badge()
-                    ->toggleable(),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('nomor_kartu_identitas')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('nama_kontak_darurat')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('nomor_kontak_darurat')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('golongan_darah')
                     ->searchable()
                     ->sortable()
                     ->badge()
-                    ->toggleable(),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('ukuran_jersey')
                     ->searchable()
                     ->sortable()
                     ->badge()
+                    ->alignCenter()
                     ->toggleable(),
-                Tables\Columns\TextColumn::make('kategori_lomba')
+                Tables\Columns\TextColumn::make('kategori.nama')
                     ->searchable()
                     ->sortable()
                     ->badge()
+                    ->alignCenter()
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('komunitas')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('status_earlybird')
                     ->searchable()
                     ->sortable()
                     ->badge()
+                    ->alignCenter()
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
@@ -218,6 +283,7 @@ class EarlybirdResource extends Resource
 
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
@@ -240,6 +306,7 @@ class EarlybirdResource extends Resource
             'index' => Pages\ListEarlybirds::route('/'),
             'create' => Pages\CreateEarlybird::route('/create'),
             'edit' => Pages\EditEarlybird::route('/{record}/edit'),
+            'view' => Pages\ViewEarlybirds::route('/{record}/view'),
         ];
     }
 }
