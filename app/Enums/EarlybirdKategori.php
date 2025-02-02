@@ -40,7 +40,7 @@ enum EarlybirdKategori: string implements HasLabel, HasIcon, HasColor
     public function getLabel(): ?string
     {
         return match ($this) {
-            self::EARLY_DELAPAN_K => 'EARLY 8K - IDR 200K',
+            self::EARLY_DELAPAN_K => 'EARLY 8K - IDR 225K',
             self::EARLY_LIMABELAS_K => 'EARLY 15K - IDR 275K',
         };
     }

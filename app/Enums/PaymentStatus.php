@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Enums;
 
 use Filament\Support\Contracts\HasColor;
@@ -39,14 +41,14 @@ enum PaymentStatus: string implements HasLabel, HasDescription, HasColor
         };
     }
 
-//    public function getIcon(): ?string
-//    {
-//        return match ($this) {
-//            self::AUTHORIZE => 'heroicon-o-shield-check',
-//            self::CAPTURE => 'heroicon-o-camera',
-//            self::SETTLEMENT => 'heroicon-o-x-mark',
-//        };
-//    }
+    //    public function getIcon(): ?string
+    //    {
+    //        return match ($this) {
+    //            self::AUTHORIZE => 'heroicon-o-shield-check',
+    //            self::CAPTURE => 'heroicon-o-camera',
+    //            self::SETTLEMENT => 'heroicon-o-x-mark',
+    //        };
+    //    }
 
     public function getColor(): ?string
     {
@@ -66,8 +68,7 @@ enum PaymentStatus: string implements HasLabel, HasDescription, HasColor
         };
     }
 
-    public
-    function getLabel(): ?string
+    public function getLabel(): ?string
     {
         return match ($this) {
             self::AUTHORIZE => 'Authorize',

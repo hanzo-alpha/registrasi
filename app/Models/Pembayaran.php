@@ -7,7 +7,9 @@ namespace App\Models;
 use App\Enums\PaymentStatus;
 use App\Enums\StatusBayar;
 use App\Enums\StatusDaftar;
+use App\Enums\StatusPendaftaran;
 use App\Enums\TipeBayar;
+use App\Enums\UkuranJersey;
 use App\Traits\HasWilayah;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
@@ -75,6 +77,8 @@ class Pembayaran extends Model
             'status_transaksi' => PaymentStatus::class,
             'status_daftar' => StatusDaftar::class,
             'tipe_pembayaran' => TipeBayar::class,
+            'status_pendaftaran' => StatusPendaftaran::class,
+            'ukuran_jersey' => UkuranJersey::class,
         ];
     }
 
