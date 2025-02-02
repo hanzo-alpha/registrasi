@@ -17,6 +17,7 @@ use App\Enums\UkuranJersey;
 use App\Models\KategoriLomba;
 use App\Models\Pembayaran;
 use App\Services\MidtransAPI;
+use Closure;
 use Exception;
 use Filament\Actions\Action;
 use Filament\Forms;
@@ -119,7 +120,17 @@ class Earlybird extends Page implements HasForms
                                     ->label('Tanggal Lahir')
                                     ->required()
                                     ->displayFormat('d-m-Y')
-                                    ->format('Y-m-d'),
+                                    ->format('Y-m-d')
+                                    ->rules([
+                                        function () {
+                                            return function (string $attribute, mixed $value, Closure $fail): void {
+                                                $umur = Carbon::parse($value)->age;
+                                                if ($umur < 18) {
+                                                    $fail('Tanggal lahir harus lebih dari 18 tahun');
+                                                }
+                                            };
+                                        },
+                                    ]),
                                 Forms\Components\Select::make('jenis_kelamin')
                                     ->label('Jenis Kelamin')
                                     ->options(JenisKelamin::class)
