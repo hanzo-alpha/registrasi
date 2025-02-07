@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use App\Enums\StatusPendaftaran;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -12,7 +11,8 @@ return new class () extends Migration {
     {
         Schema::create('pembayaran', function (Blueprint $table): void {
             $table->id();
-            $table->uuid('uuid_pembayaran')->nullable()->index()->default(Str::uuid()->toString());
+            $table->uuid('uuid_pembayaran')->nullable()->index();
+            $table->uuid('order_id')->nullable()->index();
             $table->foreignId('registrasi_id')->index()->nullable();
             $table->string('nama_kegiatan')->nullable();
             $table->string('ukuran_jersey')->nullable();
@@ -25,7 +25,7 @@ return new class () extends Migration {
             $table->string('status_pembayaran')->nullable();
             $table->string('status_transaksi')->nullable();
             $table->boolean('status_daftar')->nullable()->default(false);
-            $table->string('status_pendaftaran')->nullable()->default(StatusPendaftaran::EARLYBIRD);
+            $table->string('status_pendaftaran')->nullable();
             $table->string('keterangan')->nullable();
             $table->json('detail_transaksi')->nullable();
             $table->string('lampiran')->nullable();

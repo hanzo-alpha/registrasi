@@ -33,10 +33,13 @@ if ( ! function_exists('midtrans_config')) {
 }
 
 if ( ! function_exists('payment_notification')) {
-    function payment_notification(string $serverKey, bool $isProduction = false): string
+    function payment_notification(): string
     {
-        \Midtrans\Config::$isProduction = $isProduction ?: false;
-        \Midtrans\Config::$serverKey = $serverKey ?: config('midtrans.sb.server_key');
+        \Midtrans\Config::$isProduction = config('midtrans.is_production', false);
+        \Midtrans\Config::$serverKey = config(
+            'midtrans.is_production',
+            false,
+        ) ? config('midtrans.production.server_key') : config('midtrans.sb.server_key');
 
         $message = '';
 

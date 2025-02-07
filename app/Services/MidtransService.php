@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use AllowDynamicProperties;
+use Exception;
 use Midtrans\Config;
 use Midtrans\Snap;
 
@@ -20,16 +23,8 @@ use Midtrans\Snap;
         $this->setConfig();
     }
 
-    private function setConfig(): void
-    {
-        Config::$serverKey = $this->serverKey;
-        Config::$isProduction = $this->isProduction;
-        Config::$isSanitized = $this->isSanitized;
-        Config::$is3ds = $this->is3ds;
-    }
-
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function getTransactionToken(array $transaction, array $customer): string
     {
@@ -49,7 +44,7 @@ use Midtrans\Snap;
     public function setTransactionDetails(array $transaction_details): array
     {
         $this->transaction_details = [
-            'transaction_details' => $this->transformToArray($transaction_details)
+            'transaction_details' => $this->transformToArray($transaction_details),
         ];
 
         return $this->transaction_details;
@@ -63,7 +58,7 @@ use Midtrans\Snap;
     public function setCustomerDetails(array $customer_details): array
     {
         $this->customer_details = [
-            'customer_details' => $this->transformToArray($customer_details)
+            'customer_details' => $this->transformToArray($customer_details),
         ];
 
         return $this->customer_details;
@@ -71,18 +66,18 @@ use Midtrans\Snap;
 
     public function getSnapToken(array $params): string
     {
-        $params = array(
-            'transaction_details' => array(
+        $params = [
+            'transaction_details' => [
                 'order_id' => rand(),
                 'gross_amount' => 10000,
-            ),
-            'customer_details' => array(
+            ],
+            'customer_details' => [
                 'first_name' => 'budi',
                 'last_name' => 'pratama',
                 'email' => 'budi.pra@example.com',
                 'phone' => '08111222333',
-            ),
-        );
+            ],
+        ];
 
         return Snap::getSnapToken($params);
     }
@@ -94,5 +89,13 @@ use Midtrans\Snap;
             $collect->put($key, $value);
         }
         return $collect->toArray();
+    }
+
+    private function setConfig(): void
+    {
+        Config::$serverKey = $this->serverKey;
+        Config::$isProduction = $this->isProduction;
+        Config::$isSanitized = $this->isSanitized;
+        Config::$is3ds = $this->is3ds;
     }
 }

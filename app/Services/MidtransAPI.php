@@ -6,10 +6,14 @@ namespace App\Services;
 
 use App\Enums\PaymentStatus;
 use App\Enums\StatusBayar;
+use App\Models\Pembayaran;
+use Exception;
 use Filament\Notifications\Notification;
+
+use function hash;
+
 use Illuminate\Support\Facades\Http;
 use Midtrans\Snap;
-use function hash;
 
 class MidtransAPI
 {
@@ -67,7 +71,7 @@ class MidtransAPI
         int $amount,
         string $serverKey,
     ): bool {
-        $signature = $orderId.$statusCode.$amount.$serverKey;
+        $signature = $orderId . $statusCode . $amount . $serverKey;
         $hash = hash('sha512', $signature);
         return hash_equals($signatureKey, $hash);
     }
@@ -77,8 +81,14 @@ class MidtransAPI
      */
     public static function getTransactionStatus(string $orderId): Notification
     {
-        $url = 'https://api.sandbox.midtrans.com/v2/'.$orderId.'/status';
-        $response = Http::acceptJson()->withBasicAuth(config('midtrans.sb.server_key'), '')->get($url);
+        $url = config('midtrans.is_production')
+            ? 'https://api.midtrans.com/v2/' . $orderId . '/status'
+            : 'https://api.sandbox.midtrans.com/v2/' . $orderId . '/status';
+
+        $response = config('midtrans.is_production')
+            ? Http::acceptJson()->withBasicAuth(config('midtrans.sb.server_key'), '')->get($url)
+            : Http::acceptJson()->withBasicAuth(config('midtrans.production.server_key'), '')->get($url);
+
         $detail = $response->json();
 
         if (null === $detail || blank($detail)) {
@@ -89,7 +99,9 @@ class MidtransAPI
                 ->send();
         }
 
-        $update = \App\Models\Pembayaran::where('uuid_registrasi', $detail['order_id'])->first();
+        $update = Pembayaran::where('order_id', $detail['order_id'])->first();
+
+        $notif = MidtransAPI::getTransactionStatus($orderId);
 
         $status = match ($detail['transaction_status']) {
             PaymentStatus::SETTLEMENT->value, PaymentStatus::CAPTURE->value => StatusBayar::SUDAH_BAYAR,
@@ -111,7 +123,7 @@ class MidtransAPI
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public static function getSnapTokenApi(?array $transaction, ?array $items, ?array $customer): string
     {

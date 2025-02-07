@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Filament\Admin\Pages\Auth\Login;
+use Croustibat\FilamentJobsMonitor\FilamentJobsMonitorPlugin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -63,6 +64,7 @@ class AdminPanelProvider extends PanelProvider
                         navigationGroup: 'Pengaturan',
                     ),
                 FilamentWebhookClientPlugin::make(),
+                FilamentJobsMonitorPlugin::make(),
             ])
             ->resources([
                 config('filament-logger.activity_resource'),

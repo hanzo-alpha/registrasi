@@ -58,7 +58,8 @@ class Registrasi extends Model
 
     public function kategori(): BelongsTo
     {
-        return $this->belongsTo(KategoriLomba::class, 'kategori_lomba', 'id');
+        return $this->belongsTo(KategoriLomba::class, 'kategori_lomba', 'id')
+            ->where('kategori', StatusPendaftaran::NORMAL);
     }
 
     public function scopeKategoriLomba(Builder $query, string $kategoriLomba): Builder

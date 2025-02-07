@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Webhooks\RegistrasiProcessWebhookJob;
 
 return [
@@ -27,20 +29,20 @@ return [
              *
              * It should implement \Spatie\WebhookClient\SignatureValidator\SignatureValidator
              */
-//            'signature_validator' => \Spatie\WebhookClient\SignatureValidator\DefaultSignatureValidator::class,
+            //            'signature_validator' => \Spatie\WebhookClient\SignatureValidator\DefaultSignatureValidator::class,
             'signature_validator' => \App\Webhooks\RegistrasiSignatureValidator::class,
 
             /*
              * This class determines if the webhook call should be stored and processed.
              */
-            'webhook_profile' => \Spatie\WebhookClient\WebhookProfile\ProcessEverythingWebhookProfile::class,
-//            'webhook_profile' => \App\Webhooks\RegistrasiProfileWebhook::class,
+            //            'webhook_profile' => \Spatie\WebhookClient\WebhookProfile\ProcessEverythingWebhookProfile::class,
+            'webhook_profile' => \App\Webhooks\RegistrasiProfileWebhook::class,
 
             /*
              * This class determines the response on a valid webhook call.
              */
-            'webhook_response' => \Spatie\WebhookClient\WebhookResponse\DefaultRespondsTo::class,
-//            'webhook_response' => \App\Webhooks\RegistrasiResponseWebhook::class,
+            //            'webhook_response' => \Spatie\WebhookClient\WebhookResponse\DefaultRespondsTo::class,
+            'webhook_response' => \App\Webhooks\RegistrasiResponseWebhook::class,
 
             /*
              * The classname of the model to be used to store webhook calls. The class should

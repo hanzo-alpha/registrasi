@@ -6,6 +6,7 @@ namespace App\Filament\Admin\Resources;
 
 use App\Enums\GolonganDarah;
 use App\Enums\JenisKelamin;
+use App\Enums\StatusRegistrasi;
 use App\Enums\TipeKartuIdentitas;
 use App\Enums\UkuranJersey;
 use App\Filament\Admin\Resources\EarlybirdResource\Pages;
@@ -143,6 +144,12 @@ class EarlybirdResource extends Resource
                     ->options(UkuranJersey::class)
                     ->enum(UkuranJersey::class)
                     ->required(),
+                Forms\Components\Select::make('status_earlybird')
+                    ->label('Status Earlybird')
+                    ->native(false)
+                    ->options(StatusRegistrasi::class)
+                    ->enum(StatusRegistrasi::class)
+                    ->required(),
             ]);
     }
 
@@ -151,6 +158,8 @@ class EarlybirdResource extends Resource
         return $infolist->schema([
             Group::make()->schema([
                 Section::make('Data Peserta')->schema([
+                    TextEntry::make('uuid_earlybird')
+                        ->label('UUID'),
                     TextEntry::make('nama_lengkap'),
                     TextEntry::make('email'),
                     TextEntry::make('no_telp'),
@@ -196,6 +205,9 @@ class EarlybirdResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('uuid_earlybird')
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('nama_lengkap')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email')
@@ -280,7 +292,16 @@ class EarlybirdResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-
+                Tables\Filters\SelectFilter::make('status_earlybird')
+                    ->options(StatusRegistrasi::class)
+                    ->searchable(),
+                Tables\Filters\SelectFilter::make('jenis_kelamin')
+                    ->options(JenisKelamin::class)
+                    ->searchable(),
+                Tables\Filters\SelectFilter::make('kategori_lomba')
+                    ->relationship('kategori', 'nama')
+                    ->preload()
+                    ->searchable(),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),

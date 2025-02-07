@@ -29,12 +29,11 @@ return new class () extends Migration {
             $table->string('nama_kontak_darurat');
             $table->string('nomor_kontak_darurat');
             $table->string('golongan_darah');
-            $table->string('kewarganegaraan');
             $table->string('ukuran_jersey');
             $table->foreignId('kategori_lomba')->nullable();
             $table->string('komunitas')->nullable();
             $table->string('status_registrasi')->nullable();
-            $table->string('status_pendaftaran')->nullable()->default(StatusPendaftaran::EARLYBIRD);
+            $table->string('status_pendaftaran')->nullable()->default(StatusPendaftaran::NORMAL);
             $table->timestamps();
         });
     }

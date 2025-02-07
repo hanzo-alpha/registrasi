@@ -144,6 +144,7 @@ class Earlybird extends Page implements HasForms
                                 Forms\Components\TextInput::make('nomor_kartu_identitas')
                                     ->label('Nomor Kartu Identitas')
                                     ->required()
+                                    ->unique(ignoreRecord: true)
                                     ->numeric(),
                                 Forms\Components\TextInput::make('nama_kontak_darurat')
                                     ->label('Nama Kontak Darurat')
@@ -272,8 +273,12 @@ class Earlybird extends Page implements HasForms
         }
 
         $status = match ($transactionStatus) {
-            PaymentStatus::SETTLEMENT->value, PaymentStatus::CAPTURE->value => StatusBayar::SUDAH_BAYAR,
-            PaymentStatus::FAILURE->value => StatusBayar::GAGAL,
+            PaymentStatus::SETTLEMENT->value,
+            PaymentStatus::CAPTURE->value => StatusBayar::SUDAH_BAYAR,
+            PaymentStatus::FAILURE->value,
+            PaymentStatus::CANCEL->value,
+            PaymentStatus::DENY->value,
+            PaymentStatus::EXPIRE->value => StatusBayar::GAGAL,
             PaymentStatus::PENDING->value => StatusBayar::PENDING,
             default => StatusBayar::BELUM_BAYAR,
         };
@@ -284,10 +289,18 @@ class Earlybird extends Page implements HasForms
         };
 
         $statusRegistrasi = match ($transactionStatus) {
-            PaymentStatus::SETTLEMENT->value, PaymentStatus::CAPTURE->value => StatusRegistrasi::BERHASIL,
-            PaymentStatus::FAILURE->value => StatusRegistrasi::BATAL,
+            PaymentStatus::SETTLEMENT->value,
+            PaymentStatus::CAPTURE->value => StatusRegistrasi::BERHASIL,
+            PaymentStatus::FAILURE->value,
+            PaymentStatus::CANCEL->value,
+            PaymentStatus::DENY->value,
+            PaymentStatus::EXPIRE->value => StatusRegistrasi::BATAL,
             PaymentStatus::PENDING->value => StatusRegistrasi::TUNDA,
-            default => StatusRegistrasi::PROSES,
+            PaymentStatus::AUTHORIZE->value => StatusRegistrasi::PROSES,
+            PaymentStatus::CHARGEBACK->value,
+            PaymentStatus::PARTIAL_REFUND->value,
+            PaymentStatus::REFUND->value,
+            PaymentStatus::PARTIAL_CHARGEBACK->value => StatusRegistrasi::PENGEMBALIAN,
         };
 
         $registrasi->status_earlybird = $statusRegistrasi;
@@ -296,6 +309,8 @@ class Earlybird extends Page implements HasForms
             ? StatusDaftar::TERDAFTAR
             : StatusDaftar::BELUM_TERDAFTAR;
 
+        $pembayaran->order_id = $orderId;
+        $pembayaran->uuid_pembayaran = $uuidPembayaran;
         $pembayaran->tipe_pembayaran = $paymentTipe;
         $pembayaran->status_pembayaran = $status;
         $pembayaran->status_transaksi = $transactionStatus;
@@ -306,8 +321,7 @@ class Earlybird extends Page implements HasForms
         $pembayaran->save();
         $registrasi->save();
 
-        $redirectUrl = $this->getRedirectUrl();
-        $this->redirect($redirectUrl, navigate: FilamentView::hasSpaMode() && is_app_url($redirectUrl));
+        $this->redirect($redirectUrl, navigate: FilamentView::hasSpaMode() && is_app_url((string) $redirectUrl));
 
         if (StatusBayar::BELUM_BAYAR === $status) {
             return Notification::make()
@@ -432,7 +446,7 @@ class Earlybird extends Page implements HasForms
      */
     protected function handleRecordCreation(array $data): Model
     {
-        $data['uuid_earlybird'] = \Str::uuid()->toString();
+        $data['uuid_earlybird'] ??= \Str::uuid()->toString();
         $uuidPembayaran = \Str::uuid()->toString();
         $data['status_earlybird'] ??= StatusRegistrasi::BELUM_BAYAR;
         $data['provinsi'] ??= '74';

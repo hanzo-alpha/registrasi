@@ -12,7 +12,7 @@ use Midtrans\Notification;
 
 class MidtransNotificationHandler
 {
-    public static function getNotificationStatus(): string
+    public static function getNotificationStatus(): \Filament\Notifications\Notification
     {
         $statusMessage = '';
 
@@ -36,42 +36,43 @@ class MidtransNotificationHandler
             default => TipeBayar::TRANSFER,
         };
 
-        $pembayaran = Pembayaran::query()->where('uuid_registrasi', $order_id)->first();
+        $pembayaran = Pembayaran::query()->where('order_id', $order_id)->first();
 
         if ('capture' === $transaction) {
             if ('credit_card' === $type) {
                 if ('accept' === $fraud) {
                     // TODO set payment status in merchant's database to 'Success'
                     $pembayaran->status_transaksi = PaymentStatus::CAPTURE;
-                    $statusMessage = 'Transaksi order_id: '.$order_id.' berhasil ditangkap menggunakan '.$type;
+                    $pembayaran->status_pembayaran = StatusBayar::SUDAH_BAYAR;
+                    $statusMessage = 'Transaksi order_id: ' . $order_id . ' berhasil ditangkap menggunakan ' . $type;
                 }
             }
         } else {
             if ('settlement' === $transaction) {
                 // TODO set payment status in merchant's database to 'Settlement'
                 $pembayaran->status_transaksi = PaymentStatus::SETTLEMENT;
-                $statusMessage = 'Transaksi order_id: '.$order_id.' berhasil ditransfer menggunakan '.$type;
+                $statusMessage = 'Transaksi order_id: ' . $order_id . ' berhasil ditransfer menggunakan ' . $type;
             } else {
                 if ('pending' === $transaction) {
                     // TODO set payment status in merchant's database to 'Pending'
                     $pembayaran->status_transaksi = PaymentStatus::PENDING;
-                    $statusMessage = 'Menunggu nasabah menyelesaikan transaksi order_id: '.$order_id.' menggunakan '
-                        .$type;
+                    $statusMessage = 'Menunggu nasabah menyelesaikan transaksi order_id: ' . $order_id . ' menggunakan '
+                        . $type;
                 } else {
                     if ('deny' === $transaction) {
                         // TODO set payment status in merchant's database to 'Denied'
                         $pembayaran->status_transaksi = PaymentStatus::DENY;
-                        $statusMessage = 'Pembayaran menggunakan '.$type.' untuk transaksi order_id: '.$order_id.' ditolak.';
+                        $statusMessage = 'Pembayaran menggunakan ' . $type . ' untuk transaksi order_id: ' . $order_id . ' ditolak.';
                     } else {
                         if ('expire' === $transaction) {
                             // TODO set payment status in merchant's database to 'expire'
                             $pembayaran->status_transaksi = PaymentStatus::EXPIRE;
-                            $statusMessage = 'Pembayaran menggunakan '.$type.' untuk transaksi order_id: '.$order_id.' kedaluwarsa.';
+                            $statusMessage = 'Pembayaran menggunakan ' . $type . ' untuk transaksi order_id: ' . $order_id . ' kedaluwarsa.';
                         } else {
                             if ('cancel' === $transaction) {
                                 // TODO set payment status in merchant's database to 'Denied'
                                 $pembayaran->status_transaksi = PaymentStatus::CANCEL;
-                                $statusMessage = 'Pembayaran menggunakan '.$type.' untuk transaksi order_id: '.$order_id.' dibatalkan.';
+                                $statusMessage = 'Pembayaran menggunakan ' . $type . ' untuk transaksi order_id: ' . $order_id . ' dibatalkan.';
                             }
                         }
                     }
@@ -84,6 +85,9 @@ class MidtransNotificationHandler
         $pembayaran->detail_transaksi = $notif;
         $pembayaran->save();
 
-        return $statusMessage;
+        return \Filament\Notifications\Notification::make('pembayaran')
+            ->title('Notifikasi Pembayaran')
+            ->body($statusMessage)
+            ->success();
     }
 }

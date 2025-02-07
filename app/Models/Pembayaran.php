@@ -24,6 +24,7 @@ class Pembayaran extends Model
 
     protected $fillable = [
         'uuid_pembayaran',
+        'order_id',
         'registrasi_id',
         'nama_kegiatan',
         'ukuran_jersey',
@@ -45,7 +46,7 @@ class Pembayaran extends Model
 
     public function uniqueIds(): array
     {
-        return ['uuid_pembayaran'];
+        return ['uuid_pembayaran', 'order_id'];
     }
 
     public function getRouteKeyName(): string
@@ -55,7 +56,7 @@ class Pembayaran extends Model
 
     public function registrasi(): BelongsTo
     {
-        return $this->belongsTo(Registrasi::class);
+        return $this->belongsTo(Registrasi::class, 'registrasi_id', 'id');
     }
 
     public function earlybird(): BelongsTo
@@ -72,6 +73,7 @@ class Pembayaran extends Model
     {
         return [
             'uuid_pembayaran' => 'string',
+            'order_id' => 'string',
             'detail_transaksi' => 'array',
             'status_pembayaran' => StatusBayar::class,
             'status_transaksi' => PaymentStatus::class,

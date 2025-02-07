@@ -17,50 +17,13 @@
 
             window.snap.pay(snap_token, {
                 onSuccess: function (result) {
-                    new FilamentNotification()
-                        .title('Pembayaran anda sedang diproses')
-                        .icon('heroicon-o-check-circle')
-                        .success()
-                        .color('success')
-                        .actions([
-                            new FilamentNotificationAction('Konfirmasi')
-                                .color('primary')
-                                .button()
-                                .icon('heroicon-o-arrow-down-tray')
-                                .dispatch('detailTransaction', {result})
-                                .close()
-                        ])
-                        .send()
+                    Livewire.dispatch('detailTransaction', {result});
                 },
                 onPending: function (result) {
-                    new FilamentNotification()
-                        .title('Menunggu Pembayaran')
-                        .icon('heroicon-o-clock')
-                        .info()
-                        .actions([
-                            new FilamentNotificationAction('Konfirmasi')
-                                .color('warning')
-                                .button()
-                                .icon('heroicon-o-arrow-down-tray')
-                                .dispatch('detailTransaction', {result})
-                                .close(),
-                        ])
-                        .send();
+                    Livewire.dispatch('detailTransaction', {result});
                 },
                 onError: function (result) {
-                    new FilamentNotification()
-                        .title('Pembayaran gagal')
-                        .danger()
-                        .actions([
-                            new FilamentNotificationAction('Konfirmasi')
-                                .color('danger')
-                                .button()
-                                .icon('heroicon-o-arrow-down-tray')
-                                .dispatch('detailTransaction', {result})
-                                .close(),
-                        ])
-                        .icon('heroicon-o-x-mark')
-                        .send();
+                    Livewire.dispatch('detailTransaction', {result});
                 },
                 onClose: function () {
                     new FilamentNotification()

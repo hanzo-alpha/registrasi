@@ -11,6 +11,7 @@ use App\Enums\StatusPendaftaran;
 use App\Enums\TipeBayar;
 use App\Enums\UkuranJersey;
 use App\Filament\Admin\Resources\PembayaranResource\Pages;
+use App\Filament\Exports\PembayaranExporter;
 use App\Models\Pembayaran;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -41,7 +42,7 @@ class PembayaranResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Select::make('registrasi_id')
-                    ->relationship('registrasi', 'id')
+                    ->relationship('earlybird', 'nama_lengkap')
                     ->native(false)
                     ->preload()
                     ->required()
@@ -112,6 +113,9 @@ class PembayaranResource extends Resource
         return $infolist->schema([
             Group::make()->schema([
                 Section::make('Data Peserta')->schema([
+                    TextEntry::make('earlybird.uuid_earlybird')
+                        ->label('Order ID')
+                        ->color('secondary'),
                     TextEntry::make('earlybird.nama_lengkap')
                         ->label('Nama Lengkap')
                         ->color('secondary'),
@@ -195,6 +199,11 @@ class PembayaranResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('earlybird.uuid_earlybird')
+                    ->label('Order ID')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('earlybird.nama_lengkap')
                     ->searchable()
                     ->sortable()
@@ -234,11 +243,15 @@ class PembayaranResource extends Resource
                     ->sortable()
                     ->badge()
                     ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('status_pendaftaran')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('status_pembayaran')
                     ->searchable()
                     ->sortable()
                     ->badge()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('status_transaksi')
                     ->searchable()
                     ->sortable()
@@ -248,10 +261,6 @@ class PembayaranResource extends Resource
                     ->boolean()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('status_pendaftaran')
-                    ->searchable()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('keterangan')
                     ->searchable()
                     ->sortable()
@@ -270,7 +279,19 @@ class PembayaranResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-
+                Tables\Filters\SelectFilter::make('status_pembayaran')
+                    ->options(StatusBayar::class)
+                    ->searchable(),
+                Tables\Filters\SelectFilter::make('status_transaksi')
+                    ->options(PaymentStatus::class)
+                    ->searchable(),
+                Tables\Filters\SelectFilter::make('status_pendaftaran')
+                    ->options(StatusPendaftaran::class)
+                    ->searchable(),
+                Tables\Filters\SelectFilter::make('kategori_lomba')
+                    ->relationship('kategori', 'nama')
+                    ->preload()
+                    ->searchable(),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
@@ -279,6 +300,8 @@ class PembayaranResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\ExportBulkAction::make()
+                        ->exporter(PembayaranExporter::class),
                 ]),
             ]);
     }

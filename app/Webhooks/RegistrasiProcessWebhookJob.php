@@ -1,19 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Webhooks;
 
-use Filament\Notifications\Notification;
+use App\Services\MidtransNotificationHandler;
 use Spatie\WebhookClient\Jobs\ProcessWebhookJob as SpatieProcessWebhookJob;
 
 class RegistrasiProcessWebhookJob extends SpatieProcessWebhookJob
 {
-    public function handle(): Notification
+    public function handle(): void
     {
-        return Notification::make()
-            ->title('Testing Webhook')
-        ->body('Testing Webhook');
-//         $this->webhookCall; // contains an instance of `WebhookCall`
-
-        // perform the work here
+        $data = $this->webhookCall->payload;
+        //        MidtransNotificationHandler::getNotificationStatus();
+        //Acknowledge you received the response
+        http_response_code(200);
     }
 }

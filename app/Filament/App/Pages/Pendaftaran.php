@@ -9,14 +9,16 @@ use App\Enums\JenisKelamin;
 use App\Enums\PaymentStatus;
 use App\Enums\StatusBayar;
 use App\Enums\StatusDaftar;
+use App\Enums\StatusPendaftaran;
 use App\Enums\StatusRegistrasi;
 use App\Enums\TipeBayar;
 use App\Enums\TipeKartuIdentitas;
 use App\Enums\UkuranJersey;
+use App\Models\KategoriLomba;
 use App\Models\Pembayaran;
 use App\Models\Registrasi;
 use App\Services\MidtransAPI;
-use Awcodes\Shout\Components\Shout;
+use Closure;
 use Exception;
 use Filament\Actions\Action;
 use Filament\Forms;
@@ -34,7 +36,6 @@ use Filament\Support\Facades\FilamentView;
 
 use function Filament\Support\is_app_url;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Blade;
@@ -67,13 +68,14 @@ class Pendaftaran extends Page implements HasForms
     protected ?string $subheading = 'Silahkan lengkapi data peserta di bawah ini.';
     protected static bool $shouldRegisterNavigation = false;
 
+    public static function getNavigationBadge(): ?string
+    {
+        return (string) Registrasi::count();
+    }
+
     public static function formOtomatis(): array
     {
         return [
-            Shout::make('Informasi')
-                ->columnSpanFull()
-                ->content('Bagi 100 Pendaftar Pertama (Early Bird) untuk kategori 8K dan 15K akan mendapatkan keuntungan potongan harga. Jika sudah melebihi 100 pendaftar, akan dikenakan harga normal.')
-                ->icon('heroicon-o-information-circle'),
             Forms\Components\Wizard::make([
                 Forms\Components\Wizard\Step::make('Data Pribadi Peserta')
                     ->icon('heroicon-o-user')
@@ -121,7 +123,17 @@ class Pendaftaran extends Page implements HasForms
                                     ->label('Tanggal Lahir')
                                     ->required()
                                     ->displayFormat('d-m-Y')
-                                    ->format('Y-m-d'),
+                                    ->format('Y-m-d')
+                                    ->rules([
+                                        function () {
+                                            return function (string $attribute, mixed $value, Closure $fail): void {
+                                                $umur = Carbon::parse($value)->age;
+                                                if ($umur < 18) {
+                                                    $fail('Tanggal lahir harus lebih dari 18 tahun');
+                                                }
+                                            };
+                                        },
+                                    ]),
                                 Forms\Components\Select::make('jenis_kelamin')
                                     ->label('Jenis Kelamin')
                                     ->options(JenisKelamin::class)
@@ -146,9 +158,9 @@ class Pendaftaran extends Page implements HasForms
                                     ->label('Golongan Darah')
                                     ->options(GolonganDarah::class)
                                     ->required(),
-                                Forms\Components\TextInput::make('kewarganegaraan')
-                                    ->label('Kewarganegaraan')
-                                    ->required(),
+                                Forms\Components\TextInput::make('komunitas')
+                                    ->label('Komunitas (Optional)')
+                                    ->maxLength(255),
                             ])->columns(2),
                     ]),
                 Forms\Components\Wizard\Step::make('Data Alamat Peserta')
@@ -206,29 +218,9 @@ class Pendaftaran extends Page implements HasForms
                     ->schema([
                         Section::make('Data Pendaftaran')
                             ->schema([
-                                Forms\Components\TextInput::make('jumlah_peserta')
-                                    ->label('Jumlah Peserta Yang Didaftarkan')
-                                    ->required()
-                                    ->numeric()
-                                    ->default(1)
-                                    ->dehydrated()
-                                    ->maxLength(255),
-                                Forms\Components\TextInput::make('komunitas')
-                                    ->label('Komunitas (Optional)')
-                                    ->maxLength(255),
                                 Forms\Components\Select::make('kategori_lomba')
                                     ->label('Kategori Lomba')
-                                    ->relationship(
-                                        name: 'kategori',
-                                        titleAttribute: 'nama',
-                                        modifyQueryUsing: function (Builder $query) {
-                                            if (Registrasi::count() > 100) {
-                                                return $query->whereNotIn('id', [1, 3]);
-                                            }
-
-                                            return $query->whereNotIn('id', [2, 4]);
-                                        },
-                                    )
+                                    ->relationship('kategori', 'nama')
                                     ->native(false)
                                     ->required(),
                                 Forms\Components\Select::make('ukuran_jersey')
@@ -281,8 +273,12 @@ class Pendaftaran extends Page implements HasForms
         }
 
         $status = match ($transactionStatus) {
-            PaymentStatus::SETTLEMENT->value, PaymentStatus::CAPTURE->value => StatusBayar::SUDAH_BAYAR,
-            PaymentStatus::FAILURE->value => StatusBayar::GAGAL,
+            PaymentStatus::SETTLEMENT->value,
+            PaymentStatus::CAPTURE->value => StatusBayar::SUDAH_BAYAR,
+            PaymentStatus::FAILURE->value,
+            PaymentStatus::CANCEL->value,
+            PaymentStatus::DENY->value,
+            PaymentStatus::EXPIRE->value => StatusBayar::GAGAL,
             PaymentStatus::PENDING->value => StatusBayar::PENDING,
             default => StatusBayar::BELUM_BAYAR,
         };
@@ -293,10 +289,18 @@ class Pendaftaran extends Page implements HasForms
         };
 
         $statusRegistrasi = match ($transactionStatus) {
-            PaymentStatus::SETTLEMENT->value, PaymentStatus::CAPTURE->value => StatusRegistrasi::BERHASIL,
-            PaymentStatus::FAILURE->value => StatusRegistrasi::BATAL,
+            PaymentStatus::SETTLEMENT->value,
+            PaymentStatus::CAPTURE->value => StatusRegistrasi::BERHASIL,
+            PaymentStatus::FAILURE->value,
+            PaymentStatus::CANCEL->value,
+            PaymentStatus::DENY->value,
+            PaymentStatus::EXPIRE->value => StatusRegistrasi::BATAL,
             PaymentStatus::PENDING->value => StatusRegistrasi::TUNDA,
-            default => StatusRegistrasi::PROSES,
+            PaymentStatus::AUTHORIZE->value => StatusRegistrasi::PROSES,
+            PaymentStatus::CHARGEBACK->value,
+            PaymentStatus::PARTIAL_REFUND->value,
+            PaymentStatus::REFUND->value,
+            PaymentStatus::PARTIAL_CHARGEBACK->value => StatusRegistrasi::PENGEMBALIAN,
         };
 
         $registrasi->status_registrasi = $statusRegistrasi;
@@ -305,17 +309,19 @@ class Pendaftaran extends Page implements HasForms
             ? StatusDaftar::TERDAFTAR
             : StatusDaftar::BELUM_TERDAFTAR;
 
+        $pembayaran->order_id = $orderId;
+        $pembayaran->uuid_pembayaran = $uuidPembayaran;
         $pembayaran->tipe_pembayaran = $paymentTipe;
         $pembayaran->status_pembayaran = $status;
         $pembayaran->status_transaksi = $transactionStatus;
         $pembayaran->detail_transaksi = $result;
         $pembayaran->status_daftar = $statusDaftar;
+        $pembayaran->status_pendaftaran = StatusPendaftaran::NORMAL;
         $pembayaran->lampiran = null;
         $pembayaran->save();
         $registrasi->save();
 
-        $redirectUrl = $this->getRedirectUrl();
-        $this->redirect($redirectUrl, navigate: FilamentView::hasSpaMode() && is_app_url($redirectUrl));
+        $this->redirect($redirectUrl, navigate: FilamentView::hasSpaMode() && is_app_url((string) $redirectUrl));
 
         if (StatusBayar::BELUM_BAYAR === $status) {
             return Notification::make()
@@ -432,14 +438,14 @@ class Pendaftaran extends Page implements HasForms
     protected function handleRecordCreation(array $data): Model
     {
         $data['uuid_registrasi'] = \Str::uuid()->toString();
-        $uuidPembayaran = \Str::uuid()->toString();
         $data['status_registrasi'] ??= StatusRegistrasi::BELUM_BAYAR;
         $data['provinsi'] ??= '74';
-        $biaya = biaya_pendaftaran($data['kategori_lomba']);
-        $data['jumlah_peserta'] ??= 1;
-        $totalHarga = (int) $data['jumlah_peserta'] * $biaya;
-        $namaKegiatan = 'Pendaftaran Bantaeng Trail Run 2025 Kategori Lomba - ' . $data['kategori_lomba'];
-        $merchant = 'Freelethics Bantaeng';
+        $biaya = biaya_pendaftaran($data['kategori_lomba']) ?? 0;
+        $qty = 1;
+        $totalHarga = $qty * $biaya;
+        $kategori = KategoriLomba::find($data['kategori_lomba']);
+        $namaKegiatan = 'Pendaftaran Bantaeng Trail Run 2025 Kategori Lomba - ' . $kategori->nama;
+        $merchant = 'Freeletics Bantaeng';
 
         midtrans_config();
 
@@ -451,10 +457,10 @@ class Pendaftaran extends Page implements HasForms
         $items = [
             'id' => \Str::uuid()->toString(),
             'price' => $biaya,
-            'quantity' => (int) $data['jumlah_peserta'],
+            'quantity' => $qty,
             'name' => $namaKegiatan,
             'merchant_name' => $merchant,
-            'category' => $data['kategori_lomba'],
+            'category' => $kategori->nama,
         ];
 
         $customers = [
@@ -476,33 +482,28 @@ class Pendaftaran extends Page implements HasForms
             'transactions' => $transactions,
             'items' => $items,
             'customers' => $customers,
+            'custom_field1' => '5000',
         ];
-
-        $data['is_earlybird'] = true;
-
-        if (Registrasi::count() > 100) {
-            $data['is_earlybird'] = false;
-        }
 
         $record = new ($this->getModel())($data);
 
         $record->save();
 
         Pembayaran::create([
-            'uuid_pembayaran' => $uuidPembayaran,
             'registrasi_id' => $record->id,
             'nama_kegiatan' => $namaKegiatan,
             'ukuran_jersey' => $data['ukuran_jersey'],
             'kategori_lomba' => $data['kategori_lomba'],
-            'jumlah' => $data['jumlah_peserta'],
+            'jumlah' => $qty,
             'satuan' => 'Peserta',
             'harga_satuan' => $biaya,
             'total_harga' => $totalHarga,
-            'tipe_pembayaran' => TipeBayar::QRIS,
-            'status_pembayaran' => StatusBayar::PENDING,
-            'status_transaksi' => PaymentStatus::PENDING,
+            //            'tipe_pembayaran' => TipeBayar::QRIS,
+            'status_pembayaran' => StatusBayar::BELUM_BAYAR,
+            'status_transaksi' => PaymentStatus::CAPTURE,
             'status_daftar' => StatusDaftar::TERDAFTAR,
             'keterangan' => null,
+            'status_pendaftaran' => StatusPendaftaran::NORMAL,
             'detail_transaksi' => $detailTransaksi,
             'lampiran' => null,
         ]);
