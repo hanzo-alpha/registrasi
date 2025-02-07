@@ -173,11 +173,18 @@ class PembayaranResource extends Resource
             ])->columnSpan(2),
             Group::make()->schema([
                 Section::make('Status Peserta')->schema([
-
-                    TextEntry::make('earlybird.ukuran_jersey')->badge(),
-                    TextEntry::make('earlybird.kategori.nama')->badge(),
-                    TextEntry::make('earlybird.komunitas')->badge(),
-                    TextEntry::make('earlybird.status_earlybird')->badge(),
+                    TextEntry::make('earlybird.ukuran_jersey')
+                        ->label('Ukuran Jersey')
+                        ->badge(),
+                    TextEntry::make('earlybird.kategori.nama')
+                        ->label('Kategori')
+                        ->badge(),
+                    TextEntry::make('earlybird.komunitas')
+                        ->label('Komunitas')
+                        ->badge(),
+                    TextEntry::make('earlybird.status_earlybird')
+                        ->label('Status EarlyBird')
+                        ->badge(),
                 ])->columns(2),
                 Section::make('Pembayaran')->schema([
                     TextEntry::make('order_id')

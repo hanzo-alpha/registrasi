@@ -309,14 +309,17 @@ class EarlybirdResource extends Resource
                     ->searchable(),
             ])
             ->actions([
-                Tables\Actions\Action::make('check')
+                Tables\Actions\Action::make('Check Pembayaran')
+                    ->label('Check Pembayaran')
                     ->icon('heroicon-o-check')
+                    ->color('yellow')
                     ->action(function ($record): void {
                         $check = MidtransAPI::getTransactionStatus($record->pembayaran?->order_id);
                         if ($check['sukses']) {
                             $detail = $check['responses'];
                             if (isset($detail['status_code'])) {
                                 $record->delete();
+                                $record->pembayaran->delete();
                                 Notification::make('Info')
                                     ->danger()
                                     ->title($detail['status_message'])
@@ -367,8 +370,11 @@ class EarlybirdResource extends Resource
                                 ->sendToDatabase(auth()->user());
                         }
                     }),
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\ViewAction::make(),
+                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\DeleteAction::make(),
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
