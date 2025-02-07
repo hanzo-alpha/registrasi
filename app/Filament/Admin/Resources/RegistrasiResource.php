@@ -7,17 +7,21 @@ namespace App\Filament\Admin\Resources;
 use App\Enums\GolonganDarah;
 use App\Enums\JenisKelamin;
 use App\Enums\KategoriLomba;
+use App\Enums\PaymentStatus;
+use App\Enums\StatusBayar;
 use App\Enums\StatusRegistrasi;
 use App\Enums\TipeKartuIdentitas;
 use App\Enums\UkuranJersey;
 use App\Filament\Admin\Resources\RegistrasiResource\Pages;
 use App\Models\Registrasi;
+use App\Services\MidtransAPI;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Group;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -237,21 +241,99 @@ class RegistrasiResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('status_registrasi')
                     ->searchable(),
-                //                Tables\Columns\TextColumn::make('created_at')
-                //                    ->dateTime()
-                //                    ->sortable()
-                //                    ->toggleable(isToggledHiddenByDefault: true),
-                //                Tables\Columns\TextColumn::make('updated_at')
-                //                    ->dateTime()
-                //                    ->sortable()
-                //                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
 
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('Check Pembayaran')
+                    ->label('Check Pembayaran')
+                    ->icon('heroicon-o-check')
+                    ->color('yellow')
+                    ->action(function ($record): void {
+                        $orderId = $record->pembayaran?->order_id;
+                        $data = MidtransAPI::getTransactionStatus($orderId);
+
+                        if (blank($data) || 0 === count($data)) {
+                            Notification::make('Info')
+                                ->danger()
+                                ->title('Data sudah terupdate')
+                                ->send();
+                            return;
+                        }
+
+                        if ($data['sukses']) {
+                            $detail = $data['responses'];
+                            if (isset($detail['status_code']) && 404 === $detail['status_code']) {
+                                $record->delete();
+                                $record->pembayaran->delete();
+                                Notification::make('Info')
+                                    ->danger()
+                                    ->title($detail['status_message'])
+                                    ->send();
+                                return;
+                            }
+
+                            if (empty($detail)) {
+                                Notification::make('Info')
+                                    ->info()
+                                    ->title('Pembayaran sudah berhasil')
+                                    ->send();
+                                return;
+                            }
+
+                            $update = $record->pembayaran;
+
+                            $status = match ($detail['transaction_status']) {
+                                PaymentStatus::SETTLEMENT->value,
+                                PaymentStatus::CAPTURE->value => StatusBayar::SUDAH_BAYAR,
+                                PaymentStatus::FAILURE->value,
+                                PaymentStatus::CANCEL->value,
+                                PaymentStatus::DENY->value,
+                                PaymentStatus::EXPIRE->value => StatusBayar::GAGAL,
+                                PaymentStatus::PENDING->value => StatusBayar::PENDING,
+                                default => StatusBayar::BELUM_BAYAR,
+                            };
+
+                            $statusRegistrasi = match ($detail['transaction_status']) {
+                                PaymentStatus::SETTLEMENT->value,
+                                PaymentStatus::CAPTURE->value => StatusRegistrasi::BERHASIL,
+                                PaymentStatus::FAILURE->value,
+                                PaymentStatus::CANCEL->value,
+                                PaymentStatus::DENY->value,
+                                PaymentStatus::EXPIRE->value => StatusRegistrasi::BATAL,
+                                PaymentStatus::PENDING->value => StatusRegistrasi::TUNDA,
+                                PaymentStatus::AUTHORIZE->value => StatusRegistrasi::PROSES,
+                                PaymentStatus::CHARGEBACK->value,
+                                PaymentStatus::PARTIAL_REFUND->value,
+                                PaymentStatus::REFUND->value,
+                                PaymentStatus::PARTIAL_CHARGEBACK->value => StatusRegistrasi::PENGEMBALIAN,
+                            };
+
+                            $update->status_transaksi = $detail['transaction_status'];
+                            $update->status_pembayaran = $status;
+                            $update->detail_transaksi = $detail;
+
+                            $stat = ('App\Models\Registrasi' === self::getModel())
+                                ? 'status_registrasi' : 'status_earlybird';
+
+                            $record->update([
+                                $stat => $statusRegistrasi,
+                            ]);
+
+                            $update->save();
+                            Notification::make('sukses')
+                                ->success()
+                                ->title('Berhasil mengupdate pembayaran')
+                                ->send()
+                                ->sendToDatabase(auth()->user());
+                        }
+                    }),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\ViewAction::make(),
+                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\DeleteAction::make(),
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

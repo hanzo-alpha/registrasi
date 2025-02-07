@@ -75,24 +75,25 @@ class MidtransAPI
     /**
      * @throws \Illuminate\Http\Client\ConnectionException
      */
-    public static function getTransactionStatus(string $orderId): bool|string|int|null|array
+    public static function getTransactionStatus($orderId): bool|string|int|null|array
     {
         $data = [];
-        $url = config('midtrans.is_production')
-            ? 'https://api.midtrans.com/v2/' . $orderId . '/status'
-            : 'https://api.sandbox.midtrans.com/v2/' . $orderId . '/status';
+        $data['responses'] = [];
+        $data['sukses'] = true;
 
-        $response = config('midtrans.is_production')
-            ? Http::acceptJson()->withBasicAuth(config('midtrans.production.server_key'), '')->get($url)
-            : Http::acceptJson()->withBasicAuth(config('midtrans.sb.server_key'), '')->get($url);
+        if ($orderId) {
+            $url = config('midtrans.is_production')
+                ? 'https://api.midtrans.com/v2/' . $orderId . '/status'
+                : 'https://api.sandbox.midtrans.com/v2/' . $orderId . '/status';
 
-        $data['responses'] = $response->json();
+            $response = config('midtrans.is_production')
+                ? Http::acceptJson()->withBasicAuth(config('midtrans.production.server_key'), '')->get($url)
+                : Http::acceptJson()->withBasicAuth(config('midtrans.sb.server_key'), '')->get($url);
 
-        if ( ! null === $data['responses'] || ! blank($data['responses'])) {
-            $sukses = true;
+            $data['responses'] = $response->json();
+            $data['sukses'] = true;
         }
 
-        $data['sukses'] = $sukses;
         return $data;
     }
 

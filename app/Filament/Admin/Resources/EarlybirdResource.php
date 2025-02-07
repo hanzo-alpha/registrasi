@@ -13,7 +13,6 @@ use App\Enums\TipeKartuIdentitas;
 use App\Enums\UkuranJersey;
 use App\Filament\Admin\Resources\EarlybirdResource\Pages;
 use App\Models\Earlybird;
-use App\Models\Pembayaran;
 use App\Services\MidtransAPI;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -314,9 +313,19 @@ class EarlybirdResource extends Resource
                     ->icon('heroicon-o-check')
                     ->color('yellow')
                     ->action(function ($record): void {
-                        $check = MidtransAPI::getTransactionStatus($record->pembayaran?->order_id);
-                        if ($check['sukses']) {
-                            $detail = $check['responses'];
+                        $orderId = $record->pembayaran?->order_id;
+                        $data = MidtransAPI::getTransactionStatus($orderId);
+
+                        if (blank($data) || 0 === count($data)) {
+                            Notification::make('Info')
+                                ->danger()
+                                ->title('Data sudah terupdate')
+                                ->send();
+                            return;
+                        }
+
+                        if ($data['sukses']) {
+                            $detail = $data['responses'];
                             if (isset($detail['status_code'])) {
                                 $record->delete();
                                 $record->pembayaran->delete();
@@ -326,7 +335,16 @@ class EarlybirdResource extends Resource
                                     ->send();
                                 return;
                             }
-                            $update = Pembayaran::where('order_id', $detail['order_id'])->first();
+
+                            if (empty($detail)) {
+                                Notification::make('Info')
+                                    ->info()
+                                    ->title('Pembayaran sudah berhasil')
+                                    ->send();
+                                return;
+                            }
+
+                            $update = $record->pembayaran;
 
                             $status = match ($detail['transaction_status']) {
                                 PaymentStatus::SETTLEMENT->value,

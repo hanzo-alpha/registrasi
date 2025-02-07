@@ -48,7 +48,7 @@ class Registrasi extends Model
         'uuid_registrasi',
     ];
 
-    protected $with = ['kategori'];
+    protected $with = ['kategori', 'pembayaran'];
 
     public function pembayaran(): HasOne
     {
