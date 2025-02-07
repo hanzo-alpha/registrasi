@@ -6,17 +6,22 @@ namespace App\Filament\Admin\Resources;
 
 use App\Enums\GolonganDarah;
 use App\Enums\JenisKelamin;
+use App\Enums\PaymentStatus;
+use App\Enums\StatusBayar;
 use App\Enums\StatusRegistrasi;
 use App\Enums\TipeKartuIdentitas;
 use App\Enums\UkuranJersey;
 use App\Filament\Admin\Resources\EarlybirdResource\Pages;
 use App\Models\Earlybird;
+use App\Models\Pembayaran;
+use App\Services\MidtransAPI;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Group;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -304,6 +309,56 @@ class EarlybirdResource extends Resource
                     ->searchable(),
             ])
             ->actions([
+                Tables\Actions\Action::make('check')
+                    ->icon('heroicon-o-check')
+                    ->action(function ($record): void {
+                        $check = MidtransAPI::getTransactionStatus($record->pembayaran?->order_id);
+                        if ($check['sukses']) {
+                            $detail = $check['responses'];
+                            $update = Pembayaran::where('order_id', $detail['order_id'])->first();
+
+                            $status = match ($detail['transaction_status']) {
+                                PaymentStatus::SETTLEMENT->value,
+                                PaymentStatus::CAPTURE->value => StatusBayar::SUDAH_BAYAR,
+                                PaymentStatus::FAILURE->value,
+                                PaymentStatus::CANCEL->value,
+                                PaymentStatus::DENY->value,
+                                PaymentStatus::EXPIRE->value => StatusBayar::GAGAL,
+                                PaymentStatus::PENDING->value => StatusBayar::PENDING,
+                                default => StatusBayar::BELUM_BAYAR,
+                            };
+
+                            $statusRegistrasi = match ($detail['transaction_status']) {
+                                PaymentStatus::SETTLEMENT->value,
+                                PaymentStatus::CAPTURE->value => StatusRegistrasi::BERHASIL,
+                                PaymentStatus::FAILURE->value,
+                                PaymentStatus::CANCEL->value,
+                                PaymentStatus::DENY->value,
+                                PaymentStatus::EXPIRE->value => StatusRegistrasi::BATAL,
+                                PaymentStatus::PENDING->value => StatusRegistrasi::TUNDA,
+                                PaymentStatus::AUTHORIZE->value => StatusRegistrasi::PROSES,
+                                PaymentStatus::CHARGEBACK->value,
+                                PaymentStatus::PARTIAL_REFUND->value,
+                                PaymentStatus::REFUND->value,
+                                PaymentStatus::PARTIAL_CHARGEBACK->value => StatusRegistrasi::PENGEMBALIAN,
+                            };
+
+                            $update->status_transaksi = $detail['transaction_status'];
+                            $update->status_pembayaran = $status;
+                            $update->detail_transaksi = $detail;
+
+                            $record->update([
+                                'status_earlybird' => $statusRegistrasi,
+                            ]);
+
+                            $update->save();
+                            Notification::make('sukses')
+                                ->success()
+                                ->title('Berhasil mengupdate pembayaran')
+                                ->send()
+                                ->sendToDatabase(auth()->user());
+                        }
+                    }),
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
             ])

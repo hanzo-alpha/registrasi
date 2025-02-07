@@ -47,6 +47,8 @@ class PembayaranResource extends Resource
                     ->preload()
                     ->required()
                     ->optionsLimit(30),
+                Forms\Components\TextInput::make('order_id')
+                    ->maxLength(255),
                 Forms\Components\TextInput::make('nama_kegiatan')
                     ->maxLength(255),
                 Forms\Components\Select::make('ukuran_jersey')
@@ -178,6 +180,8 @@ class PembayaranResource extends Resource
                     TextEntry::make('earlybird.status_earlybird')->badge(),
                 ])->columns(2),
                 Section::make('Pembayaran')->schema([
+                    TextEntry::make('order_id')
+                        ->label('Order ID')->badge(),
                     TextEntry::make('tipe_pembayaran')
                         ->label('Tipe Bayar')->badge(),
                     TextEntry::make('status_pembayaran')
@@ -196,6 +200,10 @@ class PembayaranResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('uuid_pembayaran')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('order_id')
                     ->searchable()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

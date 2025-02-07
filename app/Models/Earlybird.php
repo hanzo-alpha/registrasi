@@ -47,6 +47,8 @@ class Earlybird extends Model
         'uuid_earlybird',
     ];
 
+    protected $with = ['pembayaran'];
+
     public function pembayaran(): HasOne
     {
         return $this->hasOne(Pembayaran::class, 'registrasi_id', 'id')

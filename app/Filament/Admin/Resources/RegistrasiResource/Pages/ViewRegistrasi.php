@@ -6,17 +6,16 @@ namespace App\Filament\Admin\Resources\RegistrasiResource\Pages;
 
 use App\Filament\Admin\Resources\RegistrasiResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use Filament\Resources\Pages\EditRecord;
 
-class ListRegistrasis extends ListRecords
+class ViewRegistrasi extends EditRecord
 {
     protected static string $resource = RegistrasiResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make()
-                ->icon('heroicon-o-plus'),
+            Actions\EditAction::make(),
         ];
     }
 }

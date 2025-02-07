@@ -27,7 +27,8 @@ class ListEarlybirds extends ListRecords
                 ->icon('heroicon-s-arrow-down-tray')
                 ->maxRows(10000)
                 ->chunkSize(250),
-            Actions\CreateAction::make(),
+            Actions\CreateAction::make()
+                ->icon('heroicon-o-plus'),
         ];
     }
 }

@@ -4,11 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Enums\PaymentStatus;
-use App\Enums\StatusBayar;
-use App\Models\Pembayaran;
 use Exception;
-use Filament\Notifications\Notification;
 
 use function hash;
 
@@ -79,47 +75,25 @@ class MidtransAPI
     /**
      * @throws \Illuminate\Http\Client\ConnectionException
      */
-    public static function getTransactionStatus(string $orderId): Notification
+    public static function getTransactionStatus(string $orderId): bool|string|int|null|array
     {
+        $data = [];
         $url = config('midtrans.is_production')
             ? 'https://api.midtrans.com/v2/' . $orderId . '/status'
             : 'https://api.sandbox.midtrans.com/v2/' . $orderId . '/status';
 
         $response = config('midtrans.is_production')
-            ? Http::acceptJson()->withBasicAuth(config('midtrans.sb.server_key'), '')->get($url)
-            : Http::acceptJson()->withBasicAuth(config('midtrans.production.server_key'), '')->get($url);
+            ? Http::acceptJson()->withBasicAuth(config('midtrans.production.server_key'), '')->get($url)
+            : Http::acceptJson()->withBasicAuth(config('midtrans.sb.server_key'), '')->get($url);
 
-        $detail = $response->json();
+        $data['responses'] = $response->json();
 
-        if (null === $detail || blank($detail)) {
-            return Notification::make()
-                ->title('Gagal mengambil status transaksi')
-                ->danger()
-                ->icon('heroicon-o-information-circle')
-                ->send();
+        if ( ! null === $data['responses'] || ! blank($data['responses'])) {
+            $sukses = true;
         }
 
-        $update = Pembayaran::where('order_id', $detail['order_id'])->first();
-
-        $notif = MidtransAPI::getTransactionStatus($orderId);
-
-        $status = match ($detail['transaction_status']) {
-            PaymentStatus::SETTLEMENT->value, PaymentStatus::CAPTURE->value => StatusBayar::SUDAH_BAYAR,
-            PaymentStatus::FAILURE->value => StatusBayar::GAGAL,
-            PaymentStatus::PENDING->value => StatusBayar::PENDING,
-            default => StatusBayar::BELUM_BAYAR,
-        };
-
-        $update->status_pembayaran = $status;
-        $update->detail_transaksi = $detail;
-
-        $update->save();
-
-        return Notification::make()
-            ->title('Detail Berhasil di simpan')
-            ->success()
-            ->icon('heroicon-o-check-circle')
-            ->send();
+        $data['sukses'] = $sukses;
+        return $data;
     }
 
     /**

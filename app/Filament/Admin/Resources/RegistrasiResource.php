@@ -14,6 +14,10 @@ use App\Filament\Admin\Resources\RegistrasiResource\Pages;
 use App\Models\Registrasi;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Infolists\Components\Group;
+use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -114,6 +118,54 @@ class RegistrasiResource extends Resource
             ]);
     }
 
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist->schema([
+            Group::make()->schema([
+                Section::make('Data Peserta')->schema([
+                    TextEntry::make('uuid_registrasi')
+                        ->label('UUID'),
+                    TextEntry::make('nama_lengkap'),
+                    TextEntry::make('email'),
+                    TextEntry::make('no_telp'),
+                    TextEntry::make('jenis_kelamin')
+                        ->badge(),
+                    TextEntry::make('tempat_lahir'),
+                    TextEntry::make('tanggal_lahir')->date('d M Y'),
+                    TextEntry::make('alamat')->columnSpanFull(),
+                    TextEntry::make('negara'),
+                    TextEntry::make('prov.name'),
+                    TextEntry::make('kab.name'),
+                    TextEntry::make('kec.name'),
+                    TextEntry::make('tipe_kartu_identitas')->badge(),
+                    TextEntry::make('nomor_kartu_identitas'),
+                    TextEntry::make('nama_kontak_darurat'),
+                    TextEntry::make('nomor_kontak_darurat'),
+                    TextEntry::make('golongan_darah')->badge(),
+                ])->columns(2),
+            ])->columnSpan(2),
+            Group::make()->schema([
+                Section::make('Status Peserta')->schema([
+
+                    TextEntry::make('ukuran_jersey')->badge(),
+                    TextEntry::make('kategori.nama')->badge(),
+                    TextEntry::make('komunitas')->badge(),
+                    TextEntry::make('status_registrasi')->badge(),
+                ])->columns(2),
+                Section::make('Pembayaran')->schema([
+                    TextEntry::make('pembayaran.tipe_pembayaran')
+                        ->label('Tipe Bayar')->badge(),
+                    TextEntry::make('pembayaran.status_pembayaran')
+                        ->label('Status Pembayaran')->badge(),
+                    TextEntry::make('pembayaran.status_pendaftaran')
+                        ->label('Status Pendaftaran')->badge(),
+                    TextEntry::make('pembayaran.status_transaksi')
+                        ->label('Status Transaksi')->badge(),
+                ])->columns(2),
+            ])->columns(1),
+        ])->columns(3);
+    }
+
     public static function table(Table $table): Table
     {
         return $table
@@ -198,6 +250,7 @@ class RegistrasiResource extends Resource
 
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
@@ -220,6 +273,7 @@ class RegistrasiResource extends Resource
             'index' => Pages\ListRegistrasis::route('/'),
             'create' => Pages\CreateRegistrasi::route('/create'),
             'edit' => Pages\EditRegistrasi::route('/{record}/edit'),
+            'view' => Pages\ViewRegistrasi::route('/{record}/view'),
         ];
     }
 }
