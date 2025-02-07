@@ -315,6 +315,14 @@ class EarlybirdResource extends Resource
                         $check = MidtransAPI::getTransactionStatus($record->pembayaran?->order_id);
                         if ($check['sukses']) {
                             $detail = $check['responses'];
+                            if (isset($detail['status_code'])) {
+                                $record->delete();
+                                Notification::make('Info')
+                                    ->danger()
+                                    ->title($detail['status_message'])
+                                    ->send();
+                                return;
+                            }
                             $update = Pembayaran::where('order_id', $detail['order_id'])->first();
 
                             $status = match ($detail['transaction_status']) {
