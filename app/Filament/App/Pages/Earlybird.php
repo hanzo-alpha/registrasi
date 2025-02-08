@@ -320,7 +320,7 @@ class Earlybird extends Page implements HasForms
         $pembayaran->lampiran = null;
         $pembayaran->save();
         $registrasi->save();
-
+        $redirectUrl = $this->getUrl();
         $this->redirect($redirectUrl, navigate: FilamentView::hasSpaMode() && is_app_url((string) $redirectUrl));
 
         if (StatusBayar::BELUM_BAYAR === $status) {

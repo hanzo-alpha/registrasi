@@ -47,113 +47,115 @@ class EarlybirdResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('nama_lengkap')
-                    ->label('Nama Lengkap Peserta')
-                    ->required()
-                    ->autofocus()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('no_telp')
-                    ->label('Nomor Telepon/WA Peserta')
-                    ->required()
-                    ->numeric()
-                    ->maxLength(12),
-                Forms\Components\TextInput::make('email')
-                    ->email()
-                    ->unique(ignoreRecord: true)
-                    ->label('Email Peserta')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('tempat_lahir')
-                    ->label('Tempat Lahir')
-                    ->required(),
-                Forms\Components\DatePicker::make('tanggal_lahir')
-                    ->label('Tanggal Lahir')
-                    ->required()
-                    ->displayFormat('d-m-Y')
-                    ->format('Y-m-d'),
-                Forms\Components\Select::make('jenis_kelamin')
-                    ->label('Jenis Kelamin')
-                    ->options(JenisKelamin::class)
-                    ->required()
-                    ->default(JenisKelamin::LAKI),
-                Forms\Components\Select::make('tipe_kartu_identitas')
-                    ->label('Tipe Kartu Identitas')
-                    ->options(TipeKartuIdentitas::class)
-                    ->required()
-                    ->default(TipeKartuIdentitas::KTP),
-                Forms\Components\TextInput::make('nomor_kartu_identitas')
-                    ->label('Nomor Kartu Identitas')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('nama_kontak_darurat')
-                    ->label('Nama Kontak Darurat')
-                    ->required(),
-                Forms\Components\TextInput::make('nomor_kontak_darurat')
-                    ->label('Nomor Kontak Darurat')
-                    ->required(),
-                Forms\Components\Select::make('golongan_darah')
-                    ->label('Golongan Darah')
-                    ->options(GolonganDarah::class)
-                    ->required(),
-                Forms\Components\TextInput::make('komunitas')
-                    ->label('Komunitas (Optional)')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('alamat')
-                    ->required()
-                    ->columnSpanFull(),
-                Country::make('negara')
-                    ->required()
-                    ->searchable(),
-                Forms\Components\Select::make('provinsi')
-                    ->required()
-                    ->options(Province::pluck('name', 'code'))
-                    ->dehydrated()
-                    ->live(onBlur: true)
-                    ->native(false)
-                    ->searchable()
-                    ->afterStateUpdated(fn(Forms\Set $set) => $set('kabupaten', null)),
-                Forms\Components\Select::make('kabupaten')
-                    ->required()
-                    ->live(onBlur: true)
-                    ->options(fn(Forms\Get $get) => City::where(
-                        'province_code',
-                        $get('provinsi'),
-                    )->pluck(
-                        'name',
-                        'code',
-                    ))
-                    ->native(false)
-                    ->searchable()
-                    ->afterStateUpdated(fn(Forms\Set $set) => $set('kecamatan', null)),
-                Forms\Components\Select::make('kecamatan')
-                    ->required()
-                    ->live(onBlur: true)
-                    ->options(fn(Forms\Get $get) => District::where(
-                        'city_code',
-                        $get('kabupaten'),
-                    )->pluck(
-                        'name',
-                        'code',
-                    ))
-                    ->native(false)
-                    ->searchable(),
-                Forms\Components\Select::make('kategori_lomba')
-                    ->label('Kategori Lomba')
-                    ->relationship('kategori', 'nama')
-                    ->native(false)
-                    ->required(),
-                Forms\Components\Select::make('ukuran_jersey')
-                    ->label('Ukuran Jersey')
-                    ->native(false)
-                    ->options(UkuranJersey::class)
-                    ->enum(UkuranJersey::class)
-                    ->required(),
-                Forms\Components\Select::make('status_earlybird')
-                    ->label('Status Earlybird')
-                    ->native(false)
-                    ->options(StatusRegistrasi::class)
-                    ->enum(StatusRegistrasi::class)
-                    ->required(),
+                Forms\Components\Section::make()->schema([
+                    Forms\Components\TextInput::make('nama_lengkap')
+                        ->label('Nama Lengkap Peserta')
+                        ->required()
+                        ->autofocus()
+                        ->maxLength(255),
+                    Forms\Components\TextInput::make('no_telp')
+                        ->label('Nomor Telepon/WA Peserta')
+                        ->required()
+                        ->numeric()
+                        ->maxLength(12),
+                    Forms\Components\TextInput::make('email')
+                        ->email()
+                        ->unique(ignoreRecord: true)
+                        ->label('Email Peserta')
+                        ->required()
+                        ->maxLength(255),
+                    Forms\Components\TextInput::make('tempat_lahir')
+                        ->label('Tempat Lahir')
+                        ->required(),
+                    Forms\Components\DatePicker::make('tanggal_lahir')
+                        ->label('Tanggal Lahir')
+                        ->required()
+                        ->displayFormat('d-m-Y')
+                        ->format('Y-m-d'),
+                    Forms\Components\Select::make('jenis_kelamin')
+                        ->label('Jenis Kelamin')
+                        ->options(JenisKelamin::class)
+                        ->required()
+                        ->default(JenisKelamin::LAKI),
+                    Forms\Components\Select::make('tipe_kartu_identitas')
+                        ->label('Tipe Kartu Identitas')
+                        ->options(TipeKartuIdentitas::class)
+                        ->required()
+                        ->default(TipeKartuIdentitas::KTP),
+                    Forms\Components\TextInput::make('nomor_kartu_identitas')
+                        ->label('Nomor Kartu Identitas')
+                        ->required()
+                        ->numeric(),
+                    Forms\Components\TextInput::make('nama_kontak_darurat')
+                        ->label('Nama Kontak Darurat')
+                        ->required(),
+                    Forms\Components\TextInput::make('nomor_kontak_darurat')
+                        ->label('Nomor Kontak Darurat')
+                        ->required(),
+                    Forms\Components\Select::make('golongan_darah')
+                        ->label('Golongan Darah')
+                        ->options(GolonganDarah::class)
+                        ->required(),
+                    Forms\Components\TextInput::make('komunitas')
+                        ->label('Komunitas (Optional)')
+                        ->maxLength(255),
+                    Forms\Components\TextInput::make('alamat')
+                        ->required()
+                        ->columnSpanFull(),
+                    Country::make('negara')
+                        ->required()
+                        ->searchable(),
+                    Forms\Components\Select::make('provinsi')
+                        ->required()
+                        ->options(Province::pluck('name', 'code'))
+                        ->dehydrated()
+                        ->live(onBlur: true)
+                        ->native(false)
+                        ->searchable()
+                        ->afterStateUpdated(fn(Forms\Set $set) => $set('kabupaten', null)),
+                    Forms\Components\Select::make('kabupaten')
+                        ->required()
+                        ->live(onBlur: true)
+                        ->options(fn(Forms\Get $get) => City::where(
+                            'province_code',
+                            $get('provinsi'),
+                        )->pluck(
+                            'name',
+                            'code',
+                        ))
+                        ->native(false)
+                        ->searchable()
+                        ->afterStateUpdated(fn(Forms\Set $set) => $set('kecamatan', null)),
+                    Forms\Components\Select::make('kecamatan')
+                        ->required()
+                        ->live(onBlur: true)
+                        ->options(fn(Forms\Get $get) => District::where(
+                            'city_code',
+                            $get('kabupaten'),
+                        )->pluck(
+                            'name',
+                            'code',
+                        ))
+                        ->native(false)
+                        ->searchable(),
+                    Forms\Components\Select::make('kategori_lomba')
+                        ->label('Kategori Lomba')
+                        ->relationship('kategori', 'nama')
+                        ->native(false)
+                        ->required(),
+                    Forms\Components\Select::make('ukuran_jersey')
+                        ->label('Ukuran Jersey')
+                        ->native(false)
+                        ->options(UkuranJersey::class)
+                        ->enum(UkuranJersey::class)
+                        ->required(),
+                    Forms\Components\Select::make('status_earlybird')
+                        ->label('Status Earlybird')
+                        ->native(false)
+                        ->options(StatusRegistrasi::class)
+                        ->enum(StatusRegistrasi::class)
+                        ->required(),
+                ])->columns(2),
             ]);
     }
 
@@ -324,69 +326,76 @@ class EarlybirdResource extends Resource
                             return;
                         }
 
-                        if ($data['sukses']) {
-                            $detail = $data['responses'];
-                            if (isset($detail['status_code'])) {
-                                $record->delete();
-                                $record->pembayaran->delete();
-                                Notification::make('Info')
-                                    ->danger()
-                                    ->title($detail['status_message'])
-                                    ->send();
-                                return;
-                            }
+                        $detail = $data['sukses'] ? $data['responses'] : [];
 
-                            if (empty($detail)) {
-                                Notification::make('Info')
-                                    ->info()
-                                    ->title('Pembayaran sudah berhasil')
-                                    ->send();
-                                return;
-                            }
-
-                            $update = $record->pembayaran;
-
-                            $status = match ($detail['transaction_status']) {
-                                PaymentStatus::SETTLEMENT->value,
-                                PaymentStatus::CAPTURE->value => StatusBayar::SUDAH_BAYAR,
-                                PaymentStatus::FAILURE->value,
-                                PaymentStatus::CANCEL->value,
-                                PaymentStatus::DENY->value,
-                                PaymentStatus::EXPIRE->value => StatusBayar::GAGAL,
-                                PaymentStatus::PENDING->value => StatusBayar::PENDING,
-                                default => StatusBayar::BELUM_BAYAR,
-                            };
-
-                            $statusRegistrasi = match ($detail['transaction_status']) {
-                                PaymentStatus::SETTLEMENT->value,
-                                PaymentStatus::CAPTURE->value => StatusRegistrasi::BERHASIL,
-                                PaymentStatus::FAILURE->value,
-                                PaymentStatus::CANCEL->value,
-                                PaymentStatus::DENY->value,
-                                PaymentStatus::EXPIRE->value => StatusRegistrasi::BATAL,
-                                PaymentStatus::PENDING->value => StatusRegistrasi::TUNDA,
-                                PaymentStatus::AUTHORIZE->value => StatusRegistrasi::PROSES,
-                                PaymentStatus::CHARGEBACK->value,
-                                PaymentStatus::PARTIAL_REFUND->value,
-                                PaymentStatus::REFUND->value,
-                                PaymentStatus::PARTIAL_CHARGEBACK->value => StatusRegistrasi::PENGEMBALIAN,
-                            };
-
-                            $update->status_transaksi = $detail['transaction_status'];
-                            $update->status_pembayaran = $status;
-                            $update->detail_transaksi = $detail;
-
-                            $record->update([
-                                'status_earlybird' => $statusRegistrasi,
-                            ]);
-
-                            $update->save();
-                            Notification::make('sukses')
-                                ->success()
-                                ->title('Berhasil mengupdate pembayaran')
-                                ->send()
-                                ->sendToDatabase(auth()->user());
+                        if (empty($detail) || count($detail) < 1) {
+                            Notification::make()
+                                ->info()
+                                ->title('Data tidak ditemukan')
+                                ->send();
+                            return;
                         }
+
+                        if (isset($detail['transaction_status']) && 'expire' === $detail['transaction_status']) {
+                            $record->delete();
+                            $record->pembayaran->delete();
+                            Notification::make('Info')
+                                ->danger()
+                                ->title($detail['status_message'])
+                                ->send();
+                            return;
+                        }
+
+                        if (isset($detail['transaction_status']) && 'settlement' === $detail['transaction_status']) {
+                            Notification::make()
+                                ->success()
+                                ->title('Transaksi sudah berhasil terbayar')
+                                ->send();
+                            return;
+                        }
+
+                        $update = $record->pembayaran;
+
+                        $status = match ($detail['transaction_status']) {
+                            PaymentStatus::SETTLEMENT->value,
+                            PaymentStatus::CAPTURE->value => StatusBayar::SUDAH_BAYAR,
+                            PaymentStatus::FAILURE->value,
+                            PaymentStatus::CANCEL->value,
+                            PaymentStatus::DENY->value,
+                            PaymentStatus::EXPIRE->value => StatusBayar::GAGAL,
+                            PaymentStatus::PENDING->value => StatusBayar::PENDING,
+                            default => StatusBayar::BELUM_BAYAR,
+                        };
+
+                        $statusRegistrasi = match ($detail['transaction_status']) {
+                            PaymentStatus::SETTLEMENT->value,
+                            PaymentStatus::CAPTURE->value => StatusRegistrasi::BERHASIL,
+                            PaymentStatus::FAILURE->value,
+                            PaymentStatus::CANCEL->value,
+                            PaymentStatus::DENY->value,
+                            PaymentStatus::EXPIRE->value => StatusRegistrasi::BATAL,
+                            PaymentStatus::PENDING->value => StatusRegistrasi::TUNDA,
+                            PaymentStatus::AUTHORIZE->value => StatusRegistrasi::PROSES,
+                            PaymentStatus::CHARGEBACK->value,
+                            PaymentStatus::PARTIAL_REFUND->value,
+                            PaymentStatus::REFUND->value,
+                            PaymentStatus::PARTIAL_CHARGEBACK->value => StatusRegistrasi::PENGEMBALIAN,
+                        };
+
+                        $update->status_transaksi = $detail['transaction_status'];
+                        $update->status_pembayaran = $status;
+                        $update->detail_transaksi = $detail;
+
+                        $record->update([
+                            'status_earlybird' => $statusRegistrasi,
+                        ]);
+
+                        $update->save();
+                        Notification::make('sukses')
+                            ->success()
+                            ->title('Berhasil mengupdate pembayaran')
+                            ->send()
+                            ->sendToDatabase(auth()->user());
                     }),
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\ViewAction::make(),

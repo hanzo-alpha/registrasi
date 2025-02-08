@@ -48,77 +48,79 @@ class RegistrasiResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('nama_lengkap')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('email')
-                    ->email()
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('no_telp')
-                    ->tel()
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\Select::make('jenis_kelamin')
-                    ->required()
-                    ->options(JenisKelamin::class),
-                Forms\Components\TextInput::make('tempat_lahir')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\DatePicker::make('tanggal_lahir')
-                    ->required(),
-                Forms\Components\TextInput::make('alamat')
-                    ->required()
-                    ->maxLength(255),
-                Country::make('negara')
-                    ->required(),
-                Forms\Components\Select::make('provinsi')
-                    ->required()
-                    ->options(Province::pluck('name', 'code'))
-                    ->searchable(),
-                Forms\Components\Select::make('kabupaten')
-                    ->required()
-                    ->options(City::pluck('name', 'code'))
-                    ->searchable(),
-                Forms\Components\Select::make('kecamatan')
-                    ->required()
-                    ->options(District::pluck('name', 'code'))
-                    ->searchable(),
-                Forms\Components\Select::make('tipe_kartu_identitas')
-                    ->required()
-                    ->options(TipeKartuIdentitas::class),
-                Forms\Components\TextInput::make('nomor_kartu_identitas')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('nama_kontak_darurat')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('nomor_kontak_darurat')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\Select::make('golongan_darah')
-                    ->required()
-                    ->options(GolonganDarah::class)
-                    ->searchable(),
-                Forms\Components\TextInput::make('kewarganegaraan')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\Select::make('ukuran_jersey')
-                    ->required()
-                    ->options(UkuranJersey::class)
-                    ->searchable(),
-                Forms\Components\TextInput::make('komunitas')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('jumlah_peserta')
-                    ->required()
-                    ->numeric()
-                    ->default(1),
-                Forms\Components\Select::make('kategori_lomba')
-                    ->required()
-                    ->options(KategoriLomba::class)
-                    ->searchable(),
-                //                Forms\Components\Select::make('status_registrasi')
-                //                    ->options(StatusRegistrasi::class),
+                Forms\Components\Section::make()->schema([
+                    Forms\Components\TextInput::make('nama_lengkap')
+                        ->required()
+                        ->maxLength(255),
+                    Forms\Components\TextInput::make('email')
+                        ->email()
+                        ->required()
+                        ->maxLength(255),
+                    Forms\Components\TextInput::make('no_telp')
+                        ->tel()
+                        ->required()
+                        ->maxLength(255),
+                    Forms\Components\Select::make('jenis_kelamin')
+                        ->required()
+                        ->options(JenisKelamin::class),
+                    Forms\Components\TextInput::make('tempat_lahir')
+                        ->required()
+                        ->maxLength(255),
+                    Forms\Components\DatePicker::make('tanggal_lahir')
+                        ->required(),
+                    Forms\Components\TextInput::make('alamat')
+                        ->required()
+                        ->maxLength(255),
+                    Country::make('negara')
+                        ->required(),
+                    Forms\Components\Select::make('provinsi')
+                        ->required()
+                        ->options(Province::pluck('name', 'code'))
+                        ->searchable(),
+                    Forms\Components\Select::make('kabupaten')
+                        ->required()
+                        ->options(City::pluck('name', 'code'))
+                        ->searchable(),
+                    Forms\Components\Select::make('kecamatan')
+                        ->required()
+                        ->options(District::pluck('name', 'code'))
+                        ->searchable(),
+                    Forms\Components\Select::make('tipe_kartu_identitas')
+                        ->required()
+                        ->options(TipeKartuIdentitas::class),
+                    Forms\Components\TextInput::make('nomor_kartu_identitas')
+                        ->required()
+                        ->maxLength(255),
+                    Forms\Components\TextInput::make('nama_kontak_darurat')
+                        ->required()
+                        ->maxLength(255),
+                    Forms\Components\TextInput::make('nomor_kontak_darurat')
+                        ->required()
+                        ->maxLength(255),
+                    Forms\Components\Select::make('golongan_darah')
+                        ->required()
+                        ->options(GolonganDarah::class)
+                        ->searchable(),
+                    Forms\Components\TextInput::make('kewarganegaraan')
+                        ->required()
+                        ->maxLength(255),
+                    Forms\Components\Select::make('ukuran_jersey')
+                        ->required()
+                        ->options(UkuranJersey::class)
+                        ->searchable(),
+                    Forms\Components\TextInput::make('komunitas')
+                        ->maxLength(255),
+                    Forms\Components\TextInput::make('jumlah_peserta')
+                        ->required()
+                        ->numeric()
+                        ->default(1),
+                    Forms\Components\Select::make('kategori_lomba')
+                        ->required()
+                        ->options(KategoriLomba::class)
+                        ->searchable(),
+                    //                Forms\Components\Select::make('status_registrasi')
+                    //                    ->options(StatusRegistrasi::class),
+                ]),
             ]);
     }
 

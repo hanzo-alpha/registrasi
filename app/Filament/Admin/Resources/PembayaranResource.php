@@ -41,72 +41,76 @@ class PembayaranResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('registrasi_id')
-                    ->relationship('earlybird', 'nama_lengkap')
-                    ->native(false)
-                    ->preload()
-                    ->required()
-                    ->optionsLimit(30),
-                Forms\Components\TextInput::make('order_id')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('nama_kegiatan')
-                    ->maxLength(255),
-                Forms\Components\Select::make('ukuran_jersey')
-                    ->label('Ukuran Jersey')
-                    ->native(false)
-                    ->options(UkuranJersey::class)
-                    ->enum(UkuranJersey::class)
-                    ->required(),
-                Forms\Components\Select::make('kategori_lomba')
-                    ->label('Kategori Lomba')
-                    ->relationship('kategori', 'nama')
-                    ->native(false)
-                    ->required(),
-                Forms\Components\TextInput::make('jumlah')
-                    ->numeric()
-                    ->default(1),
-                Forms\Components\TextInput::make('satuan')
-                    ->maxLength(255)
-                    ->default('peserta'),
-                Forms\Components\TextInput::make('harga_satuan')
-                    ->numeric()
-                    ->default(0),
-                Forms\Components\TextInput::make('total_harga')
-                    ->numeric()
-                    ->default(0),
-                Forms\Components\Select::make('tipe_pembayaran')
-                    ->label('Tipe Pembayaran')
-                    ->native(false)
-                    ->options(TipeBayar::class)
-                    ->enum(TipeBayar::class)
-                    ->required(),
-                Forms\Components\Select::make('status_pembayaran')
-                    ->label('Status Pembayaran')
-                    ->native(false)
-                    ->options(StatusBayar::class)
-                    ->enum(StatusBayar::class)
-                    ->required(),
-                Forms\Components\Select::make('status_transaksi')
-                    ->label('Status Transaksi')
-                    ->native(false)
-                    ->options(PaymentStatus::class)
-                    ->enum(PaymentStatus::class)
-                    ->required(),
-                Forms\Components\Select::make('status_daftar')
-                    ->label('Status Daftar')
-                    ->native(false)
-                    ->options(StatusDaftar::class)
-                    ->enum(StatusDaftar::class)
-                    ->required(),
-                Forms\Components\Select::make('status_pendaftaran')
-                    ->label('Status Pendaftaran')
-                    ->native(false)
-                    ->options(StatusPendaftaran::class)
-                    ->enum(StatusPendaftaran::class)
-                    ->required(),
-                Forms\Components\TextInput::make('keterangan')
-                    ->maxLength(255),
-                Forms\Components\FileUpload::make('lampiran'),
+                Forms\Components\Section::make()
+                    ->schema([
+                        //                        Forms\Components\Select::make('registrasi_id')
+                        //                            ->label('Registrasi')
+                        //                            ->relationship('earlybird', 'nama_lengkap')
+                        //                            ->native(false)
+                        //                            ->preload()
+                        //                            ->required()
+                        //                            ->optionsLimit(30),
+                        Forms\Components\TextInput::make('order_id')
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('nama_kegiatan')
+                            ->maxLength(255),
+                        Forms\Components\Select::make('ukuran_jersey')
+                            ->label('Ukuran Jersey')
+                            ->native(false)
+                            ->options(UkuranJersey::class)
+                            ->enum(UkuranJersey::class)
+                            ->required(),
+                        Forms\Components\Select::make('kategori_lomba')
+                            ->label('Kategori Lomba')
+                            ->relationship('kategori', 'nama')
+                            ->native(false)
+                            ->required(),
+                        Forms\Components\TextInput::make('jumlah')
+                            ->numeric()
+                            ->default(1),
+                        Forms\Components\TextInput::make('satuan')
+                            ->maxLength(255)
+                            ->default('peserta'),
+                        Forms\Components\TextInput::make('harga_satuan')
+                            ->numeric()
+                            ->default(0),
+                        Forms\Components\TextInput::make('total_harga')
+                            ->numeric()
+                            ->default(0),
+                        Forms\Components\Select::make('tipe_pembayaran')
+                            ->label('Tipe Pembayaran')
+                            ->native(false)
+                            ->options(TipeBayar::class)
+                            ->enum(TipeBayar::class)
+                            ->required(),
+                        Forms\Components\Select::make('status_pembayaran')
+                            ->label('Status Pembayaran')
+                            ->native(false)
+                            ->options(StatusBayar::class)
+                            ->enum(StatusBayar::class)
+                            ->required(),
+                        Forms\Components\Select::make('status_transaksi')
+                            ->label('Status Transaksi')
+                            ->native(false)
+                            ->options(PaymentStatus::class)
+                            ->enum(PaymentStatus::class)
+                            ->required(),
+                        Forms\Components\Select::make('status_daftar')
+                            ->label('Status Daftar')
+                            ->native(false)
+                            ->options(StatusDaftar::class)
+                            ->enum(StatusDaftar::class)
+                            ->required(),
+                        Forms\Components\Select::make('status_pendaftaran')
+                            ->label('Status Pendaftaran')
+                            ->native(false)
+                            ->options(StatusPendaftaran::class)
+                            ->enum(StatusPendaftaran::class)
+                            ->required(),
+                        Forms\Components\TextInput::make('keterangan')
+                            ->maxLength(255),
+                        //                        Forms\Components\FileUpload::make('lampiran'),
+                    ])->columns(2),
             ]);
     }
 
@@ -214,7 +218,7 @@ class PembayaranResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('earlybird.uuid_earlybird')
+                Tables\Columns\TextColumn::make('order_id')
                     ->label('Order ID')
                     ->searchable()
                     ->sortable()
