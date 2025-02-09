@@ -165,29 +165,63 @@ class EarlybirdResource extends Resource
             Group::make()->schema([
                 Section::make('Data Peserta')->schema([
                     TextEntry::make('uuid_earlybird')
-                        ->label('UUID'),
-                    TextEntry::make('nama_lengkap'),
-                    TextEntry::make('email'),
-                    TextEntry::make('no_telp'),
+                        ->label('UUID')
+                        ->color('secondary'),
+                    TextEntry::make('nama_lengkap')
+                        ->label('Nama Lengkap')
+                        ->color('secondary'),
+                    TextEntry::make('email')
+                        ->label('Email')
+                        ->color('secondary'),
+                    TextEntry::make('no_telp')
+                        ->label('No Telp')
+                        ->color('secondary'),
                     TextEntry::make('jenis_kelamin')
+                        ->label('Jenis Kelamin')
                         ->badge(),
-                    TextEntry::make('tempat_lahir'),
-                    TextEntry::make('tanggal_lahir')->date('d M Y'),
-                    TextEntry::make('alamat')->columnSpanFull(),
-                    TextEntry::make('negara'),
-                    TextEntry::make('prov.name'),
-                    TextEntry::make('kab.name'),
-                    TextEntry::make('kec.name'),
-                    TextEntry::make('tipe_kartu_identitas')->badge(),
-                    TextEntry::make('nomor_kartu_identitas'),
-                    TextEntry::make('nama_kontak_darurat'),
-                    TextEntry::make('nomor_kontak_darurat'),
-                    TextEntry::make('golongan_darah')->badge(),
+                    TextEntry::make('tempat_lahir')
+                        ->label('Tempat Lahir')
+                        ->color('secondary'),
+                    TextEntry::make('tanggal_lahir')
+                        ->label('Tanggal Lahir')
+                        ->date('d M Y')
+                        ->color('secondary'),
+                    TextEntry::make('tipe_kartu_identitas')
+                        ->label('Tipe Kartu Identitas')
+                        ->badge(),
+                    TextEntry::make('nomor_kartu_identitas')
+                        ->label('Nomor Kartu Identitas')
+                        ->color('secondary'),
+                    TextEntry::make('nama_kontak_darurat')
+                        ->label('Nama Kontak Darurat')
+                        ->color('secondary'),
+                    TextEntry::make('nomor_kontak_darurat')
+                        ->label('Nomor Kontak Darurat')
+                        ->color('secondary'),
+                    TextEntry::make('golongan_darah')->badge()
+                        ->label('Golongan Darah'),
+                ])->columns(2),
+                Section::make('Data Alamat')->schema([
+                    TextEntry::make('alamat')
+                        ->label('Alamat')
+                        ->columnSpanFull()
+                        ->color('secondary'),
+                    TextEntry::make('negara')
+                        ->label('Negara')
+                        ->color('secondary'),
+                    TextEntry::make('prov.name')
+                        ->label('Provinsi')
+                        ->color('secondary'),
+                    TextEntry::make('kab.name')
+                        ->label('Kabupaten')
+                        ->color('secondary'),
+                    TextEntry::make('kec.name')
+                        ->label('Kecamatan')
+                        ->color('secondary'),
                 ])->columns(2),
             ])->columnSpan(2),
             Group::make()->schema([
                 Section::make('Status Peserta')->schema([
-
                     TextEntry::make('ukuran_jersey')->badge(),
                     TextEntry::make('kategori.nama')->badge(),
                     TextEntry::make('komunitas')->badge(),

@@ -141,22 +141,6 @@ class PembayaranResource extends Resource
                         ->label('Tanggal Lahir')
                         ->date('d M Y')
                         ->color('secondary'),
-                    TextEntry::make('earlybird.alamat')
-                        ->label('Alamat')
-                        ->columnSpanFull()
-                        ->color('secondary'),
-                    TextEntry::make('earlybird.negara')
-                        ->label('Negara')
-                        ->color('secondary'),
-                    TextEntry::make('earlybird.prov.name')
-                        ->label('Provinsi')
-                        ->color('secondary'),
-                    TextEntry::make('earlybird.kab.name')
-                        ->label('Kabupaten')
-                        ->color('secondary'),
-                    TextEntry::make('earlybird.kec.name')
-                        ->label('Kecamatan')
-                        ->color('secondary'),
                     TextEntry::make('earlybird.tipe_kartu_identitas')
                         ->badge()
                         ->label('Tipe Kartu Identitas')
@@ -173,6 +157,25 @@ class PembayaranResource extends Resource
                     TextEntry::make('earlybird.golongan_darah')
                         ->badge()
                         ->label('Golongan Darah'),
+                ])->columns(2),
+
+                Section::make('Data Alamat')->schema([
+                    TextEntry::make('earlybird.alamat')
+                        ->label('Alamat')
+                        ->columnSpanFull()
+                        ->color('secondary'),
+                    TextEntry::make('earlybird.negara')
+                        ->label('Negara')
+                        ->color('secondary'),
+                    TextEntry::make('earlybird.prov.name')
+                        ->label('Provinsi')
+                        ->color('secondary'),
+                    TextEntry::make('earlybird.kab.name')
+                        ->label('Kabupaten')
+                        ->color('secondary'),
+                    TextEntry::make('earlybird.kec.name')
+                        ->label('Kecamatan')
+                        ->color('secondary'),
                 ])->columns(2),
             ])->columnSpan(2),
             Group::make()->schema([
@@ -211,10 +214,6 @@ class PembayaranResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('uuid_pembayaran')
-                    ->searchable()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('order_id')
                     ->searchable()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
