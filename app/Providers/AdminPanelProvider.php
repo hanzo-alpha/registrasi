@@ -61,7 +61,7 @@ class AdminPanelProvider extends PanelProvider
             ->plugins([
                 BreezyCore::make()
                     ->myProfile(
-                        navigationGroup: 'Pengaturan',
+                        navigationGroup: 'Settings',
                     ),
                 FilamentWebhookClientPlugin::make(),
                 FilamentJobsMonitorPlugin::make(),
