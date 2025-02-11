@@ -14,6 +14,7 @@ use App\Enums\StatusRegistrasi;
 use App\Enums\TipeBayar;
 use App\Enums\TipeKartuIdentitas;
 use App\Enums\UkuranJersey;
+use App\Mail\PembayaranBerhasil;
 use App\Models\KategoriLomba;
 use App\Models\Pembayaran;
 use App\Services\MidtransAPI;
@@ -38,6 +39,7 @@ use function Filament\Support\is_app_url;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Number;
 use Illuminate\Support\Str;
@@ -54,6 +56,7 @@ class Earlybird extends Page implements HasForms
     use HasUnsavedDataChangesAlert;
     use InteractsWithFormActions;
     use InteractsWithForms;
+
     public ?Model $record = null;
     public ?array $data = [];
 
@@ -367,6 +370,14 @@ class Earlybird extends Page implements HasForms
                 ->send()
                 ->sendToDatabase(auth()->user());
         }
+
+        /* Kirim email untuk pengambilan perlengkapan peserta */
+        //        $peserta = $pembayaran->earlybird->email;
+        //
+        //        Mail::to($peserta)
+        //            ->cc('ulueretrailrun@gmail.com')
+        //            ->locale(config('app.locale'))
+        //            ->queue(new PembayaranBerhasil($pembayaran));
 
         return Notification::make()
             ->title('Pembayaran Berhasil')

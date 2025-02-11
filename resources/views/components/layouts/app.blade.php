@@ -21,11 +21,6 @@
     <link rel="stylesheet" href="{{ asset('frontend/css/bootstrap.min.css') }}" type="text/css"/>
     <link rel="stylesheet" type="text/css" href="{{ asset('frontend/css/style.css') }}"/>
     @livewireStyles
-    {{--    @vite([--}}
-    {{--        'resources/css/filament/app/theme.css',--}}
-    {{--        'resources/css/app.css',--}}
-    {{--        'resources/js/app.js'--}}
-    {{--    ])--}}
 </head>
 
 <body data-bs-spy="scroll" data-bs-target=".navbar" data-bs-offset="60">
