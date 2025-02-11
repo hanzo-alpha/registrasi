@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Webhooks;
 
 use Illuminate\Http\Request;
@@ -9,7 +11,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class RegistrasiResponseWebhook implements RespondsToWebhook
 {
-
     public function respondToValidWebhook(Request $request, WebhookConfig $config): Response
     {
         return response()->json($request);

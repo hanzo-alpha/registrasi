@@ -14,6 +14,7 @@ use App\Traits\HasWilayah;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Pembayaran extends Model
 {
@@ -67,6 +68,11 @@ class Pembayaran extends Model
     public function kategori(): BelongsTo
     {
         return $this->belongsTo(KategoriLomba::class, 'kategori_lomba', 'id');
+    }
+
+    public function historiPembayaran(): HasOne
+    {
+        return $this->hasOne(HistoriPembayaran::class, 'pembayaran_id', 'id');
     }
 
     protected function casts(): array
