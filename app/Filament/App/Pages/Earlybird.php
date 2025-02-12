@@ -232,8 +232,15 @@ class Earlybird extends Page implements HasForms
                                     ->required(),
                             ])->columns(2),
                     ]),
-            ])->submitAction(new HtmlString(Blade::render(
-                <<<BLADE
+            ])
+//                ->previousAction(
+//                    fn(Forms\Components\Actions\Action $action) => $action->disabled(),
+//                )
+//                ->nextAction(
+//                    fn(Forms\Components\Actions\Action $action) => $action->disabled(),
+//                )
+                ->submitAction(new HtmlString(Blade::render(
+                    <<<BLADE
                 <x-filament::button
                     type="submit"
                     size="sm"
@@ -241,7 +248,7 @@ class Earlybird extends Page implements HasForms
                     Submit
                 </x-filament::button>
             BLADE,
-            )))
+                )))
                 ->columnSpanFull(),
         ];
     }
