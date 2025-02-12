@@ -6,8 +6,6 @@ namespace App\Filament\Admin\Resources;
 
 use App\Enums\GolonganDarah;
 use App\Enums\JenisKelamin;
-use App\Enums\PaymentStatus;
-use App\Enums\StatusBayar;
 use App\Enums\StatusRegistrasi;
 use App\Enums\TipeKartuIdentitas;
 use App\Enums\UkuranJersey;
@@ -403,85 +401,27 @@ class EarlybirdResource extends Resource
     private static function checkPembayaran(Model|Earlybird $record): void
     {
         $orderId = $record->pembayaran?->order_id;
-        $data = MidtransAPI::getTransactionStatus($orderId);
+        $data = MidtransAPI::getStatusMessage($orderId);
 
-        if (blank($data) || 0 === count($data)) {
-            Notification::make('Info')
-                ->danger()
-                ->title('Data sudah terupdate')
-                ->send();
-            return;
-        }
-
-        $detail = $data['sukses'] ? $data['responses'] : [];
-
-        if (isset($detail['transaction_status']) && 'expire' === $detail['transaction_status']
-            || isset($detail['status_code']) && '404' === $detail['status_code']) {
-            $record->delete();
-            $record->pembayaran->delete();
-            Notification::make('Info')
-                ->danger()
-                ->title('Transaksi tidak ditemukan.')
-                ->send();
-            return;
-        }
-
-        if (isset($detail['transaction_status']) && 'settlement' === $detail['transaction_status']) {
+        if (null === $data['status_message']) {
             Notification::make()
-                ->success()
-                ->title('Transaksi sudah berhasil terbayar')
+                ->danger()
+                ->title('Status Transaksi')
+                ->body('Transaksi tidak ditemukan')
                 ->send();
             return;
         }
 
-        if (isset($detail['transaction_status']) && 'pending' === $detail['transaction_status']) {
-            Notification::make()
-                ->info()
-                ->title('Transaksi sedang dalam proses. Mohon tunggu sejenak.')
-                ->send();
-            return;
-        }
-
-        $update = $record->pembayaran;
-
-        $status = match ($detail['transaction_status']) {
-            PaymentStatus::SETTLEMENT->value,
-            PaymentStatus::CAPTURE->value => StatusBayar::SUDAH_BAYAR,
-            PaymentStatus::FAILURE->value,
-            PaymentStatus::CANCEL->value,
-            PaymentStatus::DENY->value,
-            PaymentStatus::EXPIRE->value => StatusBayar::GAGAL,
-            PaymentStatus::PENDING->value => StatusBayar::PENDING,
-            default => StatusBayar::BELUM_BAYAR,
+        $notif = Notification::make('statuspembayaran');
+        match ($data['status']) {
+            'success' => $notif->success(),
+            'warning' => $notif->warning(),
+            'info' => $notif->info(),
+            'danger' => $notif->danger(),
         };
 
-        $statusRegistrasi = match ($detail['transaction_status']) {
-            PaymentStatus::SETTLEMENT->value,
-            PaymentStatus::CAPTURE->value => StatusRegistrasi::BERHASIL,
-            PaymentStatus::FAILURE->value,
-            PaymentStatus::CANCEL->value,
-            PaymentStatus::DENY->value,
-            PaymentStatus::EXPIRE->value => StatusRegistrasi::BATAL,
-            PaymentStatus::PENDING->value => StatusRegistrasi::TUNDA,
-            PaymentStatus::AUTHORIZE->value => StatusRegistrasi::PROSES,
-            PaymentStatus::CHARGEBACK->value,
-            PaymentStatus::PARTIAL_REFUND->value,
-            PaymentStatus::REFUND->value,
-            PaymentStatus::PARTIAL_CHARGEBACK->value => StatusRegistrasi::PENGEMBALIAN,
-        };
-
-        $update->status_transaksi = $detail['transaction_status'];
-        $update->status_pembayaran = $status;
-        $update->detail_transaksi = $detail;
-
-        $record->update([
-            'status_earlybird' => $statusRegistrasi,
-        ]);
-
-        $update->save();
-        Notification::make('sukses')
-            ->success()
-            ->title('Berhasil mengupdate pembayaran')
+        $notif->title('Notifikasi Pembayaran')
+            ->body($data['status_message'])
             ->send()
             ->sendToDatabase(auth()->user());
     }

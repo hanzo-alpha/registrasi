@@ -27,6 +27,9 @@ return new class () extends Migration {
             $table->string('transaction_type')->nullable();
             $table->string('acquirer')->nullable();
             $table->string('issuer')->nullable();
+            $table->json('va_numbers')->nullable();
+            $table->json('payment_amounts')->nullable();
+            $table->string('expiry_time')->nullable();
             $table->timestamps();
         });
     }

@@ -31,6 +31,9 @@ class HistoriPembayaranResource extends JsonResource
             'transaction_type' => $this->transaction_type,
             'acquirer' => $this->acquirer,
             'issuer' => $this->issuer,
+            'va_numbers' => $this->va_numbers,
+            'payment_amounts' => $this->payment_amounts,
+            'expiry_time' => $this->expiry_time,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

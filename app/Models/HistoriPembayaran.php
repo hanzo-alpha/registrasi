@@ -28,15 +28,18 @@ class HistoriPembayaran extends Model
         'transaction_type',
         'acquirer',
         'issuer',
+        'va_numbers',
+        'payment_amounts',
+        'expiry_time',
     ];
 
-    //    protected function casts(): array
-    //    {
-    //        return [
-    //            'settlement_time' => 'datetime',
-    //            'transaction_time' => 'datetime',
-    //        ];
-    //    }
+    protected function casts(): array
+    {
+        return [
+            'va_numbers' => 'array',
+            'payment_amounts' => 'array',
+        ];
+    }
 
     //    public function pembayaran(): BelongsTo
     //    {
