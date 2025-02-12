@@ -247,6 +247,8 @@ class EarlybirdResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->poll('5s')
+            ->deferLoading()
             ->columns([
                 Tables\Columns\TextColumn::make('uuid_earlybird')
                     ->searchable()
@@ -413,7 +415,8 @@ class EarlybirdResource extends Resource
 
         $detail = $data['sukses'] ? $data['responses'] : [];
 
-        if (isset($detail['transaction_status']) && 'expire' === $detail['transaction_status'] || isset($detail['status_code']) && '404' === $detail['status_code']) {
+        if (isset($detail['transaction_status']) && 'expire' === $detail['transaction_status']
+            || isset($detail['status_code']) && '404' === $detail['status_code']) {
             $record->delete();
             $record->pembayaran->delete();
             Notification::make('Info')
@@ -427,6 +430,14 @@ class EarlybirdResource extends Resource
             Notification::make()
                 ->success()
                 ->title('Transaksi sudah berhasil terbayar')
+                ->send();
+            return;
+        }
+
+        if (isset($detail['transaction_status']) && 'pending' === $detail['transaction_status']) {
+            Notification::make()
+                ->info()
+                ->title('Transaksi sedang dalam proses. Mohon tunggu sejenak.')
                 ->send();
             return;
         }

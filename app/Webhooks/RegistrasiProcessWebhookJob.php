@@ -11,8 +11,8 @@ class RegistrasiProcessWebhookJob extends SpatieProcessWebhookJob
 {
     public function handle(): void
     {
-        $data = collect($this->webhookCall->payload)->toArray();
-        HistoriPembayaran::create($data);
+        //        $data = collect($this->webhookCall->payload)->toArray();
+        //        HistoriPembayaran::create($data);
         http_response_code(200);
     }
 }

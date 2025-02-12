@@ -212,6 +212,8 @@ class PembayaranResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->poll('5s')
+            ->deferLoading()
             ->columns([
                 Tables\Columns\TextColumn::make('uuid_pembayaran')
                     ->searchable()
