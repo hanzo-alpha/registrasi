@@ -18,7 +18,6 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Jeffgreco13\FilamentBreezy\BreezyCore;
-use Tapp\FilamentWebhookClient\FilamentWebhookClientPlugin;
 
 class AppPanelProvider extends PanelProvider
 {
@@ -66,7 +65,7 @@ class AppPanelProvider extends PanelProvider
                     ->myProfile(
                         navigationGroup: 'Pengaturan',
                     ),
-                //                FilamentWebhookClientPlugin::make(),
+
                 FilamentThemeInspectorPlugin::make()
                     ->disabled(fn() => ! app()->hasDebugModeEnabled())
                     ->toggle(),
@@ -74,18 +73,16 @@ class AppPanelProvider extends PanelProvider
             ->discoverResources(in: app_path('Filament/App/Resources'), for: 'App\\Filament\\App\\Resources')
             ->discoverPages(in: app_path('Filament/App/Pages'), for: 'App\\Filament\\App\\Pages')
             ->pages([
-                //                Pages\Dashboard::class,
+
             ])
             ->discoverWidgets(in: app_path('Filament/App/Widgets'), for: 'App\\Filament\\App\\Widgets')
             ->widgets([
-                //                Widgets\AccountWidget::class,
-                //                Widgets\FilamentInfoWidget::class,
+
             ])
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
                 StartSession::class,
-                //                AuthenticateSession::class,
                 ShareErrorsFromSession::class,
                 VerifyCsrfToken::class,
                 SubstituteBindings::class,
@@ -93,7 +90,7 @@ class AppPanelProvider extends PanelProvider
                 DispatchServingFilamentEvent::class,
             ])
             ->authMiddleware([
-                //                Authenticate::class,
+
             ])
             ->viteTheme('resources/css/filament/app/theme.css');
     }

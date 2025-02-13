@@ -120,7 +120,7 @@ class PembayaranResource extends Resource
             Group::make()->schema([
                 Section::make('Data Peserta')->schema([
                     TextEntry::make('earlybird.uuid_earlybird')
-                        ->label('Order ID')
+                        ->label('ID Peserta')
                         ->color('secondary'),
                     TextEntry::make('earlybird.nama_lengkap')
                         ->label('Nama Lengkap')

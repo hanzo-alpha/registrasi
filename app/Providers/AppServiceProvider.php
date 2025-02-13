@@ -60,8 +60,8 @@ class AppServiceProvider extends ServiceProvider
             scopes: [
                 Pendaftaran::class,
                 Earlybird::class,
-                EarlybirdResource::class,
-                PembayaranResource::class,
+                //                EarlybirdResource::class,
+                //                PembayaranResource::class,
             ],
         );
     }

@@ -47,7 +47,7 @@ class Pembayaran extends Model
 
     public function uniqueIds(): array
     {
-        return ['uuid_pembayaran', 'order_id'];
+        return ['uuid_pembayaran'];
     }
 
     public function getRouteKeyName(): string
