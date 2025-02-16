@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Filament\Admin\Pages\Auth\Login;
+use CodeWithDennis\FilamentThemeInspector\FilamentThemeInspectorPlugin;
 use Croustibat\FilamentJobsMonitor\FilamentJobsMonitorPlugin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -62,6 +63,8 @@ class AdminPanelProvider extends PanelProvider
                     ),
                 FilamentWebhookClientPlugin::make(),
                 FilamentJobsMonitorPlugin::make(),
+                FilamentThemeInspectorPlugin::make()
+                    ->disabled(fn() => ! app()->hasDebugModeEnabled()),
             ])
             ->resources([
                 config('filament-logger.activity_resource'),
