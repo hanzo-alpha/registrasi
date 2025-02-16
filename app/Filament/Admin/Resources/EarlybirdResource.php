@@ -10,6 +10,7 @@ use App\Enums\StatusRegistrasi;
 use App\Enums\TipeKartuIdentitas;
 use App\Enums\UkuranJersey;
 use App\Filament\Admin\Resources\EarlybirdResource\Pages;
+use App\Filament\Admin\Widgets\EarlybirdOverview;
 use App\Models\Earlybird;
 use App\Services\MidtransAPI;
 use Filament\Forms;
@@ -411,6 +412,13 @@ class EarlybirdResource extends Resource
             'create' => Pages\CreateEarlybird::route('/create'),
             'edit' => Pages\EditEarlybird::route('/{record}/edit'),
             'view' => Pages\ViewEarlybirds::route('/{record}/view'),
+        ];
+    }
+
+    public static function getWidgets(): array
+    {
+        return [
+            EarlybirdOverview::class,
         ];
     }
 

@@ -11,6 +11,7 @@ use App\Enums\StatusPendaftaran;
 use App\Enums\TipeBayar;
 use App\Enums\UkuranJersey;
 use App\Filament\Admin\Resources\PembayaranResource\Pages;
+use App\Filament\Admin\Widgets\PembayaranOverview;
 use App\Filament\Exports\PembayaranExporter;
 use App\Models\Pembayaran;
 use Filament\Forms;
@@ -226,7 +227,7 @@ class PembayaranResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('earlybird.nama_lengkap')
+                Tables\Columns\TextColumn::make(getPembayaranRelationshipLabel())
                     ->searchable()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: false),
@@ -340,6 +341,13 @@ class PembayaranResource extends Resource
     {
         return [
 
+        ];
+    }
+
+    public static function getWidgets(): array
+    {
+        return [
+            PembayaranOverview::class,
         ];
     }
 

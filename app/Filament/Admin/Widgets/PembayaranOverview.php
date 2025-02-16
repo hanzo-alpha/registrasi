@@ -23,16 +23,27 @@ class PembayaranOverview extends BaseWidget
         $totalPending = Pembayaran::where('status_pendaftaran', StatusPendaftaran::EARLYBIRD)
             ->where('status_transaksi', PaymentStatus::PENDING)
             ->sum('total_harga');
+        $totalFailed = Pembayaran::where('status_pendaftaran', StatusPendaftaran::EARLYBIRD)
+            ->whereIn('status_transaksi', [
+                PaymentStatus::CANCEL,
+                PaymentStatus::FAILURE,
+                PaymentStatus::DENY,
+                PaymentStatus::EXPIRE,
+            ])
+            ->sum('total_harga');
         return [
             Stat::make('Total Pembayaran', Number::format($totalBayarLunas, 0, null, 'id'))
-                ->description('Total Pembayaran Lunas')
-                ->color('success'),
+                ->description('Pembayaran Yang Berhasil')
+                ->color('primary'),
             Stat::make('Total Pembayaran DiTunda', Number::format($totalPending, 0, null, 'id'))
-                ->description('Total Semua Pembayaran Yang Ditunda')
+                ->description('Pembayaran Yang Tertunda')
+                ->color('info'),
+            Stat::make('Total Pembayaran', Number::format($totalFailed, 0, null, 'id'))
+                ->description('Pembayaran Yang Kedaluwarsa')
                 ->color('danger'),
             Stat::make('Total Pembayaran', Number::format($totalBayar, 0, null, 'id'))
-                ->description('Total Semua Pembayaran Masuk')
-                ->color('info'),
+                ->description('Total Semua Pembayaran')
+                ->color('warning'),
         ];
     }
 }

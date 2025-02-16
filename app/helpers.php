@@ -13,6 +13,18 @@ if ( ! function_exists('date_format')) {
     }
 }
 
+if ( ! function_exists('getPembayaranRelationshipLabel')) {
+    function getPembayaranRelationshipLabel(): string
+    {
+        $q = (null !== request()) ? request()->get('activeTab') : null;
+
+        return match ($q) {
+            'early_bird', null => 'earlybird.nama_lengkap',
+            'normal' => 'registrasi.nama_lengkap',
+        };
+    }
+}
+
 if ( ! function_exists('midtrans_config')) {
     function midtrans_config(): string
     {

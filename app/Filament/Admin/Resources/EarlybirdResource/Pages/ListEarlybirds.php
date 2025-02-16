@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Admin\Resources\EarlybirdResource\Pages;
 
 use App\Filament\Admin\Resources\EarlybirdResource;
+use App\Filament\Admin\Widgets\EarlybirdOverview;
 use App\Filament\Exports\EarlybirdExporter;
 use Filament\Actions;
 use Filament\Actions\Exports\Enums\ExportFormat;
@@ -13,6 +14,13 @@ use Filament\Resources\Pages\ListRecords;
 class ListEarlybirds extends ListRecords
 {
     protected static string $resource = EarlybirdResource::class;
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            EarlybirdOverview::class,
+        ];
+    }
 
     protected function getHeaderActions(): array
     {
