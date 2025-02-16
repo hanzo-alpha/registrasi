@@ -116,9 +116,12 @@ class MidtransAPI
 
         $details = $response->collect()->except(['id'])->toArray();
         $responses = $response->collect()->toArray();
+        if (count($responses) <= 0) {
+            $statusMessage = 'Transaksi Dengan Order ID : ' . $orderId . ' tidak ditemukan';
+        }
         $transaction = $responses['transaction_status'] ?? null;
         $type = $responses['payment_type'] ?? null;
-        $order_id = $orderId ?? $responses['order_id'];
+        $order_id = $responses['order_id'] ?? null;
         $fraud = $responses['fraud_status'] ?? null;
 
         $pembayaran = Pembayaran::where('order_id', $order_id)->first();

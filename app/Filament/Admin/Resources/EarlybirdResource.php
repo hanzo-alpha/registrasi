@@ -362,7 +362,13 @@ class EarlybirdResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->action(function (Collection $records): void {
+                            $records->each(function ($record): void {
+                                $record->delete();
+                                $record->pembayaran->delete();
+                            });
+                        }),
                     Tables\Actions\BulkAction::make('check_pembayaran')
                         ->label('Check Pembayaran')
                         ->icon('heroicon-s-check')
