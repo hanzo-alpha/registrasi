@@ -36,6 +36,7 @@ return new class () extends Migration {
                 $table->string('status_earlybird')->nullable();
                 $table->string('status_pendaftaran')->nullable()->default(StatusPendaftaran::EARLYBIRD);
                 $table->timestamps();
+                $table->softDeletes();
             });
         }
 

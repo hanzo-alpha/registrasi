@@ -7,12 +7,11 @@ namespace App\Filament\Admin\Resources;
 use App\Enums\GolonganDarah;
 use App\Enums\JenisKelamin;
 use App\Enums\KategoriLomba;
-use App\Enums\PaymentStatus;
-use App\Enums\StatusBayar;
 use App\Enums\StatusRegistrasi;
 use App\Enums\TipeKartuIdentitas;
 use App\Enums\UkuranJersey;
 use App\Filament\Admin\Resources\RegistrasiResource\Pages;
+use App\Models\Earlybird;
 use App\Models\Registrasi;
 use App\Services\MidtransAPI;
 use Filament\Forms;
@@ -23,8 +22,13 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Support\Colors\Color;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 use KodePandai\Indonesia\Models\City;
 use KodePandai\Indonesia\Models\District;
 use KodePandai\Indonesia\Models\Province;
@@ -245,7 +249,17 @@ class RegistrasiResource extends Resource
                     ->searchable(),
             ])
             ->filters([
-
+                Tables\Filters\SelectFilter::make('status_registrasi')
+                    ->options(StatusRegistrasi::class)
+                    ->searchable(),
+                Tables\Filters\SelectFilter::make('jenis_kelamin')
+                    ->options(JenisKelamin::class)
+                    ->searchable(),
+                Tables\Filters\SelectFilter::make('kategori_lomba')
+                    ->relationship('kategori', 'nama')
+                    ->preload()
+                    ->searchable(),
+                Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
                 Tables\Actions\Action::make('Check Pembayaran')
@@ -253,93 +267,36 @@ class RegistrasiResource extends Resource
                     ->icon('heroicon-o-check')
                     ->color('yellow')
                     ->action(function ($record): void {
-                        $orderId = $record->pembayaran?->order_id;
-                        $data = MidtransAPI::getTransactionStatus($orderId);
-
-                        if (blank($data) || 0 === count($data)) {
-                            Notification::make('Info')
-                                ->danger()
-                                ->title('Data sudah terupdate')
-                                ->send();
-                            return;
-                        }
-
-                        if ($data['sukses']) {
-                            $detail = $data['responses'];
-                            if (isset($detail['status_code']) && 404 === $detail['status_code']) {
-                                $record->delete();
-                                $record->pembayaran->delete();
-                                Notification::make('Info')
-                                    ->danger()
-                                    ->title($detail['status_message'])
-                                    ->send();
-                                return;
-                            }
-
-                            if (empty($detail)) {
-                                Notification::make('Info')
-                                    ->info()
-                                    ->title('Pembayaran sudah berhasil')
-                                    ->send();
-                                return;
-                            }
-
-                            $update = $record->pembayaran;
-
-                            $status = match ($detail['transaction_status']) {
-                                PaymentStatus::SETTLEMENT->value,
-                                PaymentStatus::CAPTURE->value => StatusBayar::SUDAH_BAYAR,
-                                PaymentStatus::FAILURE->value,
-                                PaymentStatus::CANCEL->value,
-                                PaymentStatus::DENY->value,
-                                PaymentStatus::EXPIRE->value => StatusBayar::GAGAL,
-                                PaymentStatus::PENDING->value => StatusBayar::PENDING,
-                                default => StatusBayar::BELUM_BAYAR,
-                            };
-
-                            $statusRegistrasi = match ($detail['transaction_status']) {
-                                PaymentStatus::SETTLEMENT->value,
-                                PaymentStatus::CAPTURE->value => StatusRegistrasi::BERHASIL,
-                                PaymentStatus::FAILURE->value,
-                                PaymentStatus::CANCEL->value,
-                                PaymentStatus::DENY->value,
-                                PaymentStatus::EXPIRE->value => StatusRegistrasi::BATAL,
-                                PaymentStatus::PENDING->value => StatusRegistrasi::TUNDA,
-                                PaymentStatus::AUTHORIZE->value => StatusRegistrasi::PROSES,
-                                PaymentStatus::CHARGEBACK->value,
-                                PaymentStatus::PARTIAL_REFUND->value,
-                                PaymentStatus::REFUND->value,
-                                PaymentStatus::PARTIAL_CHARGEBACK->value => StatusRegistrasi::PENGEMBALIAN,
-                            };
-
-                            $update->status_transaksi = $detail['transaction_status'];
-                            $update->status_pembayaran = $status;
-                            $update->detail_transaksi = $detail;
-
-                            $stat = ('App\Models\Registrasi' === self::getModel())
-                                ? 'status_registrasi' : 'status_earlybird';
-
-                            $record->update([
-                                $stat => $statusRegistrasi,
-                            ]);
-
-                            $update->save();
-                            Notification::make('sukses')
-                                ->success()
-                                ->title('Berhasil mengupdate pembayaran')
-                                ->send()
-                                ->sendToDatabase(auth()->user());
-                        }
+                        self::checkPembayaran($record);
                     }),
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\ViewAction::make(),
                     Tables\Actions\EditAction::make(),
                     Tables\Actions\DeleteAction::make(),
+                    Tables\Actions\ForceDeleteAction::make(),
+                    Tables\Actions\RestoreAction::make(),
                 ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->action(function (Collection $records): void {
+                            $records->each(function ($record): void {
+                                $record->delete();
+                                $record->pembayaran->delete();
+                            });
+                        }),
+                    Tables\Actions\ForceDeleteBulkAction::make(),
+                    Tables\Actions\RestoreBulkAction::make(),
+                    Tables\Actions\BulkAction::make('check_pembayaran')
+                        ->label('Check Pembayaran')
+                        ->icon('heroicon-s-check')
+                        ->color(Color::Yellow)
+                        ->action(function (Collection $records): void {
+                            $records->each(function (Model $record): void {
+                                self::checkPembayaran($record);
+                            });
+                        }),
                 ]),
             ]);
     }
@@ -351,6 +308,14 @@ class RegistrasiResource extends Resource
         ];
     }
 
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                SoftDeletingScope::class,
+            ]);
+    }
+
     public static function getPages(): array
     {
         return [
@@ -359,5 +324,38 @@ class RegistrasiResource extends Resource
             'edit' => Pages\EditRegistrasi::route('/{record}/edit'),
             'view' => Pages\ViewRegistrasi::route('/{record}/view'),
         ];
+    }
+
+    /**
+     * @param  \Illuminate\Database\Eloquent\Model|\App\Models\Earlybird  $record
+     * @return void
+     * @throws \Illuminate\Http\Client\ConnectionException
+     */
+    private static function checkPembayaran(Model|Earlybird $record): void
+    {
+        $orderId = $record->pembayaran?->order_id;
+        $data = MidtransAPI::getStatusMessage($orderId);
+
+        if (null === $data['status_message']) {
+            Notification::make()
+                ->danger()
+                ->title('Status Transaksi')
+                ->body('Transaksi tidak ditemukan')
+                ->send();
+            return;
+        }
+
+        $notif = Notification::make('statuspembayaran');
+        match ($data['status']) {
+            'success' => $notif->success(),
+            'warning' => $notif->warning(),
+            'info' => $notif->info(),
+            'danger' => $notif->danger(),
+        };
+
+        $notif->title('Notifikasi Pembayaran')
+            ->body($data['status_message'])
+            ->send()
+            ->sendToDatabase(auth()->user());
     }
 }

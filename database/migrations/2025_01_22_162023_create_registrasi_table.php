@@ -35,6 +35,7 @@ return new class () extends Migration {
             $table->string('status_registrasi')->nullable();
             $table->string('status_pendaftaran')->nullable()->default(StatusPendaftaran::NORMAL);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

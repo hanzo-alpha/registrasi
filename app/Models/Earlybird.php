@@ -14,10 +14,12 @@ use App\Traits\HasWilayah;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Earlybird extends Model
 {
     use HasWilayah;
+    use SoftDeletes;
 
     protected $table = 'earlybird';
 

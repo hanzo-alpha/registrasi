@@ -31,6 +31,7 @@ return new class () extends Migration {
             $table->string('lampiran')->nullable();
 
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
