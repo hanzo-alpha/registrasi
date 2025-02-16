@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use App\Filament\Admin\Resources\EarlybirdResource;
-use App\Filament\Admin\Resources\PembayaranResource;
 use App\Filament\App\Pages\Earlybird;
 use App\Filament\App\Pages\Pendaftaran;
 use Filament\Forms\Components\Field;
@@ -60,8 +58,6 @@ class AppServiceProvider extends ServiceProvider
             scopes: [
                 Pendaftaran::class,
                 Earlybird::class,
-                //                EarlybirdResource::class,
-                //                PembayaranResource::class,
             ],
         );
     }
@@ -69,7 +65,7 @@ class AppServiceProvider extends ServiceProvider
     private function configureModels(): void
     {
         Model::unguard();
-        Model::shouldBeStrict( ! app()->isProduction());
+        Model::shouldBeStrict( ! $this->app->isProduction());
     }
 
     private function configureVite(): void
