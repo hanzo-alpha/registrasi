@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "046ce83d77a73649b942c12753a56579",
+    "content-hash": "1fcc29e20f0d9e82912436a2ed6cd668",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -477,6 +477,77 @@
             "time": "2024-02-09T16:56:22+00:00"
         },
         {
+            "name": "codeat3/blade-phosphor-icons",
+            "version": "2.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/codeat3/blade-phosphor-icons.git",
+                "reference": "d7d7c027ce0a0ce2f5e5c68688595f0a816e7508"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/codeat3/blade-phosphor-icons/zipball/d7d7c027ce0a0ce2f5e5c68688595f0a816e7508",
+                "reference": "d7d7c027ce0a0ce2f5e5c68688595f0a816e7508",
+                "shasum": ""
+            },
+            "require": {
+                "blade-ui-kit/blade-icons": "^1.1",
+                "illuminate/support": "^8.0|^9.0|^10.0|^11.0",
+                "php": "^7.4|^8.0"
+            },
+            "require-dev": {
+                "codeat3/blade-icon-generation-helpers": "^0.8",
+                "codeat3/phpcs-styles": "^1.0",
+                "orchestra/testbench": "^6.0|^7.0|^8.0|^9.0",
+                "phpunit/phpunit": "^9.0|^10.5|^11.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Codeat3\\BladePhosphorIcons\\BladePhosphorIconsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Codeat3\\BladePhosphorIcons\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Swapnil Sarwe",
+                    "homepage": "https://swapnilsarwe.com"
+                },
+                {
+                    "name": "Dries Vints",
+                    "homepage": "https://driesvints.com"
+                }
+            ],
+            "description": "A package to easily make use of \"Phosphor Icons\" in your Laravel Blade views.",
+            "homepage": "https://github.com/codeat3/blade-phosphor-icons",
+            "keywords": [
+                "blade",
+                "laravel",
+                "phosphor-icons"
+            ],
+            "support": {
+                "issues": "https://github.com/codeat3/blade-phosphor-icons/issues",
+                "source": "https://github.com/codeat3/blade-phosphor-icons/tree/2.2.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/swapnilsarwe",
+                    "type": "github"
+                }
+            ],
+            "time": "2024-04-08T19:02:17+00:00"
+        },
+        {
             "name": "codewithdennis/filament-theme-inspector",
             "version": "v0.0.7",
             "source": {
@@ -938,6 +1009,85 @@
                 "source": "https://github.com/DASPRiD/Enum/tree/1.0.6"
             },
             "time": "2024-08-09T14:30:48+00:00"
+        },
+        {
+            "name": "devonab/filament-easy-footer",
+            "version": "v1.0.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Devonab/filament-easy-footer.git",
+                "reference": "ffb893e25b4b2956d2225818e84977a7ac055e86"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Devonab/filament-easy-footer/zipball/ffb893e25b4b2956d2225818e84977a7ac055e86",
+                "reference": "ffb893e25b4b2956d2225818e84977a7ac055e86",
+                "shasum": ""
+            },
+            "require": {
+                "filament/filament": "^3.0",
+                "php": "^8.1",
+                "spatie/laravel-package-tools": "^1.15.0"
+            },
+            "require-dev": {
+                "guzzlehttp/guzzle": "^7.8",
+                "laravel/pint": "^1.0",
+                "nunomaduro/collision": "^7.9",
+                "nunomaduro/larastan": "^2.0.1",
+                "orchestra/testbench": "^8.0",
+                "pestphp/pest": "^2.1",
+                "pestphp/pest-plugin-arch": "^2.0",
+                "pestphp/pest-plugin-laravel": "^2.0",
+                "phpstan/extension-installer": "^1.1",
+                "phpstan/phpstan-deprecation-rules": "^1.0",
+                "phpstan/phpstan-phpunit": "^1.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "FilamentEasyFooter": "Devonab\\FilamentEasyFooter\\Facades\\EasyFooter"
+                    },
+                    "providers": [
+                        "Devonab\\FilamentEasyFooter\\EasyFooterServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Devonab\\FilamentEasyFooter\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Devonab",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A simple plugin to display a customizable footer in your filament application!",
+            "homepage": "https://github.com/devonab/filament-easy-footer",
+            "keywords": [
+                "Devonab",
+                "filament",
+                "filament-easy-footer",
+                "filament-php",
+                "laravel"
+            ],
+            "support": {
+                "issues": "https://github.com/devonab/filament-easy-footer/issues",
+                "source": "https://github.com/devonab/filament-easy-footer"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/Devonab",
+                    "type": "github"
+                }
+            ],
+            "time": "2025-01-16T10:08:11+00:00"
         },
         {
             "name": "dflydev/dot-access-data",
@@ -1525,6 +1675,63 @@
                 "source": "https://github.com/ezyang/htmlpurifier/tree/v4.18.0"
             },
             "time": "2024-11-01T03:51:45+00:00"
+        },
+        {
+            "name": "filafly/phosphor-icon-replacement",
+            "version": "v1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/filafly/phosphor-icon-replacement.git",
+                "reference": "914d38ca7e28feecf5aa7c30018e1ea4b3734265"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/filafly/phosphor-icon-replacement/zipball/914d38ca7e28feecf5aa7c30018e1ea4b3734265",
+                "reference": "914d38ca7e28feecf5aa7c30018e1ea4b3734265",
+                "shasum": ""
+            },
+            "require": {
+                "codeat3/blade-phosphor-icons": "^2.2",
+                "filament/filament": "^3.2.3",
+                "illuminate/support": "*",
+                "php": "^8.1",
+                "spatie/laravel-package-tools": "^1.9"
+            },
+            "require-dev": {
+                "laravel/pint": "^1.20"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Filafly\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Nolan Nordlund",
+                    "email": "nolan@filafly.com",
+                    "homepage": "https://www.filafly.com/",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Replace the default Filament icons with Phosphor icons.",
+            "homepage": "https://filafly.com/packages/phosphor-icon-replacement",
+            "keywords": [
+                "Phosphor",
+                "filament",
+                "icons",
+                "laravel",
+                "replace"
+            ],
+            "support": {
+                "issues": "https://github.com/filafly/phosphor-icon-replacement/issues",
+                "source": "https://github.com/filafly/phosphor-icon-replacement/tree/v1.0.1"
+            },
+            "time": "2025-02-04T23:01:55+00:00"
         },
         {
             "name": "filament/actions",
@@ -2698,6 +2905,147 @@
             "time": "2024-04-02T07:56:13+00:00"
         },
         {
+            "name": "laravel-notification-channels/discord",
+            "version": "v1.6.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/laravel-notification-channels/discord.git",
+                "reference": "317117f22c6c2b9a4f78976f097c3082e40902da"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/laravel-notification-channels/discord/zipball/317117f22c6c2b9a4f78976f097c3082e40902da",
+                "reference": "317117f22c6c2b9a4f78976f097c3082e40902da",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "guzzlehttp/guzzle": "^6.3 || ^7.0",
+                "illuminate/console": "^7.0 || ^8.0 || ^9.0 || ^10.0|^11.0",
+                "illuminate/notifications": "^7.0 || ^8.0 || ^9.0 || ^10.0|^11.0",
+                "illuminate/queue": "^7.0 || ^8.0 || ^9.0 || ^10.0|^11.0",
+                "illuminate/support": "^7.0 || ^8.0 || ^9.0 || ^10.0|^11.0",
+                "php": "^7.2|^8.0",
+                "textalk/websocket": "^1.2"
+            },
+            "require-dev": {
+                "mockery/mockery": "^1.3.3",
+                "orchestra/testbench": "^6.0 || ^7.0 || ^8.0|^9.0",
+                "phpunit/phpunit": "^8.5 || ^9.0|^10.5"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "NotificationChannels\\Discord\\DiscordServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "NotificationChannels\\Discord\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Cody Scott",
+                    "email": "cs475x@icloud.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Laravel notification driver for Discord.",
+            "homepage": "https://github.com/laravel-notification-channels/discord",
+            "keywords": [
+                "channel",
+                "discord",
+                "driver",
+                "laravel",
+                "notification"
+            ],
+            "support": {
+                "issues": "https://github.com/laravel-notification-channels/discord/issues",
+                "source": "https://github.com/laravel-notification-channels/discord/tree/v1.6.0"
+            },
+            "time": "2024-04-01T01:31:08+00:00"
+        },
+        {
+            "name": "laravel-notification-channels/telegram",
+            "version": "5.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/laravel-notification-channels/telegram.git",
+                "reference": "d647f0ab28c7717ef85c0c843e95f25b1c7dc498"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/laravel-notification-channels/telegram/zipball/d647f0ab28c7717ef85c0c843e95f25b1c7dc498",
+                "reference": "d647f0ab28c7717ef85c0c843e95f25b1c7dc498",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "guzzlehttp/guzzle": "^7.2",
+                "illuminate/contracts": "^10 || ^11.0",
+                "illuminate/notifications": "^10 || ^11.0",
+                "illuminate/support": "^10 || ^11.0",
+                "php": "^8.1"
+            },
+            "require-dev": {
+                "larastan/larastan": "^2.9",
+                "mockery/mockery": "^1.4.4",
+                "orchestra/testbench": "^8.0 || ^9.0",
+                "pestphp/pest": "^2.34",
+                "pestphp/pest-plugin-laravel": "^2.3",
+                "phpstan/extension-installer": "^1.2",
+                "phpstan/phpstan-deprecation-rules": "^1.1",
+                "phpstan/phpstan-phpunit": "^1.3",
+                "phpunit/phpunit": "^10.5 || ^11.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "NotificationChannels\\Telegram\\TelegramServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "NotificationChannels\\Telegram\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Irfaq Syed",
+                    "email": "github@lukonet.net",
+                    "homepage": "https://lukonet.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Telegram Notifications Channel for Laravel",
+            "homepage": "https://github.com/laravel-notification-channels/telegram",
+            "keywords": [
+                "laravel",
+                "notification",
+                "telegram",
+                "telegram notification",
+                "telegram notifications channel"
+            ],
+            "support": {
+                "issues": "https://github.com/laravel-notification-channels/telegram/issues",
+                "source": "https://github.com/laravel-notification-channels/telegram/tree/5.0.0"
+            },
+            "time": "2024-03-12T05:47:13+00:00"
+        },
+        {
             "name": "laravel/framework",
             "version": "v11.42.1",
             "source": {
@@ -2913,6 +3261,63 @@
             "time": "2025-02-12T20:58:18+00:00"
         },
         {
+            "name": "laravel/helpers",
+            "version": "v1.7.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/laravel/helpers.git",
+                "reference": "672d79d5b5f65dc821e57783fa11f22c4d762d70"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/laravel/helpers/zipball/672d79d5b5f65dc821e57783fa11f22c4d762d70",
+                "reference": "672d79d5b5f65dc821e57783fa11f22c4d762d70",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "~5.8.0|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0|^12.0",
+                "php": "^7.2.0|^8.0"
+            },
+            "require-dev": {
+                "phpstan/phpstan": "^1.10",
+                "phpunit/phpunit": "^7.0|^8.0|^9.0|^10.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.x-dev"
+                }
+            },
+            "autoload": {
+                "files": [
+                    "src/helpers.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Taylor Otwell",
+                    "email": "taylor@laravel.com"
+                },
+                {
+                    "name": "Dries Vints",
+                    "email": "dries@laravel.com"
+                }
+            ],
+            "description": "Provides backwards compatibility for helpers in the latest Laravel release.",
+            "keywords": [
+                "helpers",
+                "laravel"
+            ],
+            "support": {
+                "source": "https://github.com/laravel/helpers/tree/v1.7.2"
+            },
+            "time": "2025-01-24T15:41:25+00:00"
+        },
+        {
             "name": "laravel/pail",
             "version": "v1.2.2",
             "source": {
@@ -3109,6 +3514,71 @@
                 "source": "https://github.com/laravel/serializable-closure"
             },
             "time": "2025-02-11T15:03:05+00:00"
+        },
+        {
+            "name": "laravel/slack-notification-channel",
+            "version": "v3.4.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/laravel/slack-notification-channel.git",
+                "reference": "58890389d6b4b8021c8d34d78246d7dff5a57cb6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/laravel/slack-notification-channel/zipball/58890389d6b4b8021c8d34d78246d7dff5a57cb6",
+                "reference": "58890389d6b4b8021c8d34d78246d7dff5a57cb6",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^7.0",
+                "illuminate/http": "^9.0|^10.0|^11.0|^12.0",
+                "illuminate/notifications": "^9.0|^10.0|^11.0|^12.0",
+                "illuminate/support": "^9.0|^10.0|^11.0|^12.0",
+                "php": "^8.0"
+            },
+            "require-dev": {
+                "mockery/mockery": "^1.0",
+                "orchestra/testbench": "^7.0|^8.0|^9.0|^10.0",
+                "phpstan/phpstan": "^1.10",
+                "phpunit/phpunit": "^9.0|^10.4|^11.5"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Illuminate\\Notifications\\SlackChannelServiceProvider"
+                    ]
+                },
+                "branch-alias": {
+                    "dev-master": "3.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Illuminate\\Notifications\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Taylor Otwell",
+                    "email": "taylor@laravel.com"
+                }
+            ],
+            "description": "Slack Notification Channel for laravel.",
+            "keywords": [
+                "laravel",
+                "notifications",
+                "slack"
+            ],
+            "support": {
+                "issues": "https://github.com/laravel/slack-notification-channel/issues",
+                "source": "https://github.com/laravel/slack-notification-channel/tree/v3.4.4"
+            },
+            "time": "2025-01-24T15:40:14+00:00"
         },
         {
             "name": "laravel/tinker",
@@ -6085,6 +6555,132 @@
             "time": "2024-04-27T21:32:50+00:00"
         },
         {
+            "name": "resend/resend-laravel",
+            "version": "v0.16.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/resend/resend-laravel.git",
+                "reference": "3bcdeb9ddec1c870c458380a5c2659f1b82c70f6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/resend/resend-laravel/zipball/3bcdeb9ddec1c870c458380a5c2659f1b82c70f6",
+                "reference": "3bcdeb9ddec1c870c458380a5c2659f1b82c70f6",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/http": "^10.0|^11.0",
+                "illuminate/support": "^10.0|^11.0",
+                "php": "^8.1",
+                "resend/resend-php": "^0.15.0",
+                "symfony/mailer": "^6.2|^7.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.14",
+                "mockery/mockery": "^1.5",
+                "orchestra/testbench": "^8.17|^9.0",
+                "pestphp/pest": "^2.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Resend\\Laravel\\ResendServiceProvider"
+                    ]
+                },
+                "branch-alias": {
+                    "dev-main": "1.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Resend\\Laravel\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Resend and contributors",
+                    "homepage": "https://github.com/resend/resend-laravel/contributors"
+                }
+            ],
+            "description": "Resend for Laravel",
+            "homepage": "https://resend.com/",
+            "keywords": [
+                "api",
+                "client",
+                "laravel",
+                "php",
+                "resend",
+                "sdk"
+            ],
+            "support": {
+                "issues": "https://github.com/resend/resend-laravel/issues",
+                "source": "https://github.com/resend/resend-laravel/tree/v0.16.0"
+            },
+            "time": "2025-01-29T04:22:11+00:00"
+        },
+        {
+            "name": "resend/resend-php",
+            "version": "v0.15.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/resend/resend-php.git",
+                "reference": "53840a00e0aa234f39ee4da3a679b97df8fd2284"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/resend/resend-php/zipball/53840a00e0aa234f39ee4da3a679b97df8fd2284",
+                "reference": "53840a00e0aa234f39ee4da3a679b97df8fd2284",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^7.5",
+                "php": "^8.1.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.13",
+                "mockery/mockery": "^1.6",
+                "pestphp/pest": "^2.0"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "src/Resend.php"
+                ],
+                "psr-4": {
+                    "Resend\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Resend and contributors",
+                    "homepage": "https://github.com/resend/resend-php/contributors"
+                }
+            ],
+            "description": "Resend PHP library.",
+            "homepage": "https://resend.com/",
+            "keywords": [
+                "api",
+                "client",
+                "php",
+                "resend",
+                "sdk"
+            ],
+            "support": {
+                "issues": "https://github.com/resend/resend-php/issues",
+                "source": "https://github.com/resend/resend-php/tree/v0.15.1"
+            },
+            "time": "2025-01-03T23:17:55+00:00"
+        },
+        {
             "name": "ryangjchandler/blade-capture-directive",
             "version": "v1.0.0",
             "source": {
@@ -8996,6 +9592,55 @@
             "time": "2024-09-30T20:59:33+00:00"
         },
         {
+            "name": "textalk/websocket",
+            "version": "1.5.8",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Textalk/websocket-php.git",
+                "reference": "d05dbaa97500176447ffb1f1800573f23085ab13"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Textalk/websocket-php/zipball/d05dbaa97500176447ffb1f1800573f23085ab13",
+                "reference": "d05dbaa97500176447ffb1f1800573f23085ab13",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.2 | ^8.0",
+                "psr/log": "^1 | ^2 | ^3"
+            },
+            "require-dev": {
+                "php-coveralls/php-coveralls": "^2.0",
+                "phpunit/phpunit": "^8.0|^9.0",
+                "squizlabs/php_codesniffer": "^3.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "WebSocket\\": "lib"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "ISC"
+            ],
+            "authors": [
+                {
+                    "name": "Fredrik Liljegren"
+                },
+                {
+                    "name": "Sören Jensen",
+                    "email": "soren@abicart.se"
+                }
+            ],
+            "description": "WebSocket client and server",
+            "support": {
+                "issues": "https://github.com/Textalk/websocket-php/issues",
+                "source": "https://github.com/Textalk/websocket-php/tree/1.5.8"
+            },
+            "time": "2022-04-26T06:28:24+00:00"
+        },
+        {
             "name": "tijsverkoyen/css-to-inline-styles",
             "version": "v2.3.0",
             "source": {
@@ -9271,6 +9916,164 @@
                 }
             ],
             "time": "2024-11-21T01:49:47+00:00"
+        },
+        {
+            "name": "vormkracht10/filament-mails",
+            "version": "v2.2.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/vormkracht10/filament-mails.git",
+                "reference": "5d3ac0fd4971d34fec1e4212c2536f087a75a3dc"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/vormkracht10/filament-mails/zipball/5d3ac0fd4971d34fec1e4212c2536f087a75a3dc",
+                "reference": "5d3ac0fd4971d34fec1e4212c2536f087a75a3dc",
+                "shasum": ""
+            },
+            "require": {
+                "filament/filament": "^3.0",
+                "php": "^8.1",
+                "spatie/laravel-package-tools": "^1.15.0",
+                "vormkracht10/laravel-mails": "^1.0"
+            },
+            "require-dev": {
+                "laravel/pint": "^1.0",
+                "nunomaduro/collision": "^7.9",
+                "nunomaduro/larastan": "^2.0.1",
+                "orchestra/testbench": "^8.0",
+                "pestphp/pest": "^2.1",
+                "pestphp/pest-plugin-arch": "^2.0",
+                "pestphp/pest-plugin-laravel": "^2.0",
+                "phpstan/extension-installer": "^1.1",
+                "phpstan/phpstan-deprecation-rules": "^1.0",
+                "phpstan/phpstan-phpunit": "^1.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "FilamentMails": "Vormkracht10\\FilamentMails\\Facades\\FilamentMails"
+                    },
+                    "providers": [
+                        "Vormkracht10\\FilamentMails\\FilamentMailsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Vormkracht10\\FilamentMails\\": "src/",
+                    "Vormkracht10\\FilamentMails\\Database\\Factories\\": "database/factories/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Baspa",
+                    "email": "hello@baspa.dev",
+                    "role": "Developer"
+                }
+            ],
+            "description": "View logged mails and events in a beautiful Filament UI.",
+            "homepage": "https://github.com/vormkracht10/filament-mails",
+            "keywords": [
+                "filament-mails",
+                "laravel",
+                "vormkracht10"
+            ],
+            "support": {
+                "issues": "https://github.com/vormkracht10/filament-mails/issues",
+                "source": "https://github.com/vormkracht10/filament-mails"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/vormkracht10",
+                    "type": "github"
+                }
+            ],
+            "time": "2025-02-13T16:02:34+00:00"
+        },
+        {
+            "name": "vormkracht10/laravel-mails",
+            "version": "v1.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/vormkracht10/laravel-mails.git",
+                "reference": "cc72baf8a1fab04f32cc0cabf05a2ec615d785b7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/vormkracht10/laravel-mails/zipball/cc72baf8a1fab04f32cc0cabf05a2ec615d785b7",
+                "reference": "cc72baf8a1fab04f32cc0cabf05a2ec615d785b7",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/contracts": "^10.8.0|^11.22.0",
+                "laravel-notification-channels/discord": "^1.6",
+                "laravel-notification-channels/telegram": "^4.0|5.0",
+                "laravel/helpers": "^1.7.0",
+                "laravel/slack-notification-channel": "^2.5|^3.3.2",
+                "php": "^8.1",
+                "spatie/laravel-package-tools": "^1.14.0"
+            },
+            "require-dev": {
+                "larastan/larastan": "^2.9.8",
+                "laravel/pint": "^1.17.0",
+                "nunomaduro/collision": "^7.5.0|^8.4",
+                "orchestra/testbench": "^8.5.0|^9.4.0",
+                "pestphp/pest": "^2.35.1",
+                "pestphp/pest-plugin-laravel": "^2.4.0",
+                "phpstan/extension-installer": "^1.4.2",
+                "phpstan/phpstan-deprecation-rules": "^1.2.0",
+                "phpstan/phpstan-phpunit": "^1.3.11",
+                "phpunit/phpunit": "^10.5.17"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Vormkracht10\\Mails\\MailsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Vormkracht10\\Mails\\": "src",
+                    "Vormkracht10\\Mails\\Database\\Factories\\": "database/factories"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Mark van Eijk",
+                    "email": "mark@vormkracht10.nl",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Laravel Mails can collect everything you might want to track about the mails that has been sent by your Laravel app.",
+            "homepage": "https://github.com/vormkracht10/laravel-mails",
+            "keywords": [
+                "laravel",
+                "laravel-mails",
+                "vormkracht10"
+            ],
+            "support": {
+                "issues": "https://github.com/vormkracht10/laravel-mails/issues",
+                "source": "https://github.com/vormkracht10/laravel-mails/tree/v1.1.1"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/vormkracht10",
+                    "type": "github"
+                }
+            ],
+            "time": "2025-02-05T09:40:58+00:00"
         },
         {
             "name": "webmozart/assert",

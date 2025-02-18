@@ -18,6 +18,7 @@ use App\Mail\PembayaranBerhasil;
 use App\Models\KategoriLomba;
 use App\Models\Pembayaran;
 use App\Services\MidtransAPI;
+use Awcodes\Shout\Components\Shout;
 use Closure;
 use Exception;
 use Filament\Actions\Action;
@@ -76,6 +77,9 @@ class Earlybird extends Page implements HasForms
     public static function formOtomatis(): array
     {
         return [
+            Shout::make('so-important')
+                ->content('Disampaikan untuk saat ini Pendaftaran Early Bird Batch 2 sudah ditutup.')
+                ->columnSpanFull(),
             Forms\Components\Wizard::make([
                 Forms\Components\Wizard\Step::make('Data Pribadi Peserta')
                     ->icon('heroicon-o-user')
@@ -233,12 +237,13 @@ class Earlybird extends Page implements HasForms
                             ])->columns(2),
                     ]),
             ])
-//                ->previousAction(
-//                    fn(Forms\Components\Actions\Action $action) => $action->disabled(),
-//                )
-//                ->nextAction(
-//                    fn(Forms\Components\Actions\Action $action) => $action->disabled(),
-//                )
+                ->disabled()
+                ->previousAction(
+                    fn(Forms\Components\Actions\Action $action) => $action->disabled(),
+                )
+                ->nextAction(
+                    fn(Forms\Components\Actions\Action $action) => $action->disabled(),
+                )
                 ->submitAction(new HtmlString(Blade::render(
                     <<<BLADE
                 <x-filament::button
@@ -266,7 +271,6 @@ class Earlybird extends Page implements HasForms
         $pembayaran = $registrasi->pembayaran;
 
         $uuidPembayaran = $pembayaran->uuid_pembayaran ?? Str::uuid()->toString();
-        $orderId = $result['order_id'] ?? null;
         $transactionStatus = $result['transaction_status'] ?? null;
         $tipeBayar = $result['payment_type'] ?? TipeBayar::QRIS;
         $transactionTime = $result['transaction_time'] ?? null;

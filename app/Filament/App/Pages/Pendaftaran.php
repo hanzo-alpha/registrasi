@@ -232,12 +232,13 @@ class Pendaftaran extends Page implements HasForms
                             ])->columns(2),
                     ]),
             ])
-//                ->previousAction(
-//                    fn(Forms\Components\Actions\Action $action) => $action->disabled(),
-//                )
-//                ->nextAction(
-//                    fn(Forms\Components\Actions\Action $action) => $action->disabled(),
-//                )
+                ->disabled()
+                ->previousAction(
+                    fn(Forms\Components\Actions\Action $action) => $action->disabled(),
+                )
+                ->nextAction(
+                    fn(Forms\Components\Actions\Action $action) => $action->disabled(),
+                )
                 ->submitAction(new HtmlString(Blade::render(<<<BLADE
                 <x-filament::button
                     type="submit"
@@ -263,7 +264,6 @@ class Pendaftaran extends Page implements HasForms
         $pembayaran = $registrasi->pembayaran;
 
         $uuidPembayaran = $pembayaran->uuid_pembayaran ?? Str::uuid()->toString();
-        $orderId = $result['order_id'] ?? null;
         $transactionStatus = $result['transaction_status'] ?? null;
         $tipeBayar = $result['payment_type'] ?? TipeBayar::QRIS;
         $transactionTime = $result['transaction_time'] ?? null;
@@ -327,7 +327,7 @@ class Pendaftaran extends Page implements HasForms
         $pembayaran->lampiran = null;
         $pembayaran->save();
         $registrasi->save();
-
+        $redirectUrl = $this->getUrl();
         $this->redirect($redirectUrl, navigate: FilamentView::hasSpaMode() && is_app_url((string) $redirectUrl));
 
         if (StatusBayar::BELUM_BAYAR === $status) {

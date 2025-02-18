@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
 
     /*
@@ -14,6 +16,9 @@ return [
     */
 
     'name' => env('APP_NAME', 'Laravel'),
+    'description' => env('APP_DESCRIPTION', 'Sistem Informasi Manajemen Event'),
+    'brand' => env('APP_BRAND', 'Freeletics Bantaeng'),
+    'event' => env('APP_EVENT', 'Bantaeng Trail Run 2025'),
 
     /*
     |--------------------------------------------------------------------------
@@ -101,7 +106,7 @@ return [
 
     'previous_keys' => [
         ...array_filter(
-            explode(',', env('APP_PREVIOUS_KEYS', ''))
+            explode(',', env('APP_PREVIOUS_KEYS', '')),
         ),
     ],
 

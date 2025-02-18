@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Webhooks;
+namespace App\Webhooks\Registrasi;
 
 use Illuminate\Http\Request;
 use Spatie\WebhookClient\SignatureValidator\SignatureValidator;

@@ -7,6 +7,8 @@ namespace App\Providers;
 use App\Filament\Admin\Pages\Auth\Login;
 use CodeWithDennis\FilamentThemeInspector\FilamentThemeInspectorPlugin;
 use Croustibat\FilamentJobsMonitor\FilamentJobsMonitorPlugin;
+use Devonab\FilamentEasyFooter\EasyFooterPlugin;
+use Filafly\PhosphorIconReplacement;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -23,6 +25,7 @@ use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Jeffgreco13\FilamentBreezy\BreezyCore;
 use Tapp\FilamentWebhookClient\FilamentWebhookClientPlugin;
+use Vormkracht10\FilamentMails\FilamentMailsPlugin;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -65,6 +68,13 @@ class AdminPanelProvider extends PanelProvider
                 FilamentJobsMonitorPlugin::make(),
                 FilamentThemeInspectorPlugin::make()
                     ->disabled(fn() => ! app()->hasDebugModeEnabled()),
+                PhosphorIconReplacement::make(),
+                EasyFooterPlugin::make()
+                    ->withLoadTime('Halaman ini dimuat dalam ')
+                    ->withGithub()
+                    ->withSentence(config('app.name') . ' - ' . config('app.description')),
+                FilamentMailsPlugin::make(),
+
             ])
             ->resources([
                 config('filament-logger.activity_resource'),
@@ -104,6 +114,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-            ]);
+            ])
+            ->viteTheme('resources/css/filament/admin/theme.css');
     }
 }

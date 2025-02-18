@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Webhooks;
+namespace App\Webhooks\Registrasi;
 
 use App\Models\HistoriPembayaran;
 use Spatie\WebhookClient\Jobs\ProcessWebhookJob as SpatieProcessWebhookJob;
