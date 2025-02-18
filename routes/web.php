@@ -7,8 +7,8 @@ use Illuminate\Support\Facades\Route;
 use Vormkracht10\FilamentMails\FilamentMails;
 
 //Route::get('/', Index::class)->name('home');
-Route::get('/', fn() => redirect()->route('filament.app.pages.earlybird'))->name('home');
-//Route::get('/', fn() => redirect()->route('filament.app.pages.pendaftaran'))->name('home');
+//Route::get('/', fn() => redirect()->route('filament.app.pages.earlybird'))->name('home');
+Route::get('/', fn() => redirect()->route('filament.app.pages.pendaftaran'))->name('home');
 Route::webhooks('registrasi-webhook', 'registrasi-webhook');
 Route::webhooks('resend-notification', 'resend-webhook');
 

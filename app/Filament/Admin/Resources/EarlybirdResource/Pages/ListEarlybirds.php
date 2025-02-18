@@ -26,7 +26,7 @@ class ListEarlybirds extends ListRecords
     {
         return [
             Actions\ExportAction::make()
-                ->label('Ekspor Earlybird')
+                ->label('Ekspor')
                 ->exporter(EarlybirdExporter::class)
                 ->formats([
                     ExportFormat::Xlsx,

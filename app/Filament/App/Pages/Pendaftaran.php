@@ -66,7 +66,8 @@ class Pendaftaran extends Page implements HasForms
     protected static string $view = 'filament.app.pages.pendaftaran';
     protected ?string $heading = 'Pendaftaran Online Peserta Bantaeng Trail Run 2025';
     protected ?string $subheading = 'Silahkan lengkapi data peserta di bawah ini.';
-    protected static bool $shouldRegisterNavigation = false;
+    protected static ?string $navigationLabel = 'Pendaftaran Normal';
+    protected static bool $shouldRegisterNavigation = true;
 
     public static function getNavigationBadge(): ?string
     {
