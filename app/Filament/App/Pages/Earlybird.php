@@ -68,6 +68,7 @@ class Earlybird extends Page implements HasForms
     protected static ?string $navigationLabel = 'Pendaftaran Early Bird';
     protected ?string $heading = 'Pendaftaran Earlybird Online Peserta Bantaeng Trail Run 2025';
     protected ?string $subheading = 'Silahkan lengkapi data peserta di bawah ini.';
+    protected static bool $shouldRegisterNavigation = false;
 
     public static function getNavigationBadge(): ?string
     {

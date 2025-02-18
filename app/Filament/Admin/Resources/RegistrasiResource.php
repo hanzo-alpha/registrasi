@@ -11,6 +11,7 @@ use App\Enums\StatusRegistrasi;
 use App\Enums\TipeKartuIdentitas;
 use App\Enums\UkuranJersey;
 use App\Filament\Admin\Resources\RegistrasiResource\Pages;
+use App\Filament\Admin\Widgets\PendaftaranOverview;
 use App\Models\Earlybird;
 use App\Models\Registrasi;
 use App\Services\MidtransAPI;
@@ -179,6 +180,8 @@ class RegistrasiResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->poll('5s')
+            ->deferLoading()
             ->columns([
                 Tables\Columns\TextColumn::make('uuid_registrasi')
                     ->searchable()
@@ -193,6 +196,7 @@ class RegistrasiResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('jenis_kelamin')
                     ->searchable()
+                    ->sortable()
                     ->badge()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('tempat_lahir')
@@ -208,17 +212,19 @@ class RegistrasiResource extends Resource
                 Tables\Columns\TextColumn::make('negara')
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('provinsi')
+                Tables\Columns\TextColumn::make('prov.name')
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('kabupaten')
+                Tables\Columns\TextColumn::make('kab.name')
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('kecamatan')
+                Tables\Columns\TextColumn::make('kec.name')
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('tipe_kartu_identitas')
                     ->searchable()
+                    ->sortable()
+                    ->badge()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('nomor_kartu_identitas')
                     ->searchable()
@@ -231,22 +237,38 @@ class RegistrasiResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('golongan_darah')
                     ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('kewarganegaraan')
-                    ->searchable()
+                    ->sortable()
+                    ->badge()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('ukuran_jersey')
                     ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('jumlah_peserta')
-                    ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->badge()
+                    ->alignCenter()
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('kategori.nama')
+                    ->searchable()
+                    ->sortable()
+                    ->badge()
+                    ->alignCenter()
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('komunitas')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('kategori_lomba')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('status_registrasi')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable()
+                    ->badge()
+                    ->alignCenter()
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('status_registrasi')
@@ -299,6 +321,13 @@ class RegistrasiResource extends Resource
                         }),
                 ]),
             ]);
+    }
+
+    public static function getWidgets(): array
+    {
+        return [
+            PendaftaranOverview::class,
+        ];
     }
 
     public static function getRelations(): array

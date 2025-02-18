@@ -6,6 +6,7 @@ namespace App\Filament\Admin\Resources;
 
 use App\Enums\GolonganDarah;
 use App\Enums\JenisKelamin;
+use App\Enums\StatusPendaftaran;
 use App\Enums\StatusRegistrasi;
 use App\Enums\TipeKartuIdentitas;
 use App\Enums\UkuranJersey;
@@ -430,7 +431,9 @@ class EarlybirdResource extends Resource
      */
     private static function checkPembayaran(Model|Earlybird $record): void
     {
-        $orderId = $record->pembayaran?->order_id;
+        $orderId = $record->pembayaran
+            ->where('status_pendaftaran', StatusPendaftaran::NORMAL)
+            ?->order_id;
         $data = MidtransAPI::getStatusMessage($orderId);
 
         if (null === $data['status_message']) {

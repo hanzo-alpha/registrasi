@@ -72,7 +72,7 @@ class AdminPanelProvider extends PanelProvider
                 EasyFooterPlugin::make()
                     ->withLoadTime('Halaman ini dimuat dalam ')
                     ->withGithub()
-                    ->withSentence(config('app.name') . ' - ' . config('app.description')),
+                    ->withSentence(config('app.brand') . ' - ' . config('app.event')),
                 FilamentMailsPlugin::make(),
 
             ])
