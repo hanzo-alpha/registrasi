@@ -233,13 +233,13 @@ class Pendaftaran extends Page implements HasForms
                             ])->columns(2),
                     ]),
             ])
-                ->disabled()
-                ->previousAction(
-                    fn(Forms\Components\Actions\Action $action) => $action->disabled(),
-                )
-                ->nextAction(
-                    fn(Forms\Components\Actions\Action $action) => $action->disabled(),
-                )
+//                ->disabled()
+//                ->previousAction(
+//                    fn(Forms\Components\Actions\Action $action) => $action->disabled(),
+//                )
+//                ->nextAction(
+//                    fn(Forms\Components\Actions\Action $action) => $action->disabled(),
+//                )
                 ->submitAction(new HtmlString(Blade::render(<<<BLADE
                 <x-filament::button
                     type="submit"
