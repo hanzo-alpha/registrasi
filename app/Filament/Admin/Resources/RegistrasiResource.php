@@ -11,7 +11,6 @@ use App\Enums\TipeKartuIdentitas;
 use App\Enums\UkuranJersey;
 use App\Filament\Admin\Resources\RegistrasiResource\Pages;
 use App\Filament\Admin\Widgets\PendaftaranOverview;
-use App\Models\Earlybird;
 use App\Models\Registrasi;
 use App\Services\MidtransAPI;
 use Filament\Forms;
@@ -429,10 +428,10 @@ class RegistrasiResource extends Resource
      * @return void
      * @throws \Illuminate\Http\Client\ConnectionException
      */
-    private static function checkPembayaran(Model|Earlybird $record): void
+    private static function checkPembayaran(Model|Registrasi $record): void
     {
         $orderId = $record->pembayaran?->order_id;
-        $data = MidtransAPI::getStatusMessage($orderId);
+        $data = MidtransAPI::getStatusMessage($orderId, 'registrasi');
 
         if (null === $data['status_message']) {
             Notification::make()
