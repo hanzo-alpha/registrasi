@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Filament\Admin\Resources\PembayaranResource\Pages;
+namespace App\Filament\Admin\Resources\PendaftaranResource\Pages;
 
 use App\Enums\StatusPendaftaran;
-use App\Filament\Admin\Resources\PembayaranResource;
-use App\Filament\Admin\Widgets\PembayaranOverview;
-use App\Filament\Exports\PembayaranExporter;
+use App\Filament\Admin\Resources\PendaftaranResource;
+use App\Filament\Admin\Widgets\PendaftaranOverview;
+use App\Filament\Exports\EarlybirdExporter;
 use App\Models\Pembayaran;
 use Filament\Actions;
 use Filament\Actions\Exports\Enums\ExportFormat;
@@ -15,9 +15,9 @@ use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
 
-class ListPembayarans extends ListRecords
+class ListPendaftarans extends ListRecords
 {
-    protected static string $resource = PembayaranResource::class;
+    protected static string $resource = PendaftaranResource::class;
 
     public function getTabs(): array
     {
@@ -52,7 +52,7 @@ class ListPembayarans extends ListRecords
     protected function getHeaderWidgets(): array
     {
         return [
-            PembayaranOverview::class,
+            PendaftaranOverview::class,
         ];
     }
 
@@ -60,8 +60,8 @@ class ListPembayarans extends ListRecords
     {
         return [
             Actions\ExportAction::make()
-                ->label('Ekspor Data Pembayaran')
-                ->exporter(PembayaranExporter::class)
+                ->label('Ekspor')
+                ->exporter(EarlybirdExporter::class)
                 ->formats([
                     ExportFormat::Xlsx,
                 ])
@@ -70,7 +70,7 @@ class ListPembayarans extends ListRecords
                 ->maxRows(10000)
                 ->chunkSize(250),
             Actions\CreateAction::make()
-                ->icon('heroicon-s-plus'),
+                ->icon('heroicon-o-plus'),
         ];
     }
 }

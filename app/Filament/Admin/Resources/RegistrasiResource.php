@@ -44,6 +44,7 @@ class RegistrasiResource extends Resource
     protected static ?string $pluralModelLabel = 'Pendaftaran Normal';
     protected static ?string $navigationLabel = 'Pendaftaran Normal';
     protected static ?string $navigationGroup = 'Pendaftaran';
+    protected static bool $shouldRegisterNavigation = false;
 
     protected static ?string $recordTitleAttribute = 'nama_lengkap';
 
@@ -390,12 +391,12 @@ class RegistrasiResource extends Resource
             ]);
     }
 
-    public static function getWidgets(): array
-    {
-        return [
-            PendaftaranOverview::class,
-        ];
-    }
+    //    public static function getWidgets(): array
+    //    {
+    //        return [
+    //            PendaftaranOverview::class,
+    //        ];
+    //    }
 
     public static function getRelations(): array
     {

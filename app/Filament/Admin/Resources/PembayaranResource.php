@@ -46,13 +46,6 @@ class PembayaranResource extends Resource
             ->schema([
                 Forms\Components\Section::make()
                     ->schema([
-                        //                        Forms\Components\Select::make('registrasi_id')
-                        //                            ->label('Registrasi')
-                        //                            ->relationship('earlybird', 'nama_lengkap')
-                        //                            ->native(false)
-                        //                            ->preload()
-                        //                            ->required()
-                        //                            ->optionsLimit(30),
                         Forms\Components\TextInput::make('order_id')
                             ->maxLength(255),
                         Forms\Components\TextInput::make('nama_kegiatan')
@@ -119,97 +112,98 @@ class PembayaranResource extends Resource
 
     public static function infolist(Infolist $infolist): Infolist
     {
-        return $infolist->schema([
-            Group::make()->schema([
-                Section::make('Data Peserta')->schema([
-                    TextEntry::make('earlybird.uuid_earlybird')
-                        ->label('ID Peserta')
-                        ->color('secondary'),
-                    TextEntry::make('earlybird.nama_lengkap')
-                        ->label('Nama Lengkap')
-                        ->color('secondary'),
-                    TextEntry::make('earlybird.email')
-                        ->label('Email')
-                        ->color('secondary'),
-                    TextEntry::make('earlybird.no_telp')
-                        ->label('No Telp')
-                        ->color('secondary'),
-                    TextEntry::make('earlybird.jenis_kelamin')
-                        ->label('Jenis Kelamin')
-                        ->badge(),
-                    TextEntry::make('earlybird.tempat_lahir')
-                        ->label('Tempat Lahir')
-                        ->color('secondary'),
-                    TextEntry::make('earlybird.tanggal_lahir')
-                        ->label('Tanggal Lahir')
-                        ->date('d M Y')
-                        ->color('secondary'),
-                    TextEntry::make('earlybird.tipe_kartu_identitas')
-                        ->badge()
-                        ->label('Tipe Kartu Identitas')
-                        ->color('secondary'),
-                    TextEntry::make('earlybird.nomor_kartu_identitas')
-                        ->label('Nomor Kartu Identitas')
-                        ->color('secondary'),
-                    TextEntry::make('earlybird.nama_kontak_darurat')
-                        ->label('Nama Kontak Darurat')
-                        ->color('secondary'),
-                    TextEntry::make('earlybird.nomor_kontak_darurat')
-                        ->label('Nomor Kontak Darurat')
-                        ->color('secondary'),
-                    TextEntry::make('earlybird.golongan_darah')
-                        ->badge()
-                        ->label('Golongan Darah'),
-                ])->columns(2),
+        return $infolist
+            ->schema([
+                Group::make()->schema([
+                    Section::make('Data Peserta')->schema([
+                        TextEntry::make('pendaftaran.uuid_pendaftaran')
+                            ->label('ID Peserta')
+                            ->color('secondary'),
+                        TextEntry::make('pendaftaran.nama_lengkap')
+                            ->label('Nama Lengkap')
+                            ->color('secondary'),
+                        TextEntry::make('pendaftaran.email')
+                            ->label('Email')
+                            ->color('secondary'),
+                        TextEntry::make('pendaftaran.no_telp')
+                            ->label('No Telp')
+                            ->color('secondary'),
+                        TextEntry::make('pendaftaran.jenis_kelamin')
+                            ->label('Jenis Kelamin')
+                            ->badge(),
+                        TextEntry::make('pendaftaran.tempat_lahir')
+                            ->label('Tempat Lahir')
+                            ->color('secondary'),
+                        TextEntry::make('pendaftaran.tanggal_lahir')
+                            ->label('Tanggal Lahir')
+                            ->date('d M Y')
+                            ->color('secondary'),
+                        TextEntry::make('pendaftaran.tipe_kartu_identitas')
+                            ->badge()
+                            ->label('Tipe Kartu Identitas')
+                            ->color('secondary'),
+                        TextEntry::make('pendaftaran.nomor_kartu_identitas')
+                            ->label('Nomor Kartu Identitas')
+                            ->color('secondary'),
+                        TextEntry::make('pendaftaran.nama_kontak_darurat')
+                            ->label('Nama Kontak Darurat')
+                            ->color('secondary'),
+                        TextEntry::make('pendaftaran.nomor_kontak_darurat')
+                            ->label('Nomor Kontak Darurat')
+                            ->color('secondary'),
+                        TextEntry::make('pendaftaran.golongan_darah')
+                            ->badge()
+                            ->label('Golongan Darah'),
+                    ])->columns(2),
 
-                Section::make('Data Alamat')->schema([
-                    TextEntry::make('earlybird.alamat')
-                        ->label('Alamat')
-                        ->columnSpanFull()
-                        ->color('secondary'),
-                    TextEntry::make('earlybird.negara')
-                        ->label('Negara')
-                        ->color('secondary'),
-                    TextEntry::make('earlybird.prov.name')
-                        ->label('Provinsi')
-                        ->color('secondary'),
-                    TextEntry::make('earlybird.kab.name')
-                        ->label('Kabupaten')
-                        ->color('secondary'),
-                    TextEntry::make('earlybird.kec.name')
-                        ->label('Kecamatan')
-                        ->color('secondary'),
-                ])->columns(2),
-            ])->columnSpan(2),
-            Group::make()->schema([
-                Section::make('Status Peserta')->schema([
-                    TextEntry::make('earlybird.ukuran_jersey')
-                        ->label('Ukuran Jersey')
-                        ->badge(),
-                    TextEntry::make('earlybird.kategori.nama')
-                        ->label('Kategori')
-                        ->badge(),
-                    TextEntry::make('earlybird.komunitas')
-                        ->label('Komunitas')
-                        ->badge(),
-                    TextEntry::make('earlybird.status_earlybird')
-                        ->label('Status EarlyBird')
-                        ->badge(),
-                ])->columns(2),
-                Section::make('Pembayaran')->schema([
-                    TextEntry::make('order_id')
-                        ->label('Order ID')->badge(),
-                    TextEntry::make('tipe_pembayaran')
-                        ->label('Tipe Bayar')->badge(),
-                    TextEntry::make('status_pembayaran')
-                        ->label('Status Pembayaran')->badge(),
-                    TextEntry::make('status_pendaftaran')
-                        ->label('Status Pendaftaran')->badge(),
-                    TextEntry::make('status_transaksi')
-                        ->label('Status Transaksi')->badge(),
-                ])->columns(2),
-            ])->columns(1),
-        ])->columns(3);
+                    Section::make('Data Alamat')->schema([
+                        TextEntry::make('pendaftaran.alamat')
+                            ->label('Alamat')
+                            ->columnSpanFull()
+                            ->color('secondary'),
+                        TextEntry::make('pendaftaran.negara')
+                            ->label('Negara')
+                            ->color('secondary'),
+                        TextEntry::make('pendaftaran.prov.name')
+                            ->label('Provinsi')
+                            ->color('secondary'),
+                        TextEntry::make('pendaftaran.kab.name')
+                            ->label('Kabupaten')
+                            ->color('secondary'),
+                        TextEntry::make('pendaftaran.kec.name')
+                            ->label('Kecamatan')
+                            ->color('secondary'),
+                    ])->columns(2),
+                ])->columnSpan(2),
+                Group::make()->schema([
+                    Section::make('Status Peserta')->schema([
+                        TextEntry::make('pendaftaran.ukuran_jersey')
+                            ->label('Ukuran Jersey')
+                            ->badge(),
+                        TextEntry::make('pendaftaran.kategori.nama')
+                            ->label('Kategori')
+                            ->badge(),
+                        TextEntry::make('pendaftaran.komunitas')
+                            ->label('Komunitas')
+                            ->badge(),
+                        TextEntry::make('pendaftaran.status_pendaftaran')
+                            ->label('Status EarlyBird')
+                            ->badge(),
+                    ])->columns(2),
+                    Section::make('Pembayaran')->schema([
+                        TextEntry::make('order_id')
+                            ->label('Order ID')->badge(),
+                        TextEntry::make('tipe_pembayaran')
+                            ->label('Tipe Bayar')->badge(),
+                        TextEntry::make('status_pembayaran')
+                            ->label('Status Pembayaran')->badge(),
+                        TextEntry::make('status_pendaftaran')
+                            ->label('Status Pendaftaran')->badge(),
+                        TextEntry::make('status_transaksi')
+                            ->label('Status Transaksi')->badge(),
+                    ])->columns(2),
+                ])->columns(1),
+            ])->columns(3);
     }
 
     public static function table(Table $table): Table
@@ -227,7 +221,8 @@ class PembayaranResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make(getPembayaranRelationshipLabel())
+                Tables\Columns\TextColumn::make('pendaftaran.nama_lengkap')
+                    ->label('Nama Peserta')
                     ->searchable()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: false),

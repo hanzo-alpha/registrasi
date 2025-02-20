@@ -6,6 +6,7 @@ namespace App\Providers;
 
 use App\Filament\App\Pages\Earlybird;
 use App\Filament\App\Pages\Pendaftaran;
+use App\Filament\App\Pages\RegistrasiPeserta;
 use Filament\Forms\Components\Field;
 use Filament\Forms\Components\Placeholder;
 use Filament\Infolists\Components\Entry;
@@ -58,6 +59,7 @@ class AppServiceProvider extends ServiceProvider
             scopes: [
                 Pendaftaran::class,
                 Earlybird::class,
+                RegistrasiPeserta::class,
             ],
         );
     }

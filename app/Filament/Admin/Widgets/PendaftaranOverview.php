@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Admin\Widgets;
 
 use App\Enums\StatusRegistrasi;
-use App\Models\Registrasi;
+use App\Models\Pendaftaran;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Number;
@@ -14,14 +14,14 @@ class PendaftaranOverview extends BaseWidget
 {
     protected function getStats(): array
     {
-        $countEarly = Registrasi::count();
-        $totalBayarLunas = Registrasi::query()
+        $countEarly = Pendaftaran::count();
+        $totalBayarLunas = Pendaftaran::query()
             ->where('status_registrasi', StatusRegistrasi::BERHASIL)
             ->count();
-        $totalFailed = Registrasi::query()
+        $totalFailed = Pendaftaran::query()
             ->where('status_registrasi', StatusRegistrasi::BATAL)
             ->count();
-        $totalPending = Registrasi::query()
+        $totalPending = Pendaftaran::query()
             ->whereIn('status_registrasi', [
                 StatusRegistrasi::TUNDA,
                 StatusRegistrasi::BELUM_BAYAR,

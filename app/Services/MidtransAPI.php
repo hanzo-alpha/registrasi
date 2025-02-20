@@ -101,7 +101,7 @@ class MidtransAPI
         return $data;
     }
 
-    public static function getStatusMessage($orderId, $statusDaftar = 'earlybird'): string|null|array
+    public static function getStatusMessage($orderId): string|null|array
     {
         $statusMessage = null;
         $status = 'danger';
@@ -125,7 +125,7 @@ class MidtransAPI
         $fraud = $responses['fraud_status'] ?? null;
 
         $pembayaran = Pembayaran::where('order_id', $order_id)->first();
-        $registrasi = $pembayaran->{$statusDaftar};
+        $registrasi = $pembayaran->pendaftaran;
 
         $pembayaran->detail_transaksi = $details;
 
@@ -135,12 +135,7 @@ class MidtransAPI
                     // TODO set payment status in merchant's database to 'Success'
                     $pembayaran->status_transaksi = PaymentStatus::CAPTURE;
                     $pembayaran->status_pembayaran = StatusBayar::SUDAH_BAYAR;
-
-                    if ('earlybird' === $statusDaftar) {
-                        $registrasi->status_earlybird = StatusRegistrasi::BERHASIL;
-                    } else {
-                        $registrasi->status_registrasi = StatusRegistrasi::BERHASIL;
-                    }
+                    $registrasi->status_registrasi = StatusRegistrasi::BERHASIL;
 
                     $status = 'success';
                     $statusMessage = 'Transaksi order_id: ' . $order_id . ' berhasil ditangkap menggunakan ' . $type;
@@ -151,11 +146,8 @@ class MidtransAPI
                 // TODO set payment status in merchant's database to 'Settlement'
                 $pembayaran->status_transaksi = PaymentStatus::SETTLEMENT;
                 $pembayaran->status_pembayaran = StatusBayar::SUDAH_BAYAR;
-                if ('earlybird' === $statusDaftar) {
-                    $registrasi->status_earlybird = StatusRegistrasi::BERHASIL;
-                } else {
-                    $registrasi->status_registrasi = StatusRegistrasi::BERHASIL;
-                }
+                $registrasi->status_registrasi = StatusRegistrasi::BERHASIL;
+
                 $status = 'success';
                 $statusMessage = 'Transaksi order_id: ' . $order_id . ' berhasil ditransfer menggunakan ' . $type;
             } else {
@@ -163,11 +155,8 @@ class MidtransAPI
                     // TODO set payment status in merchant's database to 'Pending'
                     $pembayaran->status_transaksi = PaymentStatus::PENDING;
                     $pembayaran->status_pembayaran = StatusBayar::PENDING;
-                    if ('earlybird' === $statusDaftar) {
-                        $registrasi->status_earlybird = StatusRegistrasi::TUNDA;
-                    } else {
-                        $registrasi->status_registrasi = StatusRegistrasi::TUNDA;
-                    }
+                    $registrasi->status_registrasi = StatusRegistrasi::TUNDA;
+
                     $status = 'info';
                     $statusMessage = 'Menunggu nasabah menyelesaikan transaksi order_id: ' . $order_id . ' menggunakan '
                         . $type;
@@ -176,11 +165,8 @@ class MidtransAPI
                         // TODO set payment status in merchant's database to 'Denied'
                         $pembayaran->status_transaksi = PaymentStatus::DENY;
                         $pembayaran->status_pembayaran = StatusBayar::GAGAL;
-                        if ('earlybird' === $statusDaftar) {
-                            $registrasi->status_earlybird = StatusRegistrasi::BATAL;
-                        } else {
-                            $registrasi->status_registrasi = StatusRegistrasi::BATAL;
-                        }
+                        $registrasi->status_registrasi = StatusRegistrasi::BATAL;
+
                         $status = 'danger';
                         $statusMessage = 'Pembayaran menggunakan ' . $type . ' untuk transaksi order_id: ' . $order_id . ' ditolak.';
                     } else {
@@ -188,11 +174,8 @@ class MidtransAPI
                             // TODO set payment status in merchant's database to 'expire'
                             $pembayaran->status_transaksi = PaymentStatus::EXPIRE;
                             $pembayaran->status_pembayaran = StatusBayar::GAGAL;
-                            if ('earlybird' === $statusDaftar) {
-                                $registrasi->status_earlybird = StatusRegistrasi::BATAL;
-                            } else {
-                                $registrasi->status_registrasi = StatusRegistrasi::BATAL;
-                            }
+                            $registrasi->status_registrasi = StatusRegistrasi::BATAL;
+
                             $status = 'warning';
                             $statusMessage = 'Pembayaran menggunakan ' . $type . ' untuk transaksi order_id: ' . $order_id . ' kedaluwarsa.';
                         } else {
@@ -200,11 +183,8 @@ class MidtransAPI
                                 // TODO set payment status in merchant's database to 'Denied'
                                 $pembayaran->status_transaksi = PaymentStatus::CANCEL;
                                 $pembayaran->status_pembayaran = StatusBayar::GAGAL;
-                                if ('earlybird' === $statusDaftar) {
-                                    $registrasi->status_earlybird = StatusRegistrasi::BATAL;
-                                } else {
-                                    $registrasi->status_registrasi = StatusRegistrasi::BATAL;
-                                }
+                                $registrasi->status_registrasi = StatusRegistrasi::BATAL;
+
                                 $status = 'warning';
                                 $statusMessage = 'Pembayaran menggunakan ' . $type . ' untuk transaksi order_id: ' . $order_id . ' dibatalkan.';
                             }

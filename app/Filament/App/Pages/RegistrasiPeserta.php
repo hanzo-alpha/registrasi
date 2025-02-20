@@ -16,7 +16,6 @@ use App\Enums\TipeKartuIdentitas;
 use App\Enums\UkuranJersey;
 use App\Models\KategoriLomba;
 use App\Models\Pembayaran;
-use App\Models\Registrasi;
 use App\Services\MidtransAPI;
 use Closure;
 use Exception;
@@ -36,6 +35,7 @@ use Filament\Support\Facades\FilamentView;
 
 use function Filament\Support\is_app_url;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Blade;
@@ -49,29 +49,27 @@ use Livewire\Attributes\On;
 use Parfaitementweb\FilamentCountryField\Forms\Components\Country;
 use Throwable;
 
-class Pendaftaran extends Page implements HasForms
+class RegistrasiPeserta extends Page implements HasForms
 {
     use CanUseDatabaseTransactions;
     use HasUnsavedDataChangesAlert;
     use InteractsWithFormActions;
     use InteractsWithForms;
-
     public ?Model $record = null;
-
     public ?array $data = [];
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
     protected static ?string $activeNavigationIcon = 'heroicon-s-document-text';
-    protected static ?string $slug = 'pendaftaran';
-    protected static string $view = 'filament.app.pages.pendaftaran';
+    protected static ?string $slug = 'registrasi-peserta';
+    protected static string $view = 'filament.app.pages.registrasi-peserta';
+    protected static ?string $navigationLabel = 'Registrasi Peserta';
+    protected static bool $shouldRegisterNavigation = true;
     protected ?string $heading = 'Pendaftaran Online Peserta Bantaeng Trail Run 2025';
     protected ?string $subheading = 'Silahkan lengkapi data peserta di bawah ini.';
-    protected static ?string $navigationLabel = 'Pendaftaran Normal';
-    protected static bool $shouldRegisterNavigation = false;
 
     public static function getNavigationBadge(): ?string
     {
-        return (string) Registrasi::count();
+        return (string) \App\Models\Pendaftaran::count();
     }
 
     public static function formOtomatis(): array
@@ -84,7 +82,7 @@ class Pendaftaran extends Page implements HasForms
                     ->schema([
                         Section::make('Data Peserta')
                             ->schema([
-                                Forms\Components\TextInput::make('uuid_registrasi')
+                                Forms\Components\TextInput::make('uuid_pendaftaran')
                                     ->label('Kode Peserta')
                                     ->required()
                                     ->hidden()
@@ -219,9 +217,25 @@ class Pendaftaran extends Page implements HasForms
                     ->schema([
                         Section::make('Data Pendaftaran')
                             ->schema([
+                                Forms\Components\Select::make('status_pendaftaran')
+                                    ->label('Jenis Pendaftaran')
+                                    ->options(StatusPendaftaran::class)
+                                    ->native(false)
+                                    ->live(onBlur: true)
+                                    ->required()
+                                    ->default(StatusPendaftaran::NORMAL)
+                                    ->afterStateUpdated(fn(Forms\Set $set) => $set('kategori_lomba', null)),
                                 Forms\Components\Select::make('kategori_lomba')
                                     ->label('Kategori Lomba')
-                                    ->relationship('kategori', 'nama')
+                                    ->relationship(
+                                        name: 'kategori',
+                                        titleAttribute: 'nama',
+                                        modifyQueryUsing: fn(
+                                            Forms\Get $get,
+                                            Builder $query,
+                                        ) => $query->where('kategori', $get('status_pendaftaran')),
+                                    )
+                                    ->preload()
                                     ->native(false)
                                     ->required(),
                                 Forms\Components\Select::make('ukuran_jersey')
@@ -240,14 +254,16 @@ class Pendaftaran extends Page implements HasForms
 //                ->nextAction(
 //                    fn(Forms\Components\Actions\Action $action) => $action->disabled(),
 //                )
-                ->submitAction(new HtmlString(Blade::render(<<<BLADE
+                ->submitAction(new HtmlString(Blade::render(
+                    <<<BLADE
                 <x-filament::button
                     type="submit"
                     size="sm"
                 >
                     Submit
                 </x-filament::button>
-            BLADE)))
+            BLADE,
+                )))
                 ->columnSpanFull(),
         ];
     }
@@ -261,7 +277,7 @@ class Pendaftaran extends Page implements HasForms
     public function detailTransaction($result)
     {
         $orderId = $result['order_id'] ?? null;
-        $registrasi = Registrasi::where('uuid_registrasi', $orderId)->first();
+        $registrasi = \App\Models\Pendaftaran::where('uuid_pendaftaran', $orderId)->first();
         $pembayaran = $registrasi->pembayaran;
 
         $uuidPembayaran = $pembayaran->uuid_pembayaran ?? Str::uuid()->toString();
@@ -324,7 +340,7 @@ class Pendaftaran extends Page implements HasForms
         $pembayaran->status_transaksi = $transactionStatus;
         $pembayaran->detail_transaksi = $result;
         $pembayaran->status_daftar = $statusDaftar;
-        $pembayaran->status_pendaftaran = StatusPendaftaran::NORMAL;
+        //        $pembayaran->status_pendaftaran = StatusPendaftaran::NORMAL;
         $pembayaran->lampiran = null;
         $pembayaran->save();
         $registrasi->save();
@@ -418,6 +434,11 @@ class Pendaftaran extends Page implements HasForms
 
     }
 
+    public function getModel(): string
+    {
+        return \App\Models\Pendaftaran::class;
+    }
+
     public function getRecord(): ?Model
     {
         return $this->record;
@@ -430,11 +451,6 @@ class Pendaftaran extends Page implements HasForms
             ->columns(2);
     }
 
-    public function getModel(): string
-    {
-        return Registrasi::class;
-    }
-
     public function getFormStatePath(): ?string
     {
         return 'data';
@@ -445,7 +461,7 @@ class Pendaftaran extends Page implements HasForms
      */
     protected function handleRecordCreation(array $data): Model
     {
-        $data['uuid_registrasi'] = \Str::uuid()->toString();
+        $data['uuid_pendaftaran'] = \Str::uuid()->toString();
         $data['status_registrasi'] ??= StatusRegistrasi::BELUM_BAYAR;
         $data['provinsi'] ??= '74';
         $biaya = biaya_pendaftaran($data['kategori_lomba']) ?? 0;
@@ -458,7 +474,7 @@ class Pendaftaran extends Page implements HasForms
         midtrans_config();
 
         $transactions = [
-            'order_id' => $data['uuid_registrasi'],
+            'order_id' => $data['uuid_pendaftaran'],
             'gross_amount' => $totalHarga,
         ];
 
@@ -499,6 +515,8 @@ class Pendaftaran extends Page implements HasForms
 
         Pembayaran::create([
             'registrasi_id' => $record->id,
+            'order_id' => $record->uuid_pendaftaran,
+            'pendaftaran_id' => $record->id,
             'nama_kegiatan' => $namaKegiatan,
             'ukuran_jersey' => $data['ukuran_jersey'],
             'kategori_lomba' => $data['kategori_lomba'],
@@ -511,7 +529,7 @@ class Pendaftaran extends Page implements HasForms
             'status_transaksi' => PaymentStatus::CAPTURE,
             'status_daftar' => StatusDaftar::TERDAFTAR,
             'keterangan' => null,
-            'status_pendaftaran' => StatusPendaftaran::NORMAL,
+            'status_pendaftaran' => $data['status_pendaftaran'] ??= StatusPendaftaran::NORMAL,
             'detail_transaksi' => $detailTransaksi,
             'lampiran' => null,
         ]);
@@ -580,6 +598,6 @@ class Pendaftaran extends Page implements HasForms
 
     protected function getRedirectUrl(): string
     {
-        return Pendaftaran::getUrl();
+        return RegistrasiPeserta::getUrl();
     }
 }

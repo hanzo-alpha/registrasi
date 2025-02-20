@@ -15,12 +15,12 @@ class ListRegistrasis extends ListRecords
 {
     protected static string $resource = RegistrasiResource::class;
 
-    protected function getHeaderWidgets(): array
-    {
-        return [
-            PendaftaranOverview::class,
-        ];
-    }
+    //    protected function getHeaderWidgets(): array
+    //    {
+    //        return [
+    //            PendaftaranOverview::class,
+    //        ];
+    //    }
 
     protected function getHeaderActions(): array
     {

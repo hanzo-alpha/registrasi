@@ -29,6 +29,8 @@ class Pembayaran extends Model
         'uuid_pembayaran',
         'order_id',
         'registrasi_id',
+        'earlybird_id',
+        'pendaftaran_id',
         'nama_kegiatan',
         'ukuran_jersey',
         'kategori_lomba',
@@ -62,9 +64,14 @@ class Pembayaran extends Model
         return $this->belongsTo(Registrasi::class, 'registrasi_id', 'id');
     }
 
+    public function pendaftaran(): BelongsTo
+    {
+        return $this->belongsTo(Pendaftaran::class, 'pendaftaran_id', 'id');
+    }
+
     public function earlybird(): BelongsTo
     {
-        return $this->belongsTo(Earlybird::class, 'registrasi_id', 'id');
+        return $this->belongsTo(Earlybird::class, 'earlybird_id', 'id');
     }
 
     public function kategori(): BelongsTo

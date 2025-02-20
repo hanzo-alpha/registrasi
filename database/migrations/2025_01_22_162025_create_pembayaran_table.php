@@ -14,6 +14,8 @@ return new class () extends Migration {
             $table->uuid('uuid_pembayaran')->nullable()->index();
             $table->uuid('order_id')->nullable()->index();
             $table->foreignId('registrasi_id')->index()->nullable();
+            $table->foreignId('earlybird_id')->index()->nullable();
+            $table->foreignId('pendaftaran_id')->index()->nullable();
             $table->string('nama_kegiatan')->nullable();
             $table->string('ukuran_jersey')->nullable();
             $table->string('kategori_lomba')->nullable();

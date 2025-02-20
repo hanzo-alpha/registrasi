@@ -9,9 +9,9 @@ use App\Enums\JenisKelamin;
 use App\Enums\StatusRegistrasi;
 use App\Enums\TipeKartuIdentitas;
 use App\Enums\UkuranJersey;
-use App\Filament\Admin\Resources\EarlybirdResource\Pages;
-use App\Filament\Admin\Widgets\EarlybirdOverview;
-use App\Models\Earlybird;
+use App\Filament\Admin\Resources\PendaftaranResource\Pages;
+use App\Filament\Admin\Widgets\PendaftaranOverview;
+use App\Models\Pendaftaran;
 use App\Services\MidtransAPI;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -33,18 +33,16 @@ use KodePandai\Indonesia\Models\District;
 use KodePandai\Indonesia\Models\Province;
 use Parfaitementweb\FilamentCountryField\Forms\Components\Country;
 
-class EarlybirdResource extends Resource
+class PendaftaranResource extends Resource
 {
-    protected static ?string $model = Earlybird::class;
-
+    protected static ?string $model = Pendaftaran::class;
     protected static ?string $navigationIcon = 'heroicon-o-document-plus';
-    protected static ?string $label = 'Pendaftaran Earlybird';
-    protected static ?string $modelLabel = 'Pendaftaran Earlybird';
-    protected static ?string $pluralLabel = 'Pendaftaran Earlybird';
-    protected static ?string $pluralModelLabel = 'Pendaftaran Earlybird';
-    protected static ?string $navigationLabel = 'Pendaftaran Earlybird';
+    protected static ?string $label = 'Pendaftaran';
+    protected static ?string $modelLabel = 'Pendaftaran';
+    protected static ?string $pluralLabel = 'Pendaftaran';
+    protected static ?string $pluralModelLabel = 'Pendaftaran';
+    protected static ?string $navigationLabel = 'Pendaftaran';
     protected static ?string $navigationGroup = 'Pendaftaran';
-    protected static bool $shouldRegisterNavigation = false;
 
     protected static ?string $recordTitleAttribute = 'nama_lengkap';
 
@@ -149,13 +147,12 @@ class EarlybirdResource extends Resource
                         ->native(false)
                         ->required(),
                     Forms\Components\Select::make('ukuran_jersey')
-                        ->label('Ukuran Jersey')
+                        ->required()
                         ->native(false)
                         ->options(UkuranJersey::class)
                         ->enum(UkuranJersey::class)
-                        ->required(),
-                    Forms\Components\Select::make('status_earlybird')
-                        ->label('Status Earlybird')
+                        ->searchable(),
+                    Forms\Components\Select::make('status_registrasi')
                         ->native(false)
                         ->options(StatusRegistrasi::class)
                         ->enum(StatusRegistrasi::class)
@@ -169,7 +166,7 @@ class EarlybirdResource extends Resource
         return $infolist->schema([
             Group::make()->schema([
                 Section::make('Data Peserta')->schema([
-                    TextEntry::make('uuid_earlybird')
+                    TextEntry::make('uuid_registrasi')
                         ->label('UUID')
                         ->color('secondary'),
                     TextEntry::make('nama_lengkap')
@@ -230,7 +227,7 @@ class EarlybirdResource extends Resource
                     TextEntry::make('ukuran_jersey')->badge(),
                     TextEntry::make('kategori.nama')->badge(),
                     TextEntry::make('komunitas')->badge(),
-                    TextEntry::make('status_earlybird')->badge(),
+                    TextEntry::make('status_registrasi')->badge(),
                 ])->columns(2),
                 Section::make('Pembayaran')->schema([
                     TextEntry::make('pembayaran.tipe_pembayaran')
@@ -252,8 +249,9 @@ class EarlybirdResource extends Resource
             ->poll('5s')
             ->deferLoading()
             ->columns([
-                Tables\Columns\TextColumn::make('uuid_earlybird')
+                Tables\Columns\TextColumn::make('uuid_registrasi')
                     ->searchable()
+                    ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('nama_lengkap')
                     ->searchable(),
@@ -323,7 +321,14 @@ class EarlybirdResource extends Resource
                 Tables\Columns\TextColumn::make('komunitas')
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('status_earlybird')
+                Tables\Columns\TextColumn::make('status_registrasi')
+                    ->searchable()
+                    ->sortable()
+                    ->badge()
+                    ->alignCenter()
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('status_pendaftaran')
+                    ->label('Jenis Daftar')
                     ->searchable()
                     ->sortable()
                     ->badge()
@@ -339,7 +344,7 @@ class EarlybirdResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('status_earlybird')
+                Tables\Filters\SelectFilter::make('status_registrasi')
                     ->options(StatusRegistrasi::class)
                     ->searchable(),
                 Tables\Filters\SelectFilter::make('jenis_kelamin')
@@ -352,8 +357,8 @@ class EarlybirdResource extends Resource
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
-                Tables\Actions\Action::make('Check Pembayaran')
-                    ->label('Check Pembayaran')
+                Tables\Actions\Action::make('update_pembayaran')
+                    ->label('Status Bayar')
                     ->icon('heroicon-o-check')
                     ->color('yellow')
                     ->action(function ($record): void {
@@ -362,7 +367,11 @@ class EarlybirdResource extends Resource
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\ViewAction::make(),
                     Tables\Actions\EditAction::make(),
-                    Tables\Actions\DeleteAction::make(),
+                    Tables\Actions\DeleteAction::make()
+                        ->action(function ($record): void {
+                            $record->delete();
+                            $record->pembayaran->delete();
+                        }),
                     Tables\Actions\ForceDeleteAction::make(),
                     Tables\Actions\RestoreAction::make(),
                 ]),
@@ -398,6 +407,13 @@ class EarlybirdResource extends Resource
         ];
     }
 
+    public static function getWidgets(): array
+    {
+        return [
+            PendaftaranOverview::class,
+        ];
+    }
+
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
@@ -410,17 +426,10 @@ class EarlybirdResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListEarlybirds::route('/'),
-            'create' => Pages\CreateEarlybird::route('/create'),
-            'edit' => Pages\EditEarlybird::route('/{record}/edit'),
-            'view' => Pages\ViewEarlybirds::route('/{record}/view'),
-        ];
-    }
-
-    public static function getWidgets(): array
-    {
-        return [
-            EarlybirdOverview::class,
+            'index' => Pages\ListPendaftarans::route('/'),
+            'create' => Pages\CreatePendaftaran::route('/create'),
+            'view' => Pages\ViewPendaftaran::route('/{record}'),
+            'edit' => Pages\EditPendaftaran::route('/{record}/edit'),
         ];
     }
 
@@ -429,7 +438,7 @@ class EarlybirdResource extends Resource
      * @return void
      * @throws \Illuminate\Http\Client\ConnectionException
      */
-    private static function checkPembayaran(Model|Earlybird $record): void
+    private static function checkPembayaran(Model|Pendaftaran $record): void
     {
         $orderId = $record->pembayaran?->order_id;
         $data = MidtransAPI::getStatusMessage($orderId);
