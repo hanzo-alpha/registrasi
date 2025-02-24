@@ -48,7 +48,7 @@
     "grunt-contrib-cssmin": "^4.0.0",
     "grunt-contrib-uglify": "^4.0.1",
     "grunt-contrib-watch": "^1.1.0",
-    "grunt-include-replace": "^3.2.0",
+    "grunt-include-replace": "^5.0.0",
     "grunt-jsbeautifier": "^0.2.13",
     "grunt-replace": "^2.0.1",
     "grunt-strip-code": "^1.0.6"
