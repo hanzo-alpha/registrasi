@@ -219,10 +219,12 @@ class RegistrasiPeserta extends Page implements HasForms
                             ->schema([
                                 Forms\Components\Select::make('status_pendaftaran')
                                     ->label('Jenis Pendaftaran')
+                                    ->disabled()
                                     ->options(StatusPendaftaran::class)
                                     ->native(false)
                                     ->live(onBlur: true)
                                     ->required()
+                                    ->dehydrated()
                                     ->default(StatusPendaftaran::NORMAL)
                                     ->afterStateUpdated(fn(Forms\Set $set) => $set('kategori_lomba', null)),
                                 Forms\Components\Select::make('kategori_lomba')
