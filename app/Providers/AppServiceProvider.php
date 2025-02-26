@@ -67,13 +67,13 @@ class AppServiceProvider extends ServiceProvider
     private function configureModels(): void
     {
         Model::unguard();
-        Model::shouldBeStrict( ! $this->app->isProduction());
+        Model::shouldBeStrict($this->app->isProduction());
     }
 
     private function configureVite(): void
     {
         Vite::useWaterfallPrefetching(concurrency: 10);
-        Vite::useAggressivePrefetching();
-        Vite::usePrefetchStrategy('waterfall', ['concurrency' => 1]);
+        //        Vite::useAggressivePrefetching();
+        //        Vite::usePrefetchStrategy('waterfall', ['concurrency' => 1]);
     }
 }

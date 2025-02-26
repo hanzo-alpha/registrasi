@@ -12,7 +12,9 @@ export default defineConfig({
             ],
             refresh: [
                 ...refreshPaths,
+                'app/Filament/**',
                 'app/Livewire/**',
+                'app/Providers/Filament/**',
             ],
         }),
     ],
