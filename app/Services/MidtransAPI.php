@@ -43,7 +43,7 @@ class MidtransAPI
         ];
     }
 
-    public static function transformToArray(array $data)
+    public static function transformToArray(array $data): array
     {
         $collect = collect();
         foreach ($data as $key => $value) {
@@ -124,8 +124,8 @@ class MidtransAPI
         $order_id = $responses['order_id'] ?? null;
         $fraud = $responses['fraud_status'] ?? null;
 
-        $pembayaran = Pembayaran::where('order_id', $order_id)->first();
-        $registrasi = $pembayaran->pendaftaran;
+        $pembayaran = Pembayaran::query()->where('order_id', $order_id)->first();
+        $registrasi = $pembayaran?->pendaftaran;
 
         $pembayaran->detail_transaksi = $details;
 
