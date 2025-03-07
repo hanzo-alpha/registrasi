@@ -57,8 +57,8 @@ class AppServiceProvider extends ServiceProvider
             PanelsRenderHook::BODY_END,
             fn(array $scopes): View => view('payment-js', ['scopes' => $scopes]),
             scopes: [
-                Pendaftaran::class,
-                Earlybird::class,
+                //                Pendaftaran::class,
+                //                Earlybird::class,
                 RegistrasiPeserta::class,
             ],
         );
@@ -73,7 +73,5 @@ class AppServiceProvider extends ServiceProvider
     private function configureVite(): void
     {
         Vite::useWaterfallPrefetching(concurrency: 10);
-        //        Vite::useAggressivePrefetching();
-        //        Vite::usePrefetchStrategy('waterfall', ['concurrency' => 1]);
     }
 }

@@ -62,7 +62,7 @@ class Pendaftaran extends Model
 
     public function pembayaran(): HasOne
     {
-        return $this->hasOne(Pembayaran::class, 'registrasi_id', 'id');
+        return $this->hasOne(Pembayaran::class, 'pendaftaran_id', 'id');
     }
 
     public function kategori(): BelongsTo
@@ -74,7 +74,7 @@ class Pendaftaran extends Model
     {
         return [
             'tanggal_lahir' => 'date',
-            'uuid_registrasi' => 'string',
+            'uuid_pendaftaran' => 'string',
             'ukuran_jersey' => UkuranJersey::class,
             'tipe_kartu_identitas' => TipeKartuIdentitas::class,
             'golongan_darah' => GolonganDarah::class,

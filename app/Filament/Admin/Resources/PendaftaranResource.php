@@ -166,7 +166,7 @@ class PendaftaranResource extends Resource
         return $infolist->schema([
             Group::make()->schema([
                 Section::make('Data Peserta')->schema([
-                    TextEntry::make('uuid_registrasi')
+                    TextEntry::make('uuid_pendaftaran')
                         ->label('UUID')
                         ->color('secondary'),
                     TextEntry::make('nama_lengkap')
@@ -249,7 +249,7 @@ class PendaftaranResource extends Resource
             ->poll('5s')
             ->deferLoading()
             ->columns([
-                Tables\Columns\TextColumn::make('uuid_registrasi')
+                Tables\Columns\TextColumn::make('uuid_pendaftaran')
                     ->searchable()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

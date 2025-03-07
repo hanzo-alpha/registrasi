@@ -17,7 +17,6 @@
         "php": "^8.2",
         "ext-openssl": "*",
         "awcodes/shout": "^2.0",
-        "codewithdennis/filament-theme-inspector": "^0.0.7",
         "croustibat/filament-jobs-monitor": "^2.5",
         "devonab/filament-easy-footer": "^1.0",
         "filafly/phosphor-icon-replacement": "^1.0",

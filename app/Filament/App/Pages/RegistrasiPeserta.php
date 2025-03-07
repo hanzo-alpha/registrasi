@@ -14,6 +14,7 @@ use App\Enums\StatusRegistrasi;
 use App\Enums\TipeBayar;
 use App\Enums\TipeKartuIdentitas;
 use App\Enums\UkuranJersey;
+use App\Mail\PembayaranBerhasil;
 use App\Models\KategoriLomba;
 use App\Models\Pembayaran;
 use App\Services\MidtransAPI;
@@ -39,6 +40,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Number;
 use Illuminate\Support\Str;
@@ -349,6 +351,13 @@ class RegistrasiPeserta extends Page implements HasForms
         $redirectUrl = $this->getUrl();
         $this->redirect($redirectUrl, navigate: FilamentView::hasSpaMode() && is_app_url((string) $redirectUrl));
 
+        // Kirim Email Ke Peserta Setelah melakukan pembayaran
+        if ( ! app()->environment('production')) {
+            defer(function () use ($pembayaran, $registrasi): void {
+                Mail::to($registrasi->email)->send(new PembayaranBerhasil($pembayaran));
+            });
+        }
+
         if (StatusBayar::BELUM_BAYAR === $status) {
             return Notification::make()
                 ->title('Belum ada Pembayaran')
@@ -516,7 +525,6 @@ class RegistrasiPeserta extends Page implements HasForms
         $record->save();
 
         Pembayaran::create([
-            'registrasi_id' => $record->id,
             'order_id' => $record->uuid_pendaftaran,
             'pendaftaran_id' => $record->id,
             'nama_kegiatan' => $namaKegiatan,

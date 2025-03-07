@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Filament\Admin\Pages\Auth\Login;
-use CodeWithDennis\FilamentThemeInspector\FilamentThemeInspectorPlugin;
 use Croustibat\FilamentJobsMonitor\FilamentJobsMonitorPlugin;
 use Devonab\FilamentEasyFooter\EasyFooterPlugin;
 use Filafly\PhosphorIconReplacement;
@@ -16,6 +15,7 @@ use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\Support\Enums\MaxWidth;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -38,6 +38,7 @@ class AdminPanelProvider extends PanelProvider
             ->passwordReset()
             ->sidebarCollapsibleOnDesktop()
             ->spa()
+            ->maxContentWidth(MaxWidth::Full)
             ->databaseNotifications()
             ->databaseTransactions()
             ->colors([
@@ -66,15 +67,12 @@ class AdminPanelProvider extends PanelProvider
                     ),
                 FilamentWebhookClientPlugin::make(),
                 FilamentJobsMonitorPlugin::make(),
-                FilamentThemeInspectorPlugin::make()
-                    ->disabled(fn() => ! app()->hasDebugModeEnabled()),
                 PhosphorIconReplacement::make(),
                 EasyFooterPlugin::make()
                     ->withLoadTime('Halaman ini dimuat dalam ')
                     ->withGithub()
                     ->withSentence(config('app.brand') . ' - ' . config('app.event')),
                 FilamentMailsPlugin::make(),
-
             ])
             ->resources([
                 config('filament-logger.activity_resource'),

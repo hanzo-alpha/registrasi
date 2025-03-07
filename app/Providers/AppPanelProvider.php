@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use CodeWithDennis\FilamentThemeInspector\FilamentThemeInspectorPlugin;
 use Filament\Enums\ThemeMode;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -65,10 +64,6 @@ class AppPanelProvider extends PanelProvider
                     ->myProfile(
                         navigationGroup: 'Pengaturan',
                     ),
-
-                FilamentThemeInspectorPlugin::make()
-                    ->disabled(fn() => ! app()->hasDebugModeEnabled())
-                    ->toggle(),
             ])
             ->discoverResources(in: app_path('Filament/App/Resources'), for: 'App\\Filament\\App\\Resources')
             ->discoverPages(in: app_path('Filament/App/Pages'), for: 'App\\Filament\\App\\Pages')
