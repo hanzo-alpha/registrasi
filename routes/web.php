@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
+use App\Filament\App\Pages\RegistrasiPeserta;
 use App\Livewire\Frontend\Index;
 use Illuminate\Support\Facades\Route;
 
 //Route::get('/', Index::class)->name('home');
 //Route::get('/', fn() => redirect()->route('filament.app.pages.earlybird'))->name('home');
-Route::get('/', fn() => redirect()->route('filament.app.pages.registrasi-peserta'))->name('home');
+Route::get('/', RegistrasiPeserta::class)->name('home');
 Route::webhooks('registrasi-webhook', 'registrasi-webhook');
 Route::webhooks('resend-notification', 'resend-webhook');
 

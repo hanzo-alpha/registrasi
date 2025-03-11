@@ -7,7 +7,7 @@ namespace App\Filament\Admin\Resources\PendaftaranResource\Pages;
 use App\Enums\StatusPendaftaran;
 use App\Filament\Admin\Resources\PendaftaranResource;
 use App\Filament\Admin\Widgets\PendaftaranOverview;
-use App\Filament\Exports\EarlybirdExporter;
+use App\Filament\Exports\PendaftaranExporter;
 use App\Models\Pembayaran;
 use Filament\Actions;
 use Filament\Actions\Exports\Enums\ExportFormat;
@@ -19,35 +19,35 @@ class ListPendaftarans extends ListRecords
 {
     protected static string $resource = PendaftaranResource::class;
 
-    public function getTabs(): array
-    {
-        return [
-            'normal' => Tab::make()
-                ->label('Normal')
-                ->icon('heroicon-m-minus-circle')
-                ->badge(
-                    Pembayaran::query()
-                        ->where('status_pendaftaran', StatusPendaftaran::NORMAL)
-                        ->count(),
-                )
-                ->modifyQueryUsing(
-                    fn(Builder $query) => $query
-                        ->where('status_pendaftaran', StatusPendaftaran::NORMAL),
-                ),
-            'early_bird' => Tab::make()
-                ->label('Early Bird')
-                ->icon('heroicon-m-check-circle')
-                ->badge(
-                    Pembayaran::query()
-                        ->where('status_pendaftaran', StatusPendaftaran::EARLYBIRD)
-                        ->count(),
-                )
-                ->modifyQueryUsing(
-                    fn(Builder $query) => $query
-                        ->where('status_pendaftaran', StatusPendaftaran::EARLYBIRD),
-                ),
-        ];
-    }
+    //    public function getTabs(): array
+    //    {
+    //        return [
+    //            'normal' => Tab::make()
+    //                ->label('Normal')
+    //                ->icon('heroicon-m-minus-circle')
+    //                ->badge(
+    //                    Pembayaran::query()
+    //                        ->where('status_pendaftaran', StatusPendaftaran::NORMAL)
+    //                        ->count(),
+    //                )
+    //                ->modifyQueryUsing(
+    //                    fn(Builder $query) => $query
+    //                        ->where('status_pendaftaran', StatusPendaftaran::NORMAL),
+    //                ),
+    //            'early_bird' => Tab::make()
+    //                ->label('Early Bird')
+    //                ->icon('heroicon-m-check-circle')
+    //                ->badge(
+    //                    Pembayaran::query()
+    //                        ->where('status_pendaftaran', StatusPendaftaran::EARLYBIRD)
+    //                        ->count(),
+    //                )
+    //                ->modifyQueryUsing(
+    //                    fn(Builder $query) => $query
+    //                        ->where('status_pendaftaran', StatusPendaftaran::EARLYBIRD),
+    //                ),
+    //        ];
+    //    }
 
     protected function getHeaderWidgets(): array
     {
@@ -61,7 +61,7 @@ class ListPendaftarans extends ListRecords
         return [
             Actions\ExportAction::make()
                 ->label('Ekspor')
-                ->exporter(EarlybirdExporter::class)
+                ->exporter(PendaftaranExporter::class)
                 ->formats([
                     ExportFormat::Xlsx,
                 ])

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Enums;
 
 use Filament\Support\Contracts\HasLabel;
@@ -24,9 +26,18 @@ enum UkuranJersey: string implements HasLabel
     case XXL_WOMEN = '2XL_WOMEN';
     case XXXL_WOMEN = '3XL_WOMEN';
 
+    public static function toArray(): array
+    {
+        $array = [];
+        foreach (self::cases() as $case) {
+            $array[$case->name] = $case->value;
+        }
+        return $array;
+    }
+
     public function getLabel(): ?string
     {
-        return match ($this){
+        return match ($this) {
             self::XXS_MEN => __('XXS - MEN'),
             self::XS_MEN => __('XS - MEN'),
             self::S_MEN => __('S - MEN'),
@@ -42,17 +53,8 @@ enum UkuranJersey: string implements HasLabel
             self::L_WOMEN => __('L - WOMEN'),
             self::XL_WOMEN => __('XL - WOMEN'),
             self::XXL_WOMEN => __('2XL - WOMEN'),
-            self::XXXL_WOMEN => __('3XL - WOMEN')
+            self::XXXL_WOMEN => __('3XL - WOMEN'),
         };
-    }
-
-    public static function toArray(): array
-    {
-        $array = [];
-        foreach (self::cases() as $case) {
-            $array[$case->name] = $case->value;
-        }
-        return $array;
     }
 
 }
