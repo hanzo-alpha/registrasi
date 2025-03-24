@@ -367,16 +367,46 @@ class PendaftaranResource extends Resource
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\ViewAction::make(),
                     Tables\Actions\EditAction::make(),
-                    Tables\Actions\DeleteAction::make(),
-                    Tables\Actions\ForceDeleteAction::make(),
-                    Tables\Actions\RestoreAction::make(),
+                    Tables\Actions\DeleteAction::make()
+                        ->action(function ($record): void {
+                            $record->delete();
+                            $record->pembayaran?->delete();
+                        }),
+                    Tables\Actions\ForceDeleteAction::make()
+                        ->action(function ($record): void {
+                            $record->forceDelete();
+                            $record->pembayaran?->forceDelete();
+                        }),
+                    Tables\Actions\RestoreAction::make()
+                        ->action(function ($record): void {
+                            $record->restore();
+                            $record->pembayaran?->restore();
+                        }),
                 ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\ForceDeleteBulkAction::make(),
-                    Tables\Actions\RestoreBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->action(function (Collection $records): void {
+                            $records->each(function (Model $record): void {
+                                $record->delete();
+                                $record->pembayaran?->delete();
+                            });
+                        }),
+                    Tables\Actions\ForceDeleteBulkAction::make()
+                        ->action(function (Collection $records): void {
+                            $records->each(function (Model $record): void {
+                                $record->forceDelete();
+                                $record->pembayaran?->forceDelete();
+                            });
+                        }),
+                    Tables\Actions\RestoreBulkAction::make()
+                        ->action(function (Collection $records): void {
+                            $records->each(function (Model $record): void {
+                                $record->restore();
+                                $record->pembayaran?->restore();
+                            });
+                        }),
                     Tables\Actions\BulkAction::make('check_pembayaran')
                         ->label('Check Pembayaran')
                         ->icon('heroicon-s-check')
