@@ -31,6 +31,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use KodePandai\Indonesia\Models\City;
 use KodePandai\Indonesia\Models\District;
 use KodePandai\Indonesia\Models\Province;
+use Number;
 use Parfaitementweb\FilamentCountryField\Forms\Components\Country;
 
 class PendaftaranResource extends Resource
@@ -236,6 +237,10 @@ class PendaftaranResource extends Resource
                         ->label('Status Pembayaran')->badge(),
                     TextEntry::make('pembayaran.status_pendaftaran')
                         ->label('Status Pendaftaran')->badge(),
+                    TextEntry::make('pembayaran.total_harga')
+                        ->label('Total Bayar')
+                        ->formatStateUsing(fn($state) => Number::currency($state, 'IDR', 'id', 0))
+                        ->color('primary'),
                     TextEntry::make('pembayaran.status_transaksi')
                         ->label('Status Transaksi')->badge(),
                 ])->columns(2),
@@ -463,11 +468,11 @@ class PendaftaranResource extends Resource
         $orderId = $record->pembayaran?->order_id;
         $data = MidtransAPI::getStatusMessage($orderId);
 
-        if (null === $data['status_message']) {
+        if (null === $data['status_message'] || '404' === $data['status']) {
             Notification::make()
                 ->danger()
-                ->title('Status Transaksi')
-                ->body('Transaksi tidak ditemukan')
+                ->title('Status Transaksi ' . $data['status'])
+                ->body($data['status_message'])
                 ->send();
             return;
         }

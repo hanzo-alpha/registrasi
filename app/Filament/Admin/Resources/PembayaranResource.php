@@ -25,6 +25,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Number;
 
 class PembayaranResource extends Resource
 {
@@ -199,6 +200,10 @@ class PembayaranResource extends Resource
                             ->label('Status Pembayaran')->badge(),
                         TextEntry::make('status_pendaftaran')
                             ->label('Status Pendaftaran')->badge(),
+                        TextEntry::make('total_harga')
+                            ->label('Total Bayar')
+                            ->formatStateUsing(fn($state) => Number::currency($state, 'IDR', 'id', 0))
+                            ->color('primary'),
                         TextEntry::make('status_transaksi')
                             ->label('Status Transaksi')->badge(),
                     ])->columns(2),

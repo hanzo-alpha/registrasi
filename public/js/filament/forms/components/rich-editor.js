@@ -2087,13 +2087,13 @@ var Gt = class i extends gt {
 };
 z(Gt, "permittedAttributes", ["caption", "presentation"]), gt.registerType("attachment", Gt);
 var ve = class extends gt {
+    static fromJSON(t) {
+        return new this(t.string, t.attributes)
+    }
+
     constructor(t) {
         super(...arguments), this.string = (e => e.replace(/\r\n?/g, `
 `))(t), this.length = this.string.length
-    }
-
-    static fromJSON(t) {
-        return new this(t.string, t.attributes)
     }
 
     getValue() {

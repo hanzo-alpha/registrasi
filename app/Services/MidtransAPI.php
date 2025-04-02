@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Enums\PaymentStatus;
 use App\Enums\StatusBayar;
 use App\Enums\StatusRegistrasi;
+use App\Enums\TipeBayar;
 use App\Models\Pembayaran;
 use Exception;
 
@@ -101,112 +102,57 @@ class MidtransAPI
         return $data;
     }
 
-    public static function getStatusMessage($orderId): string|null|array
+    public static function getStatusMessage($orderId): array
     {
-        $statusMessage = null;
-        $status = 'danger';
+        $url = self::buildMidtransUrl($orderId);
+        $responseData = self::fetchMidtransResponse($url);
 
-        $url = config('midtrans.is_production')
-            ? 'https://api.midtrans.com/v2/' . $orderId . '/status'
-            : 'https://api.sandbox.midtrans.com/v2/' . $orderId . '/status';
-
-        $response = config('midtrans.is_production')
-            ? Http::acceptJson()->withBasicAuth(config('midtrans.production.server_key'), '')->get($url)
-            : Http::acceptJson()->withBasicAuth(config('midtrans.sb.server_key'), '')->get($url);
-
-        $details = $response->collect()->except(['id'])->toArray();
-        $responses = $response->collect()->toArray();
-        if (count($responses) <= 0) {
-            $statusMessage = 'Transaksi Dengan Order ID : ' . $orderId . ' tidak ditemukan';
+        if (empty($responseData)) {
+            return [
+                'status' => 'danger',
+                'status_message' => 'Transaksi Dengan Order ID : ' . $orderId . ' tidak ditemukan',
+            ];
         }
-        $transaction = $responses['transaction_status'] ?? null;
-        $type = $responses['payment_type'] ?? null;
-        $order_id = $responses['order_id'] ?? null;
-        $fraud = $responses['fraud_status'] ?? null;
 
+        $transactionStatus = $responseData['transaction_status'] ?? null;
+        $paymentType = self::getPaymentType($responseData['payment_type'] ?? null);
+        $order_id = $responseData['order_id'] ?? null;
+
+        $details = collect($responseData)->except(['id'])->toArray();
         $pembayaran = Pembayaran::query()->where('order_id', $order_id)->first();
         $registrasi = $pembayaran?->pendaftaran;
 
-        $pembayaran->detail_transaksi = $details;
+        // Add transaction details
+        if ('200' === $details['status_code'] || '201' === $details['status_code']) {
+            $pembayaran->detail_transaksi = $details;
+            $pembayaran->tipe_pembayaran = $paymentType;
+            $statusData = self::handleTransactionStatus(
+                $transactionStatus,
+                $responseData['payment_type'] ?? null,
+                $pembayaran,
+                $registrasi,
+            );
 
-        if ('capture' === $transaction) {
-            if ('credit_card' === $type) {
-                if ('accept' === $fraud) {
-                    // TODO set payment status in merchant's database to 'Success'
-                    $pembayaran->status_transaksi = PaymentStatus::CAPTURE;
-                    $pembayaran->status_pembayaran = StatusBayar::SUDAH_BAYAR;
-                    $registrasi->status_registrasi = StatusRegistrasi::BERHASIL;
-
-                    $status = 'success';
-                    $statusMessage = 'Transaksi order_id: ' . $order_id . ' berhasil ditangkap menggunakan ' . $type;
-                }
-            }
-        } else {
-            if ('settlement' === $transaction) {
-                // TODO set payment status in merchant's database to 'Settlement'
-                $pembayaran->status_transaksi = PaymentStatus::SETTLEMENT;
-                $pembayaran->status_pembayaran = StatusBayar::SUDAH_BAYAR;
-                $registrasi->status_registrasi = StatusRegistrasi::BERHASIL;
-
-                $status = 'success';
-                $statusMessage = 'Transaksi order_id: ' . $order_id . ' berhasil ditransfer menggunakan ' . $type;
+            if (null === $statusData['status_message']) {
+                $pembayaran->delete();
+                $registrasi->delete();
             } else {
-                if ('pending' === $transaction) {
-                    // TODO set payment status in merchant's database to 'Pending'
-                    $pembayaran->status_transaksi = PaymentStatus::PENDING;
-                    $pembayaran->status_pembayaran = StatusBayar::PENDING;
-                    $registrasi->status_registrasi = StatusRegistrasi::TUNDA;
-
-                    $status = 'info';
-                    $statusMessage = 'Menunggu nasabah menyelesaikan transaksi order_id: ' . $order_id . ' menggunakan '
-                        . $type;
-                } else {
-                    if ('deny' === $transaction) {
-                        // TODO set payment status in merchant's database to 'Denied'
-                        $pembayaran->status_transaksi = PaymentStatus::DENY;
-                        $pembayaran->status_pembayaran = StatusBayar::GAGAL;
-                        $registrasi->status_registrasi = StatusRegistrasi::BATAL;
-
-                        $status = 'danger';
-                        $statusMessage = 'Pembayaran menggunakan ' . $type . ' untuk transaksi order_id: ' . $order_id . ' ditolak.';
-                    } else {
-                        if ('expire' === $transaction) {
-                            // TODO set payment status in merchant's database to 'expire'
-                            $pembayaran->status_transaksi = PaymentStatus::EXPIRE;
-                            $pembayaran->status_pembayaran = StatusBayar::GAGAL;
-                            $registrasi->status_registrasi = StatusRegistrasi::BATAL;
-
-                            $status = 'warning';
-                            $statusMessage = 'Pembayaran menggunakan ' . $type . ' untuk transaksi order_id: ' . $order_id . ' kedaluwarsa.';
-                        } else {
-                            if ('cancel' === $transaction) {
-                                // TODO set payment status in merchant's database to 'Denied'
-                                $pembayaran->status_transaksi = PaymentStatus::CANCEL;
-                                $pembayaran->status_pembayaran = StatusBayar::GAGAL;
-                                $registrasi->status_registrasi = StatusRegistrasi::BATAL;
-
-                                $status = 'warning';
-                                $statusMessage = 'Pembayaran menggunakan ' . $type . ' untuk transaksi order_id: ' . $order_id . ' dibatalkan.';
-                            }
-                        }
-                    }
-                }
+                $pembayaran->save();
+                $registrasi->save();
             }
-        }
 
-        if (null === $statusMessage) {
-            $pembayaran->delete();
-            $registrasi->delete();
-        } else {
-            $pembayaran->save();
-            $registrasi->save();
+            return [
+                'status' => $statusData['status'],
+                'status_message' => $statusData['status_message'],
+            ];
         }
 
         return [
-            'status' => $status,
-            'status_message' => $statusMessage,
+            'status' => $details['status_code'],
+            'status_message' => $details['status_message'],
         ];
     }
+
 
     /**
      * @throws Exception
@@ -251,5 +197,134 @@ class MidtransAPI
     public static function getCustomerDetails(array $customer_details): array
     {
         return static::setCustomerDetails($customer_details);
+    }
+
+
+    private static function buildMidtransUrl($orderId): string
+    {
+        $baseUrl = config('midtrans.is_production')
+            ? 'https://api.midtrans.com/v2/'
+            : 'https://api.sandbox.midtrans.com/v2/';
+        return $baseUrl . $orderId . '/status';
+    }
+
+    private static function fetchMidtransResponse($url): array
+    {
+        $isProduction = config('midtrans.is_production');
+        $serverKey = $isProduction
+            ? config('midtrans.production.server_key')
+            : config('midtrans.sb.server_key');
+
+        $response = Http::acceptJson()
+            ->withBasicAuth($serverKey, '')
+            ->get($url);
+
+        return $response->collect()->toArray();
+    }
+
+    private static function handleTransactionStatus($transactionStatus, $type, $pembayaran, $registrasi): array
+    {
+        return match ($transactionStatus) {
+            'capture' => self::handleSuccessStatus(
+                PaymentStatus::CAPTURE,
+                'Berhasil Direkam',
+                $type,
+                $pembayaran,
+                $registrasi,
+            ),
+            'settlement' => self::handleSuccessStatus(
+                PaymentStatus::SETTLEMENT,
+                'Berhasil Melakukan Transaksi',
+                $type,
+                $pembayaran,
+                $registrasi,
+            ),
+            'pending' => self::handlePendingOrFailedStatus(
+                PaymentStatus::PENDING,
+                StatusBayar::PENDING,
+                StatusRegistrasi::TUNDA,
+                'info',
+                'Menunggu nasabah menyelesaikan transaksi',
+                $type,
+                $pembayaran,
+                $registrasi,
+            ),
+            'deny' => self::handlePendingOrFailedStatus(
+                PaymentStatus::DENY,
+                StatusBayar::GAGAL,
+                StatusRegistrasi::BATAL,
+                'danger',
+                'Transaksi Ditolak',
+                $type,
+                $pembayaran,
+                $registrasi,
+            ),
+            'expire' => self::handlePendingOrFailedStatus(
+                PaymentStatus::EXPIRE,
+                StatusBayar::GAGAL,
+                StatusRegistrasi::BATAL,
+                'warning',
+                'Transaksi Kedaluwarsa',
+                $type,
+                $pembayaran,
+                $registrasi,
+            ),
+            'cancel' => self::handlePendingOrFailedStatus(
+                PaymentStatus::CANCEL,
+                StatusBayar::GAGAL,
+                StatusRegistrasi::BATAL,
+                'warning',
+                'Transaksi Dibatalkan',
+                $type,
+                $pembayaran,
+                $registrasi,
+            ),
+            default => ['status' => 'danger', 'status_message' => null],
+        };
+    }
+
+    private static function handleSuccessStatus(
+        $paymentStatus,
+        $messageSuffix,
+        $type,
+        $pembayaran,
+        $registrasi,
+    ): array {
+        $pembayaran->status_transaksi = $paymentStatus;
+        $pembayaran->status_pembayaran = StatusBayar::SUDAH_BAYAR;
+        $registrasi->status_registrasi = StatusRegistrasi::BERHASIL;
+
+        return [
+            'status' => 'success',
+            'status_message' => 'Transaksi order_id: ' . $pembayaran->order_id . ' ' . $messageSuffix . ' menggunakan ' . $type,
+        ];
+    }
+
+    private static function handlePendingOrFailedStatus(
+        $paymentStatus,
+        $paymentState,
+        $registrationState,
+        $status,
+        $messageSuffix,
+        $type,
+        $pembayaran,
+        $registrasi,
+    ): array {
+        $pembayaran->status_transaksi = $paymentStatus;
+        $pembayaran->status_pembayaran = $paymentState;
+        $registrasi->status_registrasi = $registrationState;
+
+        return [
+            'status' => $status,
+            'status_message' => 'Pembayaran menggunakan ' . $type . ' untuk transaksi order_id: ' . $pembayaran->order_id . ' ' . $messageSuffix . '.',
+        ];
+    }
+
+    private static function getPaymentType($paymentType): TipeBayar
+    {
+        return match ($paymentType) {
+            'qris', 'gopay', 'shopeepay' => TipeBayar::QRIS,
+            default => TipeBayar::TRANSFER,
+        };
     }
 }
