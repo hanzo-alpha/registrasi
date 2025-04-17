@@ -122,8 +122,10 @@ class MidtransAPI
         $pembayaran = Pembayaran::query()->where('order_id', $order_id)->first();
         $registrasi = $pembayaran?->pendaftaran;
 
+        $responseCode = ['201', '200', '407'];
+
         // Add transaction details
-        if ('200' === $details['status_code'] || '201' === $details['status_code']) {
+        if (in_array($details['status_code'], $responseCode)) {
             $pembayaran->detail_transaksi = $details;
             $pembayaran->tipe_pembayaran = $paymentType;
             $statusData = self::handleTransactionStatus(
