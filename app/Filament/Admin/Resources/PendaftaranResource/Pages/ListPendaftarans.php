@@ -49,12 +49,12 @@ class ListPendaftarans extends ListRecords
     //        ];
     //    }
 
-    protected function getHeaderWidgets(): array
-    {
-        return [
-            PendaftaranOverview::class,
-        ];
-    }
+    //    protected function getHeaderWidgets(): array
+    //    {
+    //        return [
+    //            PendaftaranOverview::class,
+    //        ];
+    //    }
 
     protected function getHeaderActions(): array
     {

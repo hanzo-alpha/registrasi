@@ -435,7 +435,7 @@ class PendaftaranResource extends Resource
     public static function getWidgets(): array
     {
         return [
-            PendaftaranOverview::class,
+            //            PendaftaranOverview::class,
         ];
     }
 
@@ -459,9 +459,8 @@ class PendaftaranResource extends Resource
     }
 
     /**
-     * @param  \Illuminate\Database\Eloquent\Model|\App\Models\Earlybird  $record
+     * @param  \Illuminate\Database\Eloquent\Model|\App\Models\Pendaftaran  $record
      * @return void
-     * @throws \Illuminate\Http\Client\ConnectionException
      */
     private static function checkPembayaran(Model|Pendaftaran $record): void
     {
