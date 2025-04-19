@@ -18,6 +18,7 @@ use App\Mail\PembayaranBerhasil;
 use App\Models\KategoriLomba;
 use App\Models\Pembayaran;
 use App\Services\MidtransAPI;
+use Awcodes\Shout\Components\Shout;
 use Closure;
 use Exception;
 use Filament\Actions\Action;
@@ -198,7 +199,13 @@ class RegistrasiPeserta extends Page implements HasForms
     public function form(Form $form): Form
     {
         return $form
-            ->schema(static::formOtomatis())
+//            ->schema(static::formOtomatis())
+            ->schema([
+                Shout::make('Pendaftaran Ditutup')
+                    ->icon('heroicon-o-lock-closed')
+                    ->content('Pendaftaran Bantaeng Trail Run Sudah Di Tutup. Silahkan hubungi panitia untuk Pendaftaran Offline')
+                    ->columnSpanFull(),
+            ])
             ->columns(2);
     }
 

@@ -15,6 +15,10 @@ use Filament\Actions\Exports\ExportColumn;
 use Filament\Actions\Exports\Exporter;
 use Filament\Actions\Exports\Models\Export;
 use Number;
+use OpenSpout\Common\Entity\Style\CellAlignment;
+use OpenSpout\Common\Entity\Style\CellVerticalAlignment;
+use OpenSpout\Common\Entity\Style\Color;
+use OpenSpout\Common\Entity\Style\Style;
 
 class PembayaranExporter extends Exporter
 {
@@ -27,8 +31,8 @@ class PembayaranExporter extends Exporter
                 ->label('ID'),
             ExportColumn::make('uuid_pembayaran')
                 ->label('UUID Pembayaran'),
-            ExportColumn::make('pendaftaran.nama_lengkap')
-                ->label('Nama Lengkap'),
+            //            ExportColumn::make('pendaftaran.nama_lengkap')
+            //                ->label('Nama Lengkap'),
             ExportColumn::make('nama_kegiatan')
                 ->label('Nama Kegiatan'),
             ExportColumn::make('ukuran_jersey')
@@ -129,5 +133,17 @@ class PembayaranExporter extends Exporter
         }
 
         return $body;
+    }
+
+    public function getXlsxHeaderCellStyle(): ?Style
+    {
+        return (new Style())
+            ->setFontBold()
+            ->setFontItalic()
+            ->setFontSize(12)
+            ->setFontName('Calibri')
+            ->setFontColor(Color::DARK_BLUE)
+            ->setCellAlignment(CellAlignment::CENTER)
+            ->setCellVerticalAlignment(CellVerticalAlignment::CENTER);
     }
 }

@@ -25,6 +25,8 @@ class Pembayaran extends Model
 
     protected $table = 'pembayaran';
 
+    protected $with = ['kategori', 'registrasi', 'pendaftaran', 'earlybird', 'historiPembayaran'];
+
     protected $fillable = [
         'uuid_pembayaran',
         'order_id',
