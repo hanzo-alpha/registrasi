@@ -19,35 +19,35 @@ class ListPembayarans extends ListRecords
 {
     protected static string $resource = PembayaranResource::class;
 
-    public function getTabs(): array
-    {
-        return [
-            'normal' => Tab::make()
-                ->label('Normal')
-                ->icon('heroicon-m-minus-circle')
-                ->badge(
-                    Pembayaran::query()
-                        ->where('status_pendaftaran', StatusPendaftaran::NORMAL)
-                        ->count(),
-                )
-                ->modifyQueryUsing(
-                    fn(Builder $query) => $query
-                        ->where('status_pendaftaran', StatusPendaftaran::NORMAL),
-                ),
-            'early_bird' => Tab::make()
-                ->label('Early Bird')
-                ->icon('heroicon-m-check-circle')
-                ->badge(
-                    Pembayaran::query()
-                        ->where('status_pendaftaran', StatusPendaftaran::EARLYBIRD)
-                        ->count(),
-                )
-                ->modifyQueryUsing(
-                    fn(Builder $query) => $query
-                        ->where('status_pendaftaran', StatusPendaftaran::EARLYBIRD),
-                ),
-        ];
-    }
+    //    public function getTabs(): array
+    //    {
+    //        return [
+    //            'normal' => Tab::make()
+    //                ->label('Normal')
+    //                ->icon('heroicon-m-minus-circle')
+    //                ->badge(
+    //                    Pembayaran::query()
+    //                        ->where('status_pendaftaran', StatusPendaftaran::NORMAL)
+    //                        ->count(),
+    //                )
+    //                ->modifyQueryUsing(
+    //                    fn(Builder $query) => $query
+    //                        ->where('status_pendaftaran', StatusPendaftaran::NORMAL),
+    //                ),
+    //            'early_bird' => Tab::make()
+    //                ->label('Early Bird')
+    //                ->icon('heroicon-m-check-circle')
+    //                ->badge(
+    //                    Pembayaran::query()
+    //                        ->where('status_pendaftaran', StatusPendaftaran::EARLYBIRD)
+    //                        ->count(),
+    //                )
+    //                ->modifyQueryUsing(
+    //                    fn(Builder $query) => $query
+    //                        ->where('status_pendaftaran', StatusPendaftaran::EARLYBIRD),
+    //                ),
+    //        ];
+    //    }
 
     protected function getHeaderWidgets(): array
     {
