@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
 
     'resources' => [
@@ -16,7 +18,7 @@ return [
 
     'navigation' => [
         'sort' => 1,
-        'icon' => 'heroicon-o-rectangle-stack',
+        'icon' => 'heroicon-o-book-open',
     ],
 
 ];
