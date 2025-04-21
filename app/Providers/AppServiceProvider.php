@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use App\Filament\Admin\Resources\PembayaranResource;
 use App\Filament\Admin\Resources\PendaftaranResource;
 use App\Filament\App\Pages\Pendaftaran;
-use App\Models\Pembayaran;
 use App\Policies\ActivityPolicy;
 use BezhanSalleh\FilamentShield\FilamentShield;
 use Filament\Support\Facades\FilamentView;
@@ -16,6 +14,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 use Spatie\Activitylog\Models\Activity;
 
@@ -30,8 +29,6 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configurePolicies();
-
-        $this->configureDB();
 
         $this->configureModels();
 
@@ -49,11 +46,6 @@ class AppServiceProvider extends ServiceProvider
         foreach ($this->policies as $model => $policy) {
             Gate::policy($model, $policy);
         }
-    }
-
-    private function configureDB(): void
-    {
-        DB::prohibitDestructiveCommands($this->app->environment('production'));
     }
 
     private function configureModels(): void
@@ -89,6 +81,6 @@ class AppServiceProvider extends ServiceProvider
 
     private function configureVite(): void
     {
-        \Illuminate\Support\Facades\Vite::useWaterfallPrefetching(concurrency: 10);
+        Vite::useWaterfallPrefetching(concurrency: 10);
     }
 }
