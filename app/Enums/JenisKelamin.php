@@ -1,12 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Enums;
 
 use Filament\Support\Contracts\HasColor;
-use Filament\Support\Contracts\HasIcon;
 use Filament\Support\Contracts\HasLabel;
 
-enum JenisKelamin: string implements HasLabel, HasIcon, HasColor
+enum JenisKelamin: string implements HasLabel, HasColor
 {
     case LAKI = 'LAKI-LAKI';
     case PEREMPUAN = 'PEREMPUAN';
@@ -23,16 +24,8 @@ enum JenisKelamin: string implements HasLabel, HasIcon, HasColor
     public function getColor(): string|array|null
     {
         return match ($this) {
-            self::LAKI => 'success',
-            self::PEREMPUAN => 'danger',
-        };
-    }
-
-    public function getIcon(): ?string
-    {
-        return match ($this) {
-            self::LAKI => 'heroicon-o-plus',
-            self::PEREMPUAN => 'heroicon-o-minus',
+            self::LAKI => 'primary',
+            self::PEREMPUAN => 'secondary',
         };
     }
 

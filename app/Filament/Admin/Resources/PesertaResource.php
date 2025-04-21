@@ -109,10 +109,12 @@ class PesertaResource extends Resource
                 Tables\Columns\TextColumn::make('uuid_peserta')
                     ->label('ID Peserta')
                     ->searchable()
+                    ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('nama_lengkap')
                     ->label('Nama Lengkap')
                     ->searchable()
+                    ->sortable()
                     ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('email')
                     ->label('Email')
@@ -125,6 +127,8 @@ class PesertaResource extends Resource
                 Tables\Columns\TextColumn::make('jenis_kelamin')
                     ->label('Jenis Kelamin')
                     ->searchable()
+                    ->badge()
+                    ->sortable()
                     ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('tempat_lahir')
                     ->label('Tempat Lahir')
@@ -162,6 +166,8 @@ class PesertaResource extends Resource
                 Tables\Columns\TextColumn::make('status_peserta')
                     ->label('Status Peserta')
                     ->searchable()
+                    ->badge()
+                    ->sortable()
                     ->toggleable(isToggledHiddenByDefault: false),
             ])
             ->filters([
