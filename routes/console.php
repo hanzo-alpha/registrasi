@@ -1,13 +1,10 @@
 <?php
 
+use Illuminate\Foundation\Console\ClosureCommand;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
-use Spatie\WebhookClient\Models\WebhookCall;
 
-//Artisan::command('inspire', function () {
-//    $this->comment(Inspiring::quote());
-//})->purpose('Display an inspiring quote')->hourly();
-
-Schedule::command('model:prune', [
-    '--model' => [WebhookCall::class],
-])->daily();
+Artisan::command('inspire', function () {
+    /** @var ClosureCommand $this */
+    $this->comment(Inspiring::quote());
+})->purpose('Display an inspiring quote');

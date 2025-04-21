@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Traits;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use KodePandai\Indonesia\Models\City;
-use KodePandai\Indonesia\Models\District;
-use KodePandai\Indonesia\Models\Province;
-use KodePandai\Indonesia\Models\Village;
+use Laravolt\Indonesia\Models\City;
+use Laravolt\Indonesia\Models\District;
+use Laravolt\Indonesia\Models\Province;
+use Laravolt\Indonesia\Models\Village;
 
 trait HasWilayah
 {

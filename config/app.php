@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 return [
 
     /*
@@ -17,8 +15,8 @@ return [
 
     'name' => env('APP_NAME', 'Laravel'),
     'description' => env('APP_DESCRIPTION', 'Sistem Informasi Manajemen Event'),
-    'brand' => env('APP_BRAND', 'Freeletics Bantaeng'),
-    'event' => env('APP_EVENT', 'Bantaeng Trail Run 2025'),
+    'brand' => env('APP_BRAND', 'Soppeng Berlari'),
+    'event' => env('APP_EVENT', 'Soppeng Berlari & Konser 2025 '),
 
     /*
     |--------------------------------------------------------------------------
@@ -70,7 +68,7 @@ return [
     |
     */
 
-    'timezone' => env('APP_TIMEZONE', 'UTC'),
+    'timezone' => 'UTC',
 
     /*
     |--------------------------------------------------------------------------
@@ -106,7 +104,7 @@ return [
 
     'previous_keys' => [
         ...array_filter(
-            explode(',', env('APP_PREVIOUS_KEYS', '')),
+            explode(',', env('APP_PREVIOUS_KEYS', ''))
         ),
     ],
 
@@ -128,14 +126,4 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
-    /*
-     * Default user credentials for local development environment seeding
-     * Will be used as the default user credentials for login
-     */
-
-    'default_user' => [
-        'name' => env('DEFAULT_USER_NAME'),
-        'email' => env('DEFAULT_USER_EMAIL'),
-        'password' => env('DEFAULT_USER_PASSWORD'),
-    ],
 ];

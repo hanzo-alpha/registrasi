@@ -1,97 +1,92 @@
-# Larament
+# 🚀 Glow Starter Kit
 
-[![Pint](https://github.com/codewithdennis/larament/actions/workflows/pint.yml/badge.svg)](https://packagist.org/packages/codewithdennis/larament)
-[![PEST](https://github.com/codewithdennis/larament/actions/workflows/pest.yml/badge.svg)](https://packagist.org/packages/codewithdennis/larament)
-[![PHPStan](https://github.com/CodeWithDennis/larament/actions/workflows/phpstan.yml/badge.svg)](https://github.com/CodeWithDennis/larament/actions/workflows/phpstan.yml)
-[![Total Installs](https://img.shields.io/packagist/dt/codewithdennis/larament.svg?style=flat-square)](https://packagist.org/packages/codewithdennis/larament)
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/codewithdennis/larament.svg?style=flat-square)](https://packagist.org/packages/codewithdennis/larament)
+This is a **Filament v3 Starter Kit** for **Laravel 12**, designed to accelerate the development of Filament-powered
+applications.
 
-![larament](https://raw.githubusercontent.com/CodeWithDennis/larament/main/resources/images/larament.png)
+Preview:
+![](https://raw.githubusercontent.com/ercogx/laravel-filament-starter-kit/main/preview-white.png)
+Dark Mode:
+![](https://raw.githubusercontent.com/ercogx/laravel-filament-starter-kit/main/preview.png)
 
-Kickstart your project and save time with Larament! This time-saving starter kit includes a Laravel project with FilamentPHP already installed and set up, along with extra features.
+## 📦 Installation
 
-> [!NOTE]
-> This starter kit includes **Laravel 11** and **FilamentPHP 3** with some packages that improve the development experience. This will not contain any bloated features or unnecessary packages. If you want to add more features, you can do so by installing the necessary packages. 
-
-## Configuration
-
-### Security and Testing
-![pest-php](https://raw.githubusercontent.com/CodeWithDennis/larament/main/resources/images/pest-php.png)
-- A handfull of [PESTPHP](https://pestphp.com/docs/installation) test cases are included for testing.
-- [Should be strict](https://laravel-news.com/shouldbestrict)
-  - Prevents lazy loading (N+1) queries.
-  - It prevents silently discarding attributes.
-  - It prevents accessing missing attributes.
-- [Prevent destructive commands from running in production](https://laravel-news.com/prevent-destructive-commands-from-running-in-laravel-11)
-- Archtest is included for architectural testing.
-- PHPStan is included for static analysis.
-- Laravel debugbar is included for debugging.
-
-### Quality of Life
-![global-search-keybinding](https://raw.githubusercontent.com/CodeWithDennis/larament/main/resources/images/global-search-keybinding.jpg)
-- A custom login page autofills email and password with seeded data, streamlining local testing.
-- A custom password generator action is available on the user profile and user resource pages.
-- Global user search includes email addresses in results for better user discovery.
-- All component labels are automatically translatable.
-- A `composer review` command that runs PINT, PHPStan, and PEST.
-- Helper file is included for custom helper functions.
-- A custom `php artisan make:filament-action` command is available for creating actions.
-
-### Design
-![user-global-search](https://raw.githubusercontent.com/CodeWithDennis/larament/main/resources/images/user-global-search.jpg)
-- The Filament Panel's primary color is set to blue.
-- Single Page Application (SPA) mode is enabled by default.
-- Global search keybinding is preset to `CTRL + K` or `CMD + K`.
-- A ready-to-use FilamentPHP [custom theme](https://filamentphp.com/docs/3.x/panels/themes#creating-a-custom-theme) that also includes a sidebar separator.
-- A custom profile that includes the password generator action.
-
-## Default User
-The default user is seeded with the following credentials which is autofilled on the login page.
-
-```dotenv
-DEFAULT_USER_EMAIL="admin@example.com"
-DEFAULT_USER_PASSWORD="password"
-```
-
-## Packages
-
-- [timokoerber/laravel-one-time-operations](https://github.com/TimoKoerber/laravel-one-time-operations)
-- [barryvdh/laravel-debugbar](https://github.com/barryvdh/laravel-debugbar)
-- [phpstan/phpstan](https://phpstan.org/user-guide/getting-started)
-- [pestphp/pest](https://pestphp.com/docs/installation)
-  - [pestphp/pest-plugin-faker](https://pestphp.com/docs/plugins#faker) 
-  - [pestphp/pest-plugin-laravel](https://pestphp.com/docs/plugins#laravel)
-  - [pestphp/pest-plugin-livewire](https://pestphp.com/docs/plugins#livewire)
-
-## Installation
-
-**[Use this template](https://github.com/new?template_name=larament&template_owner=CodeWithDennis)** to create a new repository and clone it to your local machine, then navigate to the project directory to run the necessary commands.
+You need the Laravel Installer if it is not yet installed.
 
 ```bash
-composer install
-npm install && npm run build
-cp .env.example .env
-php artisan key:generate
-php artisan migrate
-php artisan db:seed
+composer global require laravel/installer
 ```
 
-###  CLI Installation
-
-You can also use the following command to create a new project with Larament.
+Now you can create a new project using the Laravel Filament Starter Kit.
 
 ```bash
-composer create-project --prefer-dist CodeWithDennis/larament example-app
+laravel new test-kit --using=ercogx/laravel-filament-starter-kit
 ```
 
-If you don't want to remember the composer installation syntax for future projects, you can create an alias for your terminal:
+## ⚙️ Setup
+
+1️⃣ **Database Configuration**
+
+By default, this starter kit uses **SQLite**. If you’re okay with this, you can skip this step. If you prefer **MySQL**,
+follow these steps:
+
+- Update your database credentials in `.env`
+- Run migrations: `php artisan migrate`
+- (Optional) delete the existing database file: ```rm database/database.sqlite```
+
+2️⃣ Create Filament Admin User
+```bash
+php artisan make:filament-user
+```
+
+3️⃣ Assign Super Admin Role
+```bash
+php artisan shield:super-admin --user=1 --panel=admin
+```
+
+4️⃣ Generate Permissions
+```bash
+php artisan shield:generate --all --ignore-existing-policies --panel=admin
+```
+
+## 🌟Panel Include
+
+- [Breezy](https://filamentphp.com/plugins/jeffgreco-breezy) My Profile page.
+- [Themes](https://filamentphp.com/plugins/hasnayeen-themes) Themes for Filament panels. Setup for `user` mode.
+- [Shield](https://filamentphp.com/plugins/bezhansalleh-shield) Access management to your Filament Panel's Resources,
+  Pages & Widgets through spatie/laravel-permission.
+- [Settings](https://filamentphp.com/plugins/outerweb-settings) Integrates Outerweb/Settings into Filament.
+- [Backgrounds](https://filamentphp.com/plugins/swisnl-backgrounds) Beautiful backgrounds for Filament auth pages.
+- [Logger](https://filamentphp.com/plugins/z3d0x-logger) Extensible activity logger for filament that works
+  out-of-the-box.
+
+## 🧑‍💻Development Include
+
+- [barryvdh/laravel-debugbar](https://github.com/barryvdh/laravel-debugbar) The most popular debugging tool for Laravel,
+  providing detailed request and query insights.
+- [barryvdh/laravel-ide-helper](https://github.com/barryvdh/laravel-ide-helper) Generates helper files to improve
+  autocompletion and static analysis in IDEs.
+- [larastan/larastan](https://github.com/larastan/larastan) A PHPStan extension for Laravel, configured at level 5 for
+  robust static code analysis.
+
+This kit includes **Laravel Pint** for automatic PHP code styling and structured PHPDoc generation for your models.  
+After running migrations, execute the following command to update model documentation:
 
 ```bash
-alias larament="composer create-project --prefer-dist CodeWithDennis/larament"
+php artisan ide-helper:models -W && ./vendor/bin/pint app 
 ```
 
-This allows you to simply use `larament my-cool-app` in your terminal.
+The `composer check` script runs **tests, PHPStan, and Pint** for code quality assurance:
 
 ```bash
-larament my-cool-app
+composer check
 ```
+
+## 📜 License
+
+This project is open-source and licensed under the MIT License.
+
+## 💡 Contributing
+
+We welcome contributions! Feel free to open issues, submit PRs, or suggest improvements.
+
+### 🚀 Happy Coding with Laravel & Filament! 🎉

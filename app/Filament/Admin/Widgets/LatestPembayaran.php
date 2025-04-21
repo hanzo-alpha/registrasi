@@ -25,7 +25,7 @@ class LatestPembayaran extends BaseWidget
             )
             ->paginated(false)
             ->columns([
-                Tables\Columns\TextColumn::make('pendaftaran.nama_lengkap')
+                Tables\Columns\TextColumn::make('pendaftaran.peserta.nama_lengkap')
                     ->label('Nama Lengkap'),
                 Tables\Columns\TextColumn::make('kategori.nama')
                     ->label('Kategori')

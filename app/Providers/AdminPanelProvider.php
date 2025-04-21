@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use App\Filament\Admin\Pages\Auth\Login;
+use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Croustibat\FilamentJobsMonitor\FilamentJobsMonitorPlugin;
 use Devonab\FilamentEasyFooter\EasyFooterPlugin;
 use Filafly\PhosphorIconReplacement;
 use Filament\Http\Middleware\Authenticate;
+use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Pages;
@@ -16,16 +17,18 @@ use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\Support\Enums\MaxWidth;
+use Filament\Widgets;
+use Hasnayeen\Themes\Http\Middleware\SetTheme;
+use Hasnayeen\Themes\ThemesPlugin;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
-use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Jeffgreco13\FilamentBreezy\BreezyCore;
+use Swis\Filament\Backgrounds\FilamentBackgroundsPlugin;
 use Tapp\FilamentWebhookClient\FilamentWebhookClientPlugin;
-use Vormkracht10\FilamentMails\FilamentMailsPlugin;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -34,7 +37,7 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->id('admin')
             ->path('admin')
-            ->login(Login::class)
+            ->login()
             ->passwordReset()
             ->sidebarCollapsibleOnDesktop()
             ->spa()
@@ -60,26 +63,13 @@ class AdminPanelProvider extends PanelProvider
                 'amber' => Color::Amber,
                 'yellow' => Color::Yellow,
             ])
-            ->plugins([
-                BreezyCore::make()
-                    ->myProfile(
-                        navigationGroup: 'Settings',
-                    ),
-                FilamentWebhookClientPlugin::make(),
-                FilamentJobsMonitorPlugin::make(),
-                PhosphorIconReplacement::make(),
-                EasyFooterPlugin::make()
-                    ->withLoadTime('Halaman ini dimuat dalam ')
-                    ->withGithub()
-                    ->withSentence(config('app.brand') . ' - ' . config('app.event')),
-                FilamentMailsPlugin::make(),
-            ])
             ->resources([
                 config('filament-logger.activity_resource'),
             ])
             ->navigationGroups([
                 'Pendaftaran',
                 'Master',
+                'Administration',
                 'Settings',
                 'Webhooks',
             ])
@@ -90,6 +80,19 @@ class AdminPanelProvider extends PanelProvider
             ->darkModeBrandLogo(asset('frontend/running/Logo_8.png'))
             ->brandLogoHeight('2.5em')
             ->favicon(asset('frontend/running/favicon.png'))
+            ->plugins([
+                BreezyCore::make()
+                    ->myProfile(
+                        navigationGroup: 'Settings',
+                    ),
+                FilamentJobsMonitorPlugin::make(),
+                PhosphorIconReplacement::make(),
+                FilamentWebhookClientPlugin::make(),
+                EasyFooterPlugin::make()
+                    ->withLoadTime('Halaman ini dimuat dalam ')
+                    ->withGithub()
+                    ->withSentence(config('app.brand').' - '.config('app.event')),
+            ])
             ->discoverResources(in: app_path('Filament/Admin/Resources'), for: 'App\\Filament\\Admin\\Resources')
             ->discoverPages(in: app_path('Filament/Admin/Pages'), for: 'App\\Filament\\Admin\\Pages')
             ->pages([
@@ -97,7 +100,8 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Admin/Widgets'), for: 'App\\Filament\\Admin\\Widgets')
             ->widgets([
-
+                Widgets\AccountWidget::class,
+                Widgets\FilamentInfoWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -109,6 +113,15 @@ class AdminPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
+
+                SetTheme::class,
+            ])
+            ->plugins([
+                FilamentShieldPlugin::make(),
+                BreezyCore::make()
+                    ->myProfile(shouldRegisterUserMenu: true),
+                FilamentBackgroundsPlugin::make(),
+                ThemesPlugin::make(),
             ])
             ->authMiddleware([
                 Authenticate::class,

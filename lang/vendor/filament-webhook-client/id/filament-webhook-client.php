@@ -1,10 +1,8 @@
 <?php
 
-declare(strict_types=1);
-
 return [
     'navigation.group' => 'Settings',
 
-    'navigation.label' => 'Panggilan Webhook',
-    'navigation.plural-label' => 'Panggilan Webhook',
+    'navigation.label' => 'Webhook Call',
+    'navigation.plural-label' => 'Webhook Calls',
 ];

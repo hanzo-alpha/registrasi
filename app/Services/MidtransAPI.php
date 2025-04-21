@@ -72,7 +72,7 @@ class MidtransAPI
         int $amount,
         string $serverKey,
     ): bool {
-        $signature = $orderId . $statusCode . $amount . $serverKey;
+        $signature = $orderId.$statusCode.$amount.$serverKey;
         $hash = hash('sha512', $signature);
         return hash_equals($signatureKey, $hash);
     }
@@ -88,8 +88,8 @@ class MidtransAPI
 
         if ($orderId) {
             $url = config('midtrans.is_production')
-                ? 'https://api.midtrans.com/v2/' . $orderId . '/status'
-                : 'https://api.sandbox.midtrans.com/v2/' . $orderId . '/status';
+                ? 'https://api.midtrans.com/v2/'.$orderId.'/status'
+                : 'https://api.sandbox.midtrans.com/v2/'.$orderId.'/status';
 
             $response = config('midtrans.is_production')
                 ? Http::acceptJson()->withBasicAuth(config('midtrans.production.server_key'), '')->get($url)
@@ -110,7 +110,7 @@ class MidtransAPI
         if (empty($responseData)) {
             return [
                 'status' => 'danger',
-                'status_message' => 'Transaksi Dengan Order ID : ' . $orderId . ' tidak ditemukan',
+                'status_message' => 'Transaksi Dengan Order ID : '.$orderId.' tidak ditemukan',
             ];
         }
 
@@ -207,7 +207,7 @@ class MidtransAPI
         $baseUrl = config('midtrans.is_production')
             ? 'https://api.midtrans.com/v2/'
             : 'https://api.sandbox.midtrans.com/v2/';
-        return $baseUrl . $orderId . '/status';
+        return $baseUrl.$orderId.'/status';
     }
 
     private static function fetchMidtransResponse($url): array
@@ -298,7 +298,7 @@ class MidtransAPI
 
         return [
             'status' => 'success',
-            'status_message' => 'Transaksi order_id: ' . $pembayaran->order_id . ' ' . $messageSuffix . ' menggunakan ' . $type,
+            'status_message' => 'Transaksi order_id: '.$pembayaran->order_id.' '.$messageSuffix.' menggunakan '.$type,
         ];
     }
 
@@ -318,7 +318,7 @@ class MidtransAPI
 
         return [
             'status' => $status,
-            'status_message' => 'Pembayaran menggunakan ' . $type . ' untuk transaksi order_id: ' . $pembayaran->order_id . ' ' . $messageSuffix . '.',
+            'status_message' => 'Pembayaran menggunakan '.$type.' untuk transaksi order_id: '.$pembayaran->order_id.' '.$messageSuffix.'.',
         ];
     }
 

@@ -9,7 +9,7 @@ use Filament\Support\Contracts\HasDescription;
 use Filament\Support\Contracts\HasIcon;
 use Filament\Support\Contracts\HasLabel;
 
-enum StatusPendaftaran: string implements HasLabel, HasIcon, HasDescription, HasColor
+enum StatusPendaftaran: string implements HasColor, HasDescription, HasIcon, HasLabel
 {
     case EARLYBIRD = 'early_bird';
     case NORMAL = 'normal';

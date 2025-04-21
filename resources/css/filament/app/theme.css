@@ -1,4 +1,4 @@
-@import '/vendor/filament/filament/resources/css/theme.css';
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
 
 @config 'tailwind.config.js';
 
@@ -9,18 +9,3 @@
 .dark .fi-sidebar-nav {
     border-right: 1px solid #18181B;
 }
-
-/*.fi-main-ctn {*/
-/*    background-image: url('../../../../public/frontend/running/Background Earlybird.png');*/
-/*    background-repeat: no-repeat;*/
-/*    background-position: center center;*/
-/*    background-size: cover;*/
-/*}*/
-
-/*.fi-header-heading {*/
-/*    @apply text-black dark:text-black*/
-/*}*/
-
-/*.fi-header-subheading {*/
-/*    @apply text-black dark:text-black*/
-/*}*/

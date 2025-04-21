@@ -4,86 +4,39 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources;
 
-use App\Filament\Actions\GeneratePasswordAction;
 use App\Filament\Admin\Resources\UserResource\Pages\CreateUser;
 use App\Filament\Admin\Resources\UserResource\Pages\EditUser;
 use App\Filament\Admin\Resources\UserResource\Pages\ListUsers;
 use App\Models\User;
 use Filament\Forms;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
-use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules\Password;
 
 class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-users';
-    protected static ?string $label = 'Pengguna';
-    protected static ?string $modelLabel = 'Pengguna';
-    protected static ?string $pluralLabel = 'Pengguna';
-    protected static ?string $pluralModelLabel = 'Pengguna';
-    protected static ?string $navigationLabel = 'Pengguna';
-    protected static ?string $navigationGroup = 'Settings';
 
-    protected static ?string $recordTitleAttribute = 'name';
-
-    public static function getGloballySearchableAttributes(): array
-    {
-        return [
-            'name',
-            'email',
-        ];
-    }
-
-    public static function getGlobalSearchResultDetails(Model $record): array
-    {
-        /** @var User $record */
-        return ['email' => $record->email];
-    }
+    protected static ?string $navigationGroup = 'Administration';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Section::make()
-                    ->schema([
-                        Forms\Components\TextInput::make('name')
-                            ->required()
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('email')
-                            ->email()
-                            ->unique(ignoreRecord: true)
-                            ->required()
-                            ->maxLength(255),
-                        TextInput::make('password')
-                            ->label(__('filament-panels::pages/auth/edit-profile.form.password.label'))
-                            ->password()
-                            ->required(fn($livewire) => $livewire instanceof CreateUser)
-                            ->revealable(filament()->arePasswordsRevealable())
-                            ->rule(Password::default())
-                            ->autocomplete('new-password')
-                            ->dehydrated(fn($state): bool => filled($state))
-                            ->dehydrateStateUsing(fn($state): string => Hash::make($state))
-                            ->live(debounce: 500)
-                            ->same('passwordConfirmation')
-                            ->suffixActions([
-                                GeneratePasswordAction::make(),
-                            ]),
-                        TextInput::make('passwordConfirmation')
-                            ->label(__('filament-panels::pages/auth/edit-profile.form.password_confirmation.label'))
-                            ->password()
-                            ->revealable(filament()->arePasswordsRevealable())
-                            ->required()
-                            ->visible(fn(Get $get): bool => filled($get('password')))
-                            ->dehydrated(false),
-                    ]),
+                Forms\Components\TextInput::make('name')
+                    ->required()
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('email')
+                    ->email()
+                    ->required()
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('password')
+                    ->password()
+                    ->required()
+                    ->maxLength(255),
             ]);
     }
 
@@ -92,10 +45,8 @@ class UserResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email')
-                    ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()

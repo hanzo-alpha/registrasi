@@ -4,16 +4,15 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources;
 
-use App\Enums\GolonganDarah;
 use App\Enums\JenisKelamin;
 use App\Enums\StatusRegistrasi;
-use App\Enums\TipeKartuIdentitas;
 use App\Enums\UkuranJersey;
 use App\Filament\Admin\Resources\PendaftaranResource\Pages;
 use App\Filament\Admin\Widgets\PendaftaranOverview;
 use App\Models\Pendaftaran;
 use App\Services\MidtransAPI;
 use Filament\Forms;
+use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Group;
 use Filament\Infolists\Components\Section;
@@ -28,138 +27,164 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use KodePandai\Indonesia\Models\City;
-use KodePandai\Indonesia\Models\District;
-use KodePandai\Indonesia\Models\Province;
+use Laravolt\Indonesia\Models\City;
+use Laravolt\Indonesia\Models\District;
+use Laravolt\Indonesia\Models\Province;
+use LaraZeus\Qr\Components\Qr;
 use Number;
 use Parfaitementweb\FilamentCountryField\Forms\Components\Country;
 
 class PendaftaranResource extends Resource
 {
     protected static ?string $model = Pendaftaran::class;
+
     protected static ?string $navigationIcon = 'heroicon-o-document-plus';
+
     protected static ?string $label = 'Pendaftaran';
+
     protected static ?string $modelLabel = 'Pendaftaran';
+
     protected static ?string $pluralLabel = 'Pendaftaran';
+
     protected static ?string $pluralModelLabel = 'Pendaftaran';
+
     protected static ?string $navigationLabel = 'Pendaftaran';
+
     protected static ?string $navigationGroup = 'Pendaftaran';
 
-    protected static ?string $recordTitleAttribute = 'nama_lengkap';
+    protected static ?int $navigationSort = 2;
+
+    protected static ?string $recordTitleAttribute = 'nama_bib';
+
+    public static function formPendaftaran(): array
+    {
+        return [
+            Forms\Components\Group::make()
+                ->schema([
+                    Forms\Components\Section::make('Data Peserta')->schema([
+                        Forms\Components\Select::make('peserta_id')
+                            ->required()
+                            ->relationship('peserta', 'nama_lengkap')
+                            ->live(onBlur: true)
+                            ->native(false)
+                            ->loadingMessage('Sedang dimuat...')
+                            ->placeholder('Pilih salah satu peserta')
+                            ->searchPrompt('Cari peserta berdasarkan NIK, Nama Lengkap, Peserta ID, dll')
+                            ->preload()
+                            ->optionsLimit(20)
+                            ->createOptionForm(PesertaResource::formPeserta())
+                            ->createOptionAction(
+                                fn(Action $action) => $action->modalWidth('5xl')
+                                    ->modalSubmitActionLabel('Simpan Peserta')
+                                    ->closeModalByEscaping(false)
+                                    ->closeModalByClickingAway(),
+                            )
+                            ->searchingMessage('Sedang mencari peserta...')
+                            ->noSearchResultsMessage('Peserta tidak ditemukan.')
+                            ->searchable(),
+                        Forms\Components\TextInput::make('no_bib')
+                            ->label('Nomor BIB Lari')
+                            ->required(),
+                        Forms\Components\TextInput::make('nama_bib')
+                            ->label('Nama BIB Lari')
+                            ->required(),
+
+                        Forms\Components\Select::make('kategori_lomba')
+                            ->label('Kategori Lomba')
+                            ->relationship('kategori', 'nama')
+                            ->native(false)
+                            ->required(),
+                        Forms\Components\Select::make('ukuran_jersey')
+                            ->required()
+                            ->native(false)
+                            ->options(UkuranJersey::class)
+                            ->enum(UkuranJersey::class)
+                            ->searchable(),
+                    ])->columns(2),
+
+                    Forms\Components\Section::make('Data Alamat')->schema([
+                        Forms\Components\TextInput::make('alamat')
+                            ->required()
+                            ->columnSpanFull(),
+                        Country::make('negara')
+                            ->required()
+                            ->searchable(),
+                        Forms\Components\Select::make('provinsi')
+                            ->required()
+                            ->options(Province::pluck('name', 'code'))
+                            ->dehydrated()
+                            ->live(onBlur: true)
+                            ->native(false)
+                            ->searchable()
+                            ->afterStateUpdated(fn(Forms\Set $set) => $set('kabupaten', null)),
+                        Forms\Components\Select::make('kabupaten')
+                            ->required()
+                            ->live(onBlur: true)
+                            ->options(fn(Forms\Get $get) => City::where(
+                                'province_code',
+                                $get('provinsi'),
+                            )->pluck(
+                                'name',
+                                'code',
+                            ))
+                            ->native(false)
+                            ->searchable()
+                            ->afterStateUpdated(fn(Forms\Set $set) => $set('kecamatan', null)),
+                        Forms\Components\Select::make('kecamatan')
+                            ->required()
+                            ->live(onBlur: true)
+                            ->options(fn(Forms\Get $get) => District::where(
+                                'city_code',
+                                $get('kabupaten'),
+                            )->pluck(
+                                'name',
+                                'code',
+                            ))
+                            ->native(false)
+                            ->searchable(),
+                    ])->columns(2),
+                ])
+                ->columnSpan(2),
+            Forms\Components\Group::make()
+                ->schema([
+                    Forms\Components\Section::make('Status Pendaftaran')->schema([
+                        Forms\Components\Select::make('status_registrasi')
+                            ->native(false)
+                            ->options(StatusRegistrasi::class)
+                            ->enum(StatusRegistrasi::class)
+                            ->required(),
+                        Qr::make('qr_url')
+                            ->label('QR Code')
+                            ->asSlideOver()
+                            ->optionsColumn('qr_options')
+                            ->actionIcon('heroicon-s-building-library'),
+                        Forms\Components\ToggleButtons::make('status_pengambilan')
+                            ->label('Status Pengambilan')
+                            ->inline()
+                            ->options([
+                                true => 'Sudah',
+                                false => 'Belum',
+                            ])
+                            ->colors([
+                                true => 'success',
+                                false => 'danger',
+                            ])
+                            ->icons([
+                                true => 'heroicon-m-check',
+                                false => 'heroicon-m-x-mark',
+                            ])
+                            ->grouped()
+                            ->default(false),
+                    ])->columns(1),
+                ])
+                ->columns(1),
+        ];
+    }
 
     public static function form(Form $form): Form
     {
         return $form
-            ->schema([
-                Forms\Components\Section::make()->schema([
-                    Forms\Components\TextInput::make('nama_lengkap')
-                        ->label('Nama Lengkap Peserta')
-                        ->required()
-                        ->autofocus()
-                        ->maxLength(255),
-                    Forms\Components\TextInput::make('no_telp')
-                        ->label('Nomor Telepon/WA Peserta')
-                        ->required()
-                        ->numeric()
-                        ->maxLength(12),
-                    Forms\Components\TextInput::make('email')
-                        ->email()
-                        ->unique(ignoreRecord: true)
-                        ->label('Email Peserta')
-                        ->required()
-                        ->maxLength(255),
-                    Forms\Components\TextInput::make('tempat_lahir')
-                        ->label('Tempat Lahir')
-                        ->required(),
-                    Forms\Components\DatePicker::make('tanggal_lahir')
-                        ->label('Tanggal Lahir')
-                        ->required()
-                        ->displayFormat('d-m-Y')
-                        ->format('Y-m-d'),
-                    Forms\Components\Select::make('jenis_kelamin')
-                        ->label('Jenis Kelamin')
-                        ->options(JenisKelamin::class)
-                        ->required()
-                        ->default(JenisKelamin::LAKI),
-                    Forms\Components\Select::make('tipe_kartu_identitas')
-                        ->label('Tipe Kartu Identitas')
-                        ->options(TipeKartuIdentitas::class)
-                        ->required()
-                        ->default(TipeKartuIdentitas::KTP),
-                    Forms\Components\TextInput::make('nomor_kartu_identitas')
-                        ->label('Nomor Kartu Identitas')
-                        ->required()
-                        ->numeric(),
-                    Forms\Components\TextInput::make('nama_kontak_darurat')
-                        ->label('Nama Kontak Darurat')
-                        ->required(),
-                    Forms\Components\TextInput::make('nomor_kontak_darurat')
-                        ->label('Nomor Kontak Darurat')
-                        ->required(),
-                    Forms\Components\Select::make('golongan_darah')
-                        ->label('Golongan Darah')
-                        ->options(GolonganDarah::class)
-                        ->required(),
-                    Forms\Components\TextInput::make('komunitas')
-                        ->label('Komunitas (Optional)')
-                        ->maxLength(255),
-                    Forms\Components\TextInput::make('alamat')
-                        ->required()
-                        ->columnSpanFull(),
-                    Country::make('negara')
-                        ->required()
-                        ->searchable(),
-                    Forms\Components\Select::make('provinsi')
-                        ->required()
-                        ->options(Province::pluck('name', 'code'))
-                        ->dehydrated()
-                        ->live(onBlur: true)
-                        ->native(false)
-                        ->searchable()
-                        ->afterStateUpdated(fn(Forms\Set $set) => $set('kabupaten', null)),
-                    Forms\Components\Select::make('kabupaten')
-                        ->required()
-                        ->live(onBlur: true)
-                        ->options(fn(Forms\Get $get) => City::where(
-                            'province_code',
-                            $get('provinsi'),
-                        )->pluck(
-                            'name',
-                            'code',
-                        ))
-                        ->native(false)
-                        ->searchable()
-                        ->afterStateUpdated(fn(Forms\Set $set) => $set('kecamatan', null)),
-                    Forms\Components\Select::make('kecamatan')
-                        ->required()
-                        ->live(onBlur: true)
-                        ->options(fn(Forms\Get $get) => District::where(
-                            'city_code',
-                            $get('kabupaten'),
-                        )->pluck(
-                            'name',
-                            'code',
-                        ))
-                        ->native(false)
-                        ->searchable(),
-                    Forms\Components\Select::make('kategori_lomba')
-                        ->label('Kategori Lomba')
-                        ->relationship('kategori', 'nama')
-                        ->native(false)
-                        ->required(),
-                    Forms\Components\Select::make('ukuran_jersey')
-                        ->required()
-                        ->native(false)
-                        ->options(UkuranJersey::class)
-                        ->enum(UkuranJersey::class)
-                        ->searchable(),
-                    Forms\Components\Select::make('status_registrasi')
-                        ->native(false)
-                        ->options(StatusRegistrasi::class)
-                        ->enum(StatusRegistrasi::class)
-                        ->required(),
-                ])->columns(2),
-            ]);
+            ->schema(self::formPendaftaran())->columns(3);
     }
 
     public static function infolist(Infolist $infolist): Infolist
@@ -170,38 +195,38 @@ class PendaftaranResource extends Resource
                     TextEntry::make('uuid_pendaftaran')
                         ->label('UUID')
                         ->color('secondary'),
-                    TextEntry::make('nama_lengkap')
+                    TextEntry::make('peserta.nama_lengkap')
                         ->label('Nama Lengkap')
                         ->color('secondary'),
-                    TextEntry::make('email')
+                    TextEntry::make('peserta.email')
                         ->label('Email')
                         ->color('secondary'),
-                    TextEntry::make('no_telp')
+                    TextEntry::make('peserta.no_telp')
                         ->label('No Telp')
                         ->color('secondary'),
-                    TextEntry::make('jenis_kelamin')
+                    TextEntry::make('peserta.jenis_kelamin')
                         ->label('Jenis Kelamin')
                         ->badge(),
-                    TextEntry::make('tempat_lahir')
+                    TextEntry::make('peserta.tempat_lahir')
                         ->label('Tempat Lahir')
                         ->color('secondary'),
-                    TextEntry::make('tanggal_lahir')
+                    TextEntry::make('peserta.tanggal_lahir')
                         ->label('Tanggal Lahir')
                         ->date('d M Y')
                         ->color('secondary'),
-                    TextEntry::make('tipe_kartu_identitas')
+                    TextEntry::make('peserta.tipe_kartu_identitas')
                         ->label('Tipe Kartu Identitas')
                         ->badge(),
-                    TextEntry::make('nomor_kartu_identitas')
+                    TextEntry::make('peserta.nomor_kartu_identitas')
                         ->label('Nomor Kartu Identitas')
                         ->color('secondary'),
-                    TextEntry::make('nama_kontak_darurat')
+                    TextEntry::make('peserta.nama_kontak_darurat')
                         ->label('Nama Kontak Darurat')
                         ->color('secondary'),
-                    TextEntry::make('nomor_kontak_darurat')
+                    TextEntry::make('peserta.nomor_kontak_darurat')
                         ->label('Nomor Kontak Darurat')
                         ->color('secondary'),
-                    TextEntry::make('golongan_darah')->badge()
+                    TextEntry::make('peserta.golongan_darah')->badge()
                         ->label('Golongan Darah'),
                 ])->columns(2),
                 Section::make('Data Alamat')->schema([
@@ -258,22 +283,22 @@ class PendaftaranResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('nama_lengkap')
+                Tables\Columns\TextColumn::make('peserta.nama_lengkap')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('email')
+                Tables\Columns\TextColumn::make('peserta.email')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('no_telp')
+                Tables\Columns\TextColumn::make('peserta.no_telp')
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('jenis_kelamin')
+                Tables\Columns\TextColumn::make('peserta.jenis_kelamin')
                     ->searchable()
                     ->sortable()
                     ->badge()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('tempat_lahir')
+                Tables\Columns\TextColumn::make('peserta.tempat_lahir')
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('tanggal_lahir')
+                Tables\Columns\TextColumn::make('peserta.tanggal_lahir')
                     ->date()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -292,21 +317,21 @@ class PendaftaranResource extends Resource
                 Tables\Columns\TextColumn::make('kec.name')
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('tipe_kartu_identitas')
+                Tables\Columns\TextColumn::make('peserta.tipe_kartu_identitas')
                     ->searchable()
                     ->sortable()
                     ->badge()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('nomor_kartu_identitas')
+                Tables\Columns\TextColumn::make('peserta.nomor_kartu_identitas')
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('nama_kontak_darurat')
+                Tables\Columns\TextColumn::make('peserta.nama_kontak_darurat')
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('nomor_kontak_darurat')
+                Tables\Columns\TextColumn::make('peserta.nomor_kontak_darurat')
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('golongan_darah')
+                Tables\Columns\TextColumn::make('peserta.golongan_darah')
                     ->searchable()
                     ->sortable()
                     ->badge()
@@ -323,7 +348,7 @@ class PendaftaranResource extends Resource
                     ->badge()
                     ->alignCenter()
                     ->toggleable(),
-                Tables\Columns\TextColumn::make('komunitas')
+                Tables\Columns\TextColumn::make('peserta.komunitas')
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('status_registrasi')
@@ -352,7 +377,7 @@ class PendaftaranResource extends Resource
                 Tables\Filters\SelectFilter::make('status_registrasi')
                     ->options(StatusRegistrasi::class)
                     ->searchable(),
-                Tables\Filters\SelectFilter::make('jenis_kelamin')
+                Tables\Filters\SelectFilter::make('peserta.jenis_kelamin')
                     ->options(JenisKelamin::class)
                     ->searchable(),
                 Tables\Filters\SelectFilter::make('kategori_lomba')
@@ -435,7 +460,7 @@ class PendaftaranResource extends Resource
     public static function getWidgets(): array
     {
         return [
-            //            PendaftaranOverview::class,
+            PendaftaranOverview::class,
         ];
     }
 
@@ -458,10 +483,6 @@ class PendaftaranResource extends Resource
         ];
     }
 
-    /**
-     * @param  \Illuminate\Database\Eloquent\Model|\App\Models\Pendaftaran  $record
-     * @return void
-     */
     private static function checkPembayaran(Model|Pendaftaran $record): void
     {
         $orderId = $record->pembayaran?->order_id;
@@ -473,6 +494,7 @@ class PendaftaranResource extends Resource
                 ->title('Status Transaksi ' . $data['status'])
                 ->body($data['status_message'])
                 ->send();
+
             return;
         }
 

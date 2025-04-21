@@ -31,7 +31,7 @@ class PembayaranBerhasil extends Mailable
     {
         return new Envelope(
             from: new Address(config('mail.from.address'), config('mail.from.name')),
-            subject: 'Pendaftaran Early Bird Berhasil',
+            subject: 'Pendaftaran Berhasil',
         );
     }
 

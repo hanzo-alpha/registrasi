@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Models\KategoriLomba;
+use App\Models\Pendaftaran;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 
@@ -10,6 +11,16 @@ if ( ! function_exists('date_format')) {
     function date_format($date, $format): string
     {
         return Carbon::createFromFormat('Y-m-d', $date)->format($format);
+    }
+}
+
+if (!function_exists('generateNomorBib')) {
+    function generateNomorBib($length = 4, $pad = '0'): string
+    {
+        $pad ??= $pad ?? '0';
+        $modelClass = Pendaftaran::class;
+        $max = $modelClass::max('id') + 1;
+        return Str::padLeft($max, $length, $pad);
     }
 }
 
@@ -94,6 +105,7 @@ if ( ! function_exists('payment_notification')) {
                 }
             }
         }
+
         return $message;
     }
 }
@@ -107,7 +119,7 @@ if ( ! function_exists('tanggal_ke_kalimat')) {
         }
 
         // Pecah tanggal menjadi bagian tahun, bulan, dan hari
-        list($tahun, $bulan, $hari) = explode('-', $tanggal);
+        [$tahun, $bulan, $hari] = explode('-', $tanggal);
 
         // Konversi bulan ke dalam format teks
         $bulan_kalimat = match ($bulan) {
@@ -152,8 +164,8 @@ if ( ! function_exists('terbilang')) {
         }
 
         // Sanitasi input
-        $angka = abs($angka); //mengubah angka agar menjadi bernilai positif
-        $angka = floor($angka); //mengubah angka agar menjadi bilangan bulat
+        $angka = abs($angka); // mengubah angka agar menjadi bernilai positif
+        $angka = floor($angka); // mengubah angka agar menjadi bilangan bulat
 
         $angka_huruf = [
             '', 'Satu', 'Dua', 'Tiga', 'Empat', 'Lima', 'Enam', 'Tujuh', 'Delapan', 'Sembilan', 'Sepuluh', 'Sebelas',
@@ -186,6 +198,7 @@ if ( ! function_exists('terbilang')) {
         if ($angka < 1000000000000) {
             return terbilang($angka / 1000000000) . ' Miliar ' . terbilang($angka % 1000000000);
         }
+
         return terbilang($angka / 1000000000000) . ' Triliun ' . terbilang($angka % 1000000000000);
     }
 }
@@ -193,7 +206,7 @@ if ( ! function_exists('terbilang')) {
 if ( ! function_exists('replace_nama_file_excel')) {
     function replace_nama_file_excel($namafile): string
     {
-        return str_replace(['/', "\\", ':', '*', '?', '«', '<', '>', '|'], '-', $namafile);
+        return str_replace(['/', '\\', ':', '*', '?', '«', '<', '>', '|'], '-', $namafile);
     }
 }
 
@@ -201,6 +214,7 @@ if ( ! function_exists('biaya_pendaftaran')) {
     function biaya_pendaftaran($kategoriLomba): int|float|null
     {
         $biayaPendaftaran = KategoriLomba::find($kategoriLomba);
+
         return $biayaPendaftaran->harga;
     }
 }

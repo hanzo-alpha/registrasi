@@ -12,6 +12,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Laravolt\Indonesia\Models\City;
 
 class KategoriLombaResource extends Resource
 {
@@ -37,8 +38,15 @@ class KategoriLombaResource extends Resource
                 Forms\Components\TextInput::make('harga')
                     ->numeric(),
                 Forms\Components\ColorPicker::make('warna'),
-                Forms\Components\Select::make('kategori')
+                Forms\Components\ToggleButtons::make('kategori')
                     ->options(StatusPendaftaran::class)
+                    ->label('Kategori')
+                    ->inline()
+                    ->default(StatusPendaftaran::BELUM)
+                    ->required(),
+                Forms\Components\Select::make('kabupaten')
+                    ->multiple()
+                    ->options(fn() => City::whereIn('code', ['7313', '7312', '7314', '7308'])->pluck('name', 'code'))
                     ->native(false),
                 Forms\Components\TextInput::make('deskripsi')
                     ->maxLength(255),
@@ -61,14 +69,6 @@ class KategoriLombaResource extends Resource
                     ->badge(),
                 Tables\Columns\TextColumn::make('deskripsi')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
 

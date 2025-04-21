@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Mail;
 
-use App\Models\Registrasi;
+use App\Models\Pendaftaran;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Address;
@@ -21,7 +21,7 @@ class RegistrasiBerhasil extends Mailable
      * Create a new message instance.
      */
     public function __construct(
-        public Registrasi $registrasi,
+        public Pendaftaran $registrasi,
     ) {}
 
     /**

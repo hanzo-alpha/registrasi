@@ -4,11 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Enums\GolonganDarah;
-use App\Enums\JenisKelamin;
 use App\Enums\StatusPendaftaran;
 use App\Enums\StatusRegistrasi;
-use App\Enums\TipeKartuIdentitas;
 use App\Enums\UkuranJersey;
 use App\Traits\HasWilayah;
 use Illuminate\Database\Eloquent\Model;
@@ -24,31 +21,24 @@ class Pendaftaran extends Model
     protected $table = 'pendaftaran';
 
     protected $fillable = [
-        'nama_lengkap',
-        'email',
-        'no_telp',
-        'jenis_kelamin',
-        'tempat_lahir',
-        'tanggal_lahir',
+        'peserta_id',
+        'no_bib',
+        'nama_bib',
         'alamat',
         'negara',
         'provinsi',
         'kabupaten',
         'kecamatan',
-        'tipe_kartu_identitas',
-        'nomor_kartu_identitas',
-        'nama_kontak_darurat',
-        'nomor_kontak_darurat',
-        'golongan_darah',
         'ukuran_jersey',
         'jumlah_peserta',
         'kategori_lomba',
-        'komunitas',
         'status_registrasi',
+        'status_pengambilan',
         'status_pendaftaran',
         'uuid_pendaftaran',
+        'qr_url',
+        'qr_options',
     ];
-    protected $with = ['kategori', 'pembayaran'];
 
     public function uniqueIds(): array
     {
@@ -65,6 +55,11 @@ class Pendaftaran extends Model
         return $this->hasOne(Pembayaran::class, 'pendaftaran_id', 'id');
     }
 
+    public function peserta(): BelongsTo
+    {
+        return $this->belongsTo(Peserta::class);
+    }
+
     public function kategori(): BelongsTo
     {
         return $this->belongsTo(KategoriLomba::class, 'kategori_lomba', 'id');
@@ -73,14 +68,14 @@ class Pendaftaran extends Model
     protected function casts(): array
     {
         return [
-            'tanggal_lahir' => 'date',
             'uuid_pendaftaran' => 'string',
             'ukuran_jersey' => UkuranJersey::class,
-            'tipe_kartu_identitas' => TipeKartuIdentitas::class,
-            'golongan_darah' => GolonganDarah::class,
             'status_registrasi' => StatusRegistrasi::class,
-            'jenis_kelamin' => JenisKelamin::class,
             'status_pendaftaran' => StatusPendaftaran::class,
+            'status_pengambilan' => 'boolean',
+            'qr_options' => 'array',
+            'no_bib' => 'string',
+            'nama_bib' => 'string',
         ];
     }
 }

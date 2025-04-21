@@ -14,7 +14,7 @@ use App\Traits\HasWilayah;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Pembayaran extends Model
@@ -25,17 +25,11 @@ class Pembayaran extends Model
 
     protected $table = 'pembayaran';
 
-    protected $with = ['kategori', 'registrasi', 'pendaftaran', 'earlybird', 'historiPembayaran'];
-
     protected $fillable = [
         'uuid_pembayaran',
         'order_id',
-        'registrasi_id',
-        'earlybird_id',
         'pendaftaran_id',
         'nama_kegiatan',
-        'ukuran_jersey',
-        'kategori_lomba',
         'jumlah',
         'satuan',
         'harga_satuan',
@@ -43,17 +37,14 @@ class Pembayaran extends Model
         'tipe_pembayaran',
         'status_pembayaran',
         'status_transaksi',
-        'status_daftar',
         'keterangan',
         'detail_transaksi',
         'lampiran',
-        'is_earlybird',
-        'status_pendaftaran',
     ];
 
     public function uniqueIds(): array
     {
-        return ['uuid_pembayaran'];
+        return ['uuid_pembayaran', 'order_id'];
     }
 
     public function getRouteKeyName(): string
@@ -61,29 +52,19 @@ class Pembayaran extends Model
         return 'uuid_pembayaran';
     }
 
-    public function registrasi(): BelongsTo
-    {
-        return $this->belongsTo(Registrasi::class, 'registrasi_id', 'id');
-    }
-
     public function pendaftaran(): BelongsTo
     {
         return $this->belongsTo(Pendaftaran::class, 'pendaftaran_id', 'id');
     }
 
-    public function earlybird(): BelongsTo
+    public function peserta(): HasOneThrough
     {
-        return $this->belongsTo(Earlybird::class, 'earlybird_id', 'id');
+        return $this->hasOneThrough(Pendaftaran::class, Peserta::class, 'id', 'peserta_id', 'pendaftaran_id');
     }
 
     public function kategori(): BelongsTo
     {
         return $this->belongsTo(KategoriLomba::class, 'kategori_lomba', 'id');
-    }
-
-    public function historiPembayaran(): HasOne
-    {
-        return $this->hasOne(HistoriPembayaran::class, 'pembayaran_id', 'id');
     }
 
     protected function casts(): array
@@ -94,10 +75,7 @@ class Pembayaran extends Model
             'detail_transaksi' => 'array',
             'status_pembayaran' => StatusBayar::class,
             'status_transaksi' => PaymentStatus::class,
-            'status_daftar' => StatusDaftar::class,
             'tipe_pembayaran' => TipeBayar::class,
-            'status_pendaftaran' => StatusPendaftaran::class,
-            'ukuran_jersey' => UkuranJersey::class,
         ];
     }
 

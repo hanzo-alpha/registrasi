@@ -4,46 +4,70 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use App\Filament\App\Pages\Earlybird;
+use App\Filament\Admin\Resources\PembayaranResource;
+use App\Filament\Admin\Resources\PendaftaranResource;
 use App\Filament\App\Pages\Pendaftaran;
-use App\Filament\App\Pages\RegistrasiPeserta;
-use Filament\Forms\Components\Field;
-use Filament\Forms\Components\Placeholder;
-use Filament\Infolists\Components\Entry;
-use Filament\Support\Components\Component;
-use Filament\Support\Concerns\Configurable;
+use App\Models\Pembayaran;
+use App\Policies\ActivityPolicy;
+use BezhanSalleh\FilamentShield\FilamentShield;
 use Filament\Support\Facades\FilamentView;
-use Filament\Tables\Columns\Column;
-use Filament\Tables\Filters\BaseFilter;
 use Filament\View\PanelsRenderHook;
+use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Vite;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\View\View;
+use Spatie\Activitylog\Models\Activity;
 
 class AppServiceProvider extends ServiceProvider
 {
+    protected array $policies = [
+        Activity::class => ActivityPolicy::class,
+    ];
+
     public function register(): void {}
 
     public function boot(): void
     {
-        $this->configureCommands();
+        $this->configurePolicies();
+
+        $this->configureDB();
+
         $this->configureModels();
-        $this->translatableComponents();
+
+        $this->configureFilament();
+
         $this->configureVite();
+
+        $this->configureCommands();
+
         $this->registerFilamentHook();
     }
 
-    protected function translatableComponents(): void
+    private function configurePolicies(): void
     {
-        foreach ([Field::class, BaseFilter::class, Placeholder::class, Column::class, Entry::class] as $component) {
-            /* @var Configurable $component */
-            $component::configureUsing(function (Component $translatable): void {
-                /** @phpstan-ignore method.notFound */
-                $translatable->translateLabel();
-            });
+        foreach ($this->policies as $model => $policy) {
+            Gate::policy($model, $policy);
         }
+    }
+
+    private function configureDB(): void
+    {
+        DB::prohibitDestructiveCommands($this->app->environment('production'));
+    }
+
+    private function configureModels(): void
+    {
+        Model::shouldBeStrict($this->app->isProduction());
+
+        Model::automaticallyEagerLoadRelationships();
+
+        Model::unguard();
+    }
+
+    private function configureFilament(): void
+    {
+        FilamentShield::prohibitDestructiveCommands($this->app->isProduction());
     }
 
     private function configureCommands(): void
@@ -57,21 +81,14 @@ class AppServiceProvider extends ServiceProvider
             PanelsRenderHook::BODY_END,
             fn(array $scopes): View => view('payment-js', ['scopes' => $scopes]),
             scopes: [
-                //                Pendaftaran::class,
-                //                Earlybird::class,
-                RegistrasiPeserta::class,
+                Pendaftaran::class,
+                PendaftaranResource::class,
             ],
         );
     }
 
-    private function configureModels(): void
-    {
-        Model::unguard();
-        Model::shouldBeStrict($this->app->isProduction());
-    }
-
     private function configureVite(): void
     {
-        Vite::useWaterfallPrefetching(concurrency: 10);
+        \Illuminate\Support\Facades\Vite::useWaterfallPrefetching(concurrency: 10);
     }
 }
