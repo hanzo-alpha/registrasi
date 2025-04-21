@@ -1,12 +1,7 @@
-# 🚀 Glow Starter Kit
+# 🚀 Sistem Pendaftaran Bantaeng Trail Run 2025
 
-This is a **Filament v3 Starter Kit** for **Laravel 12**, designed to accelerate the development of Filament-powered
-applications.
-
-Preview:
-![](https://raw.githubusercontent.com/ercogx/laravel-filament-starter-kit/main/preview-white.png)
-Dark Mode:
-![](https://raw.githubusercontent.com/ercogx/laravel-filament-starter-kit/main/preview.png)
+Ini adalah **Sistem Pembayaran Pendaftaran Event** untuk **Bantaeng Trail Run 2025**, khusus digunakan untuk event
+yang akan berlangsung sebagai sistem pembayaran online.
 
 ## 📦 Installation
 
@@ -76,7 +71,6 @@ php artisan ide-helper:models -W && ./vendor/bin/pint app
 ```
 
 The `composer check` script runs **tests, PHPStan, and Pint** for code quality assurance:
-
 ```bash
 composer check
 ```
