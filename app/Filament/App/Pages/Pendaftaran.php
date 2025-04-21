@@ -19,6 +19,7 @@ use App\Models\KategoriLomba;
 use App\Models\Pembayaran;
 use App\Models\Peserta;
 use App\Services\MidtransAPI;
+use Awcodes\Shout\Components\Shout;
 use Closure;
 use Exception;
 use Filament\Actions\Action;
@@ -60,14 +61,14 @@ class Pendaftaran extends Page implements HasForms
     use InteractsWithForms;
 
     private const int MINIMUM_AGE = 18;
+    public ?Model $record = null;
+    public ?array $data = [];
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
     protected static ?string $activeNavigationIcon = 'heroicon-s-document-text';
     protected static ?string $slug = 'registrasi-peserta';
     protected static string $view = 'filament.app.pages.pendafaran';
     protected static ?string $navigationLabel = 'Registrasi Peserta';
     protected static bool $shouldRegisterNavigation = true;
-    public ?Model $record = null;
-    public ?array $data = [];
     protected ?string $heading = 'Pendaftaran Online Peserta Bantaeng Trail Run 2025';
 
     protected ?string $subheading = 'Silahkan lengkapi data peserta di bawah ini.';
@@ -75,6 +76,20 @@ class Pendaftaran extends Page implements HasForms
     public static function getNavigationBadge(): ?string
     {
         return (string) \App\Models\Pendaftaran::with('peserta')->count();
+    }
+
+    /** Builds the form configuration */
+    public static function formOtomatis(): array
+    {
+        return [
+            Forms\Components\Wizard::make([
+                self::stepDataPribadiPeserta(),
+                self::stepDataAlamatPeserta(),
+                self::stepDataPendaftaranPeserta(),
+            ])
+                ->submitAction(self::renderSubmitAction())
+                ->columnSpanFull(),
+        ];
     }
 
     public function mount(): void
@@ -141,153 +156,6 @@ class Pendaftaran extends Page implements HasForms
 
     }
 
-    protected function getRedirectUrl(): string
-    {
-        return Pendaftaran::getUrl();
-    }
-
-    private function sendNotification(string $title, string $body, string $type, string $icon)
-    {
-        return Notification::make()
-            ->title($title)
-            ->{$type}()
-            ->body($body)
-            ->icon($icon)
-            ->send();
-    }
-
-    private function getPaymentStatus(?string $transactionStatus): StatusBayar
-    {
-        return match ($transactionStatus) {
-            PaymentStatus::SETTLEMENT->value, PaymentStatus::CAPTURE->value => StatusBayar::SUDAH_BAYAR,
-            PaymentStatus::FAILURE->value, PaymentStatus::CANCEL->value,
-            PaymentStatus::DENY->value, PaymentStatus::EXPIRE->value => StatusBayar::GAGAL,
-            PaymentStatus::PENDING->value => StatusBayar::PENDING,
-            default => StatusBayar::BELUM_BAYAR,
-        };
-    }
-
-    private function getRegistrationStatus(?string $transactionStatus): StatusRegistrasi
-    {
-        return match ($transactionStatus) {
-            PaymentStatus::SETTLEMENT->value, PaymentStatus::CAPTURE->value => StatusRegistrasi::BERHASIL,
-            PaymentStatus::FAILURE->value, PaymentStatus::CANCEL->value,
-            PaymentStatus::DENY->value, PaymentStatus::EXPIRE->value => StatusRegistrasi::BATAL,
-            PaymentStatus::PENDING->value => StatusRegistrasi::TUNDA,
-            PaymentStatus::AUTHORIZE->value => StatusRegistrasi::PROSES,
-            PaymentStatus::CHARGEBACK->value, PaymentStatus::PARTIAL_REFUND->value,
-            PaymentStatus::REFUND->value, PaymentStatus::PARTIAL_CHARGEBACK->value => StatusRegistrasi::PENGEMBALIAN,
-        };
-    }
-
-    private function getPendaftaranStatus($transactionStatus): StatusPendaftaran
-    {
-        return match ($transactionStatus) {
-            StatusPendaftaran::NORMAL->value => StatusPendaftaran::NORMAL,
-            default => StatusPendaftaran::EARLYBIRD,
-        };
-    }
-
-    private function getPaymentType($paymentType): TipeBayar
-    {
-        return match ($paymentType) {
-            'qris', 'gopay', 'shopeepay' => TipeBayar::QRIS,
-            default => TipeBayar::TRANSFER,
-        };
-    }
-
-    private function updatePayment(
-        $pembayaran,
-        $orderId,
-        $paymentType,
-        $status,
-        $transactionStatus,
-        $result,
-        $grossAmount,
-    ): void {
-        $pembayaran->order_id = $orderId;
-        $pembayaran->uuid_pembayaran ??= self::generateUuid();
-        $pembayaran->tipe_pembayaran = $paymentType;
-        $pembayaran->status_pembayaran = $status;
-        $pembayaran->total_harga = $grossAmount;
-        $pembayaran->harga_satuan = $grossAmount;
-        $pembayaran->status_transaksi = $transactionStatus;
-        $pembayaran->detail_transaksi = $result;
-        $pembayaran->lampiran = null;
-        $pembayaran->save();
-    }
-
-    /** Generates a UUID */
-    private static function generateUuid(): string
-    {
-        return Str::uuid()->toString();
-    }
-
-    private function updatePeserta($peserta, $statusPeserta): void
-    {
-        $peserta->status_peserta = $statusPeserta;
-        $peserta->save();
-    }
-
-    private function updateRegistration($registrasi, $statusRegistrasi): void
-    {
-        $registrasi->status_registrasi = $statusRegistrasi;
-        $registrasi->status_pengambilan = false;
-        $registrasi->save();
-    }
-
-    private function redirectToUrl($redirectUrl): void
-    {
-        $this->redirect($redirectUrl, navigate: FilamentView::hasSpaMode() && is_app_url((string) $redirectUrl));
-    }
-
-    private function sendNotificationEmail($pembayaran, $registrasi): void
-    {
-        if (!app()->environment('production')) {
-            defer(function () use ($pembayaran, $registrasi): void {
-                Mail::to($registrasi->email)->send(new PembayaranBerhasil($pembayaran));
-            });
-        }
-    }
-
-    private function handlePaymentNotification(
-        StatusBayar $status,
-        ?string $orderId,
-        int|float|string $grossAmount,
-        ?string $transactionTime,
-    ) {
-        $formattedAmount = Number::format((float) $grossAmount, locale: 'id');
-
-        return match ($status) {
-            StatusBayar::BELUM_BAYAR => $this->sendNotification(
-                'Belum ada Pembayaran',
-                "Transaksi dengan order id: {$orderId} belum melakukan pembayaran sebesar Rp. {$formattedAmount}",
-                'danger',
-                'heroicon-o-x-circle',
-            ),
-            StatusBayar::PENDING => $this->sendNotification(
-                'Menunggu Pembayaran',
-                "Transaksi dengan order id: {$orderId} masih menunggu pembayaran sebesar Rp. {$formattedAmount}",
-                'warning',
-                'heroicon-o-information-circle',
-            ),
-            StatusBayar::GAGAL => $this->sendNotification(
-                'Pembayaran Gagal',
-                "Transaksi dengan order id: {$orderId} gagal melakukan pembayaran sebesar Rp. {$formattedAmount}",
-                'danger',
-                'heroicon-o-x-mark',
-            ),
-            default => $this->sendNotification(
-                'Pembayaran Berhasil',
-                "Transaksi dengan order id: {$orderId} telah berhasil dilakukan pada ".
-                Carbon::parse($transactionTime)->format('d/m/Y H:i:s').
-                " sebesar Rp. {$formattedAmount}",
-                'success',
-                'heroicon-o-check-circle',
-            ),
-        };
-    }
-
     /**
      * @throws Throwable
      */
@@ -318,6 +186,39 @@ class Pendaftaran extends Page implements HasForms
 
         $this->getCreatedNotification()?->send();
 
+    }
+
+    public function getModel(): string
+    {
+        return \App\Models\Pendaftaran::class;
+    }
+
+    public function getRecord(): ?Model
+    {
+        return $this->record;
+    }
+
+    public function form(Form $form): Form
+    {
+        return $form
+//            ->schema(static::formOtomatis())
+            ->schema([
+                Shout::make('Pendaftaran Ditutup')
+                    ->icon('heroicon-o-lock-closed')
+                    ->content('Pendaftaran Bantaeng Trail Run Sudah Di Tutup. Silahkan hubungi panitia untuk Pendaftaran Offline')
+                    ->columnSpanFull(),
+            ])
+            ->columns(2);
+    }
+
+    public function getFormStatePath(): ?string
+    {
+        return 'data';
+    }
+
+    protected function getRedirectUrl(): string
+    {
+        return Pendaftaran::getUrl();
     }
 
     /**
@@ -361,114 +262,6 @@ class Pendaftaran extends Page implements HasForms
 
     }
 
-    private function initializeDefaults(array &$data): void
-    {
-        $data['uuid_pendaftaran'] ??= self::generateUuid();
-        $data['status_registrasi'] ??= StatusRegistrasi::BELUM_BAYAR;
-        $data['provinsi'] ??= '74';
-    }
-
-    private function buildNamaKegiatan(KategoriLomba $kategori): string
-    {
-        return 'Pendaftaran Bantaeng Trail Run 2025 Kategori Lomba - '.$kategori->nama;
-    }
-
-    private function createTransactionData(string $orderId, int|float $grossAmount): array
-    {
-        return [
-            'order_id' => $orderId,
-            'gross_amount' => $grossAmount,
-        ];
-    }
-
-    private function createItemData(
-        int|float $price,
-        KategoriLomba $kategori,
-        string $eventName,
-        string $merchant
-    ): array {
-        return [
-            'id' => self::generateUuid(),
-            'price' => $price,
-            'quantity' => 1,
-            'name' => $eventName,
-            'merchant_name' => $merchant,
-            'category' => $kategori->nama,
-        ];
-    }
-
-    private function createCustomerData(array $data): array
-    {
-        return [
-            'first_name' => $data['peserta']['nama_lengkap'],
-            'last_name' => '',
-            'email' => $data['peserta']['email'],
-            'phone' => $data['peserta']['no_telp'],
-            'address' => $data['alamat'],
-            'shipping_address' => [
-                'first_name' => $data['peserta']['nama_lengkap'],
-                'last_name' => '',
-                'email' => $data['peserta']['email'],
-                'phone' => $data['peserta']['no_telp'],
-                'address' => $data['alamat'],
-            ],
-        ];
-    }
-
-    private function createPeserta(array $data): ?int
-    {
-        $peserta = Peserta::create([
-            'nama_lengkap' => $data['nama_lengkap'],
-            'no_telp' => $data['no_telp'],
-            'email' => $data['email'],
-            'tempat_lahir' => $data['tempat_lahir'],
-            'tanggal_lahir' => $data['tanggal_lahir'],
-            'jenis_kelamin' => $data['jenis_kelamin'],
-            'tipe_kartu_identitas' => $data['tipe_kartu_identitas'],
-            'nomor_kartu_identitas' => $data['nomor_kartu_identitas'],
-            'nama_kontak_darurat' => $data['nama_kontak_darurat'],
-            'nomor_kontak_darurat' => $data['nomor_kontak_darurat'],
-            'golongan_darah' => $data['golongan_darah'],
-            'komunitas' => $data['komunitas'],
-        ]);
-
-        return $peserta->id;
-    }
-
-    public function getModel(): string
-    {
-        return \App\Models\Pendaftaran::class;
-    }
-
-    private function createPembayaran(
-        Model $record,
-        array $data,
-        array $detailTransaksi,
-        string $eventName,
-        int|float $unitPrice,
-        int|float $totalAmount,
-    ): void {
-        Pembayaran::create([
-            'order_id' => $record->uuid_pendaftaran,
-            'pendaftaran_id' => $record->id,
-            'nama_kegiatan' => $eventName,
-            'jumlah' => 1, // Always 1
-            'satuan' => 'Peserta',
-            'harga_satuan' => $unitPrice,
-            'total_harga' => $totalAmount,
-            'status_pembayaran' => StatusBayar::BELUM_BAYAR,
-            'status_transaksi' => PaymentStatus::CAPTURE,
-            'keterangan' => null,
-            'detail_transaksi' => $detailTransaksi,
-            'lampiran' => null,
-        ]);
-    }
-
-    public function getRecord(): ?Model
-    {
-        return $this->record;
-    }
-
     protected function getCreatedNotification(): ?Notification
     {
         $title = $this->getCreatedNotificationTitle();
@@ -501,29 +294,35 @@ class Pendaftaran extends Page implements HasForms
                 ->model($this->getModel())
                 ->statePath($this->getFormStatePath())
                 ->columns($this->hasInlineLabels() ? 1 : 2)
-                ->inlineLabel($this->hasInlineLabels()),),
+                ->inlineLabel($this->hasInlineLabels()), ),
         ];
     }
 
-    public function form(Form $form): Form
+    protected function getSubmitFormAction(): Action
     {
-        return $form
-            ->schema(static::formOtomatis())
-            ->columns(2);
+        return $this->getCreateFormAction();
     }
 
-    /** Builds the form configuration */
-    public static function formOtomatis(): array
+    protected function getCreateFormAction(): Action
+    {
+        return Action::make('create')
+            ->label('Pembayaran')
+            ->icon('heroicon-o-credit-card')
+            ->submit('create')
+            ->keyBindings(['ctrl+s']);
+    }
+
+    protected function getFormActions(): array
     {
         return [
-            Forms\Components\Wizard::make([
-                self::stepDataPribadiPeserta(),
-                self::stepDataAlamatPeserta(),
-                self::stepDataPendaftaranPeserta(),
-            ])
-                ->submitAction(self::renderSubmitAction())
-                ->columnSpanFull(),
+            $this->getCreateFormAction(),
         ];
+    }
+
+    /** Generates a UUID */
+    private static function generateUuid(): string
+    {
+        return Str::uuid()->toString();
     }
 
     /** Step 1: Data Pribadi Peserta */
@@ -613,8 +412,8 @@ class Pendaftaran extends Page implements HasForms
         return Forms\Components\Actions\Action::make('copy')
             ->icon('heroicon-s-clipboard-document-check')
             ->action(fn($livewire, $state) => $livewire->js(
-                'window.navigator.clipboard.writeText("'.$state.'");
-                           $tooltip("'.__('Copied to clipboard').'", { timeout: 1500 });',
+                'window.navigator.clipboard.writeText("' . $state . '");
+                           $tooltip("' . __('Copied to clipboard') . '", { timeout: 1500 });',
             ));
     }
 
@@ -760,29 +559,237 @@ class Pendaftaran extends Page implements HasForms
         ));
     }
 
-    public function getFormStatePath(): ?string
+    private function sendNotification(string $title, string $body, string $type, string $icon)
     {
-        return 'data';
+        return Notification::make()
+            ->title($title)
+            ->{$type}()
+            ->body($body)
+            ->icon($icon)
+            ->send();
     }
 
-    protected function getSubmitFormAction(): Action
+    private function getPaymentStatus(?string $transactionStatus): StatusBayar
     {
-        return $this->getCreateFormAction();
+        return match ($transactionStatus) {
+            PaymentStatus::SETTLEMENT->value, PaymentStatus::CAPTURE->value => StatusBayar::SUDAH_BAYAR,
+            PaymentStatus::FAILURE->value, PaymentStatus::CANCEL->value,
+            PaymentStatus::DENY->value, PaymentStatus::EXPIRE->value => StatusBayar::GAGAL,
+            PaymentStatus::PENDING->value => StatusBayar::PENDING,
+            default => StatusBayar::BELUM_BAYAR,
+        };
     }
 
-    protected function getCreateFormAction(): Action
+    private function getRegistrationStatus(?string $transactionStatus): StatusRegistrasi
     {
-        return Action::make('create')
-            ->label('Pembayaran')
-            ->icon('heroicon-o-credit-card')
-            ->submit('create')
-            ->keyBindings(['ctrl+s']);
+        return match ($transactionStatus) {
+            PaymentStatus::SETTLEMENT->value, PaymentStatus::CAPTURE->value => StatusRegistrasi::BERHASIL,
+            PaymentStatus::FAILURE->value, PaymentStatus::CANCEL->value,
+            PaymentStatus::DENY->value, PaymentStatus::EXPIRE->value => StatusRegistrasi::BATAL,
+            PaymentStatus::PENDING->value => StatusRegistrasi::TUNDA,
+            PaymentStatus::AUTHORIZE->value => StatusRegistrasi::PROSES,
+            PaymentStatus::CHARGEBACK->value, PaymentStatus::PARTIAL_REFUND->value,
+            PaymentStatus::REFUND->value, PaymentStatus::PARTIAL_CHARGEBACK->value => StatusRegistrasi::PENGEMBALIAN,
+        };
     }
 
-    protected function getFormActions(): array
+    private function getPendaftaranStatus($transactionStatus): StatusPendaftaran
+    {
+        return match ($transactionStatus) {
+            StatusPendaftaran::NORMAL->value => StatusPendaftaran::NORMAL,
+            default => StatusPendaftaran::EARLYBIRD,
+        };
+    }
+
+    private function getPaymentType($paymentType): TipeBayar
+    {
+        return match ($paymentType) {
+            'qris', 'gopay', 'shopeepay' => TipeBayar::QRIS,
+            default => TipeBayar::TRANSFER,
+        };
+    }
+
+    private function updatePayment(
+        $pembayaran,
+        $orderId,
+        $paymentType,
+        $status,
+        $transactionStatus,
+        $result,
+        $grossAmount,
+    ): void {
+        $pembayaran->order_id = $orderId;
+        $pembayaran->uuid_pembayaran ??= self::generateUuid();
+        $pembayaran->tipe_pembayaran = $paymentType;
+        $pembayaran->status_pembayaran = $status;
+        $pembayaran->total_harga = $grossAmount;
+        $pembayaran->harga_satuan = $grossAmount;
+        $pembayaran->status_transaksi = $transactionStatus;
+        $pembayaran->detail_transaksi = $result;
+        $pembayaran->lampiran = null;
+        $pembayaran->save();
+    }
+
+    private function updatePeserta($peserta, $statusPeserta): void
+    {
+        $peserta->status_peserta = $statusPeserta;
+        $peserta->save();
+    }
+
+    private function updateRegistration($registrasi, $statusRegistrasi): void
+    {
+        $registrasi->status_registrasi = $statusRegistrasi;
+        $registrasi->status_pengambilan = false;
+        $registrasi->save();
+    }
+
+    private function redirectToUrl($redirectUrl): void
+    {
+        $this->redirect($redirectUrl, navigate: FilamentView::hasSpaMode() && is_app_url((string) $redirectUrl));
+    }
+
+    private function sendNotificationEmail($pembayaran, $registrasi): void
+    {
+        if ( ! app()->environment('production')) {
+            defer(function () use ($pembayaran, $registrasi): void {
+                Mail::to($registrasi->email)->send(new PembayaranBerhasil($pembayaran));
+            });
+        }
+    }
+
+    private function handlePaymentNotification(
+        StatusBayar $status,
+        ?string $orderId,
+        int|float|string $grossAmount,
+        ?string $transactionTime,
+    ) {
+        $formattedAmount = Number::format((float) $grossAmount, locale: 'id');
+
+        return match ($status) {
+            StatusBayar::BELUM_BAYAR => $this->sendNotification(
+                'Belum ada Pembayaran',
+                "Transaksi dengan order id: {$orderId} belum melakukan pembayaran sebesar Rp. {$formattedAmount}",
+                'danger',
+                'heroicon-o-x-circle',
+            ),
+            StatusBayar::PENDING => $this->sendNotification(
+                'Menunggu Pembayaran',
+                "Transaksi dengan order id: {$orderId} masih menunggu pembayaran sebesar Rp. {$formattedAmount}",
+                'warning',
+                'heroicon-o-information-circle',
+            ),
+            StatusBayar::GAGAL => $this->sendNotification(
+                'Pembayaran Gagal',
+                "Transaksi dengan order id: {$orderId} gagal melakukan pembayaran sebesar Rp. {$formattedAmount}",
+                'danger',
+                'heroicon-o-x-mark',
+            ),
+            default => $this->sendNotification(
+                'Pembayaran Berhasil',
+                "Transaksi dengan order id: {$orderId} telah berhasil dilakukan pada " .
+                Carbon::parse($transactionTime)->format('d/m/Y H:i:s') .
+                " sebesar Rp. {$formattedAmount}",
+                'success',
+                'heroicon-o-check-circle',
+            ),
+        };
+    }
+
+    private function initializeDefaults(array &$data): void
+    {
+        $data['uuid_pendaftaran'] ??= self::generateUuid();
+        $data['status_registrasi'] ??= StatusRegistrasi::BELUM_BAYAR;
+        $data['provinsi'] ??= '74';
+    }
+
+    private function buildNamaKegiatan(KategoriLomba $kategori): string
+    {
+        return 'Pendaftaran Bantaeng Trail Run 2025 Kategori Lomba - ' . $kategori->nama;
+    }
+
+    private function createTransactionData(string $orderId, int|float $grossAmount): array
     {
         return [
-            $this->getCreateFormAction(),
+            'order_id' => $orderId,
+            'gross_amount' => $grossAmount,
         ];
+    }
+
+    private function createItemData(
+        int|float $price,
+        KategoriLomba $kategori,
+        string $eventName,
+        string $merchant,
+    ): array {
+        return [
+            'id' => self::generateUuid(),
+            'price' => $price,
+            'quantity' => 1,
+            'name' => $eventName,
+            'merchant_name' => $merchant,
+            'category' => $kategori->nama,
+        ];
+    }
+
+    private function createCustomerData(array $data): array
+    {
+        return [
+            'first_name' => $data['peserta']['nama_lengkap'],
+            'last_name' => '',
+            'email' => $data['peserta']['email'],
+            'phone' => $data['peserta']['no_telp'],
+            'address' => $data['alamat'],
+            'shipping_address' => [
+                'first_name' => $data['peserta']['nama_lengkap'],
+                'last_name' => '',
+                'email' => $data['peserta']['email'],
+                'phone' => $data['peserta']['no_telp'],
+                'address' => $data['alamat'],
+            ],
+        ];
+    }
+
+    private function createPeserta(array $data): ?int
+    {
+        $peserta = Peserta::create([
+            'nama_lengkap' => $data['nama_lengkap'],
+            'no_telp' => $data['no_telp'],
+            'email' => $data['email'],
+            'tempat_lahir' => $data['tempat_lahir'],
+            'tanggal_lahir' => $data['tanggal_lahir'],
+            'jenis_kelamin' => $data['jenis_kelamin'],
+            'tipe_kartu_identitas' => $data['tipe_kartu_identitas'],
+            'nomor_kartu_identitas' => $data['nomor_kartu_identitas'],
+            'nama_kontak_darurat' => $data['nama_kontak_darurat'],
+            'nomor_kontak_darurat' => $data['nomor_kontak_darurat'],
+            'golongan_darah' => $data['golongan_darah'],
+            'komunitas' => $data['komunitas'],
+        ]);
+
+        return $peserta->id;
+    }
+
+    private function createPembayaran(
+        Model $record,
+        array $data,
+        array $detailTransaksi,
+        string $eventName,
+        int|float $unitPrice,
+        int|float $totalAmount,
+    ): void {
+        Pembayaran::create([
+            'order_id' => $record->uuid_pendaftaran,
+            'pendaftaran_id' => $record->id,
+            'nama_kegiatan' => $eventName,
+            'jumlah' => 1, // Always 1
+            'satuan' => 'Peserta',
+            'harga_satuan' => $unitPrice,
+            'total_harga' => $totalAmount,
+            'status_pembayaran' => StatusBayar::BELUM_BAYAR,
+            'status_transaksi' => PaymentStatus::CAPTURE,
+            'keterangan' => null,
+            'detail_transaksi' => $detailTransaksi,
+            'lampiran' => null,
+        ]);
     }
 }

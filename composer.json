@@ -13,6 +13,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "awcodes/shout": "^2.0",
         "bezhansalleh/filament-shield": "^3.3",
         "croustibat/filament-jobs-monitor": "^2.6",
         "devonab/filament-easy-footer": "^1.1",
