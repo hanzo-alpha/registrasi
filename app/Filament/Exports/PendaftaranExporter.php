@@ -30,13 +30,13 @@ class PendaftaranExporter extends Exporter
                 ->label('ID'),
             ExportColumn::make('uuid_pendaftaran')
                 ->label('UUID Pendaftaran'),
-            ExportColumn::make('nama_lengkap')
+            ExportColumn::make('peserta.nama_lengkap')
                 ->label('Nama Lengkap'),
-            ExportColumn::make('email')
+            ExportColumn::make('peserta.email')
                 ->label('Email'),
-            ExportColumn::make('no_telp')
+            ExportColumn::make('peserta.no_telp')
                 ->label('No Telp'),
-            ExportColumn::make('jenis_kelamin')
+            ExportColumn::make('peserta.jenis_kelamin')
                 ->label('Jenis Kelamin')
                 ->formatStateUsing(function ($state) {
                     return match ($state->value) {
@@ -44,11 +44,11 @@ class PendaftaranExporter extends Exporter
                         JenisKelamin::PEREMPUAN->value => JenisKelamin::PEREMPUAN->value,
                     };
                 }),
-            ExportColumn::make('tempat_lahir')
+            ExportColumn::make('peserta.tempat_lahir')
                 ->label('Tempat Lahir'),
-            ExportColumn::make('tanggal_lahir')
+            ExportColumn::make('peserta.tanggal_lahir')
                 ->label('Tanggal Lahir')
-                ->state(fn($record) => $record->tanggal_lahir->format('d-m-Y')),
+                ->state(fn($record) => $record->peserta->tanggal_lahir->format('d-m-Y')),
             ExportColumn::make('alamat')
                 ->label('Alamat'),
             ExportColumn::make('negara')
@@ -59,7 +59,7 @@ class PendaftaranExporter extends Exporter
                 ->label('Kabupaten'),
             ExportColumn::make('kec.name')
                 ->label('Kecamatan'),
-            ExportColumn::make('tipe_kartu_identitas')
+            ExportColumn::make('peserta.tipe_kartu_identitas')
                 ->label('Tipe Kartu Identitas')
                 ->formatStateUsing(function ($state) {
                     return match ($state->value) {
@@ -68,13 +68,13 @@ class PendaftaranExporter extends Exporter
                         TipeKartuIdentitas::PASSPORT->value => TipeKartuIdentitas::PASSPORT->value,
                     };
                 }),
-            ExportColumn::make('nomor_kartu_identitas')
+            ExportColumn::make('peserta.nomor_kartu_identitas')
                 ->label('Nomor Kartu Identitas'),
-            ExportColumn::make('nama_kontak_darurat')
+            ExportColumn::make('peserta.nama_kontak_darurat')
                 ->label('Nama Kontak Darurat'),
-            ExportColumn::make('nomor_kontak_darurat')
+            ExportColumn::make('peserta.nomor_kontak_darurat')
                 ->label('Nomor Kontak Darurat'),
-            ExportColumn::make('golongan_darah')
+            ExportColumn::make('peserta.golongan_darah')
                 ->label('Golongan Darah')
                 ->formatStateUsing(function ($state) {
                     return match ($state->value) {
@@ -159,7 +159,7 @@ class PendaftaranExporter extends Exporter
             ->setFontItalic()
             ->setFontSize(12)
             ->setFontName('Calibri')
-            ->setFontColor(Color::DARK_BLUE)
+            ->setFontColor(Color::BLACK)
             ->setCellAlignment(CellAlignment::CENTER)
             ->setCellVerticalAlignment(CellVerticalAlignment::CENTER);
     }

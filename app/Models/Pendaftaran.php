@@ -40,6 +40,12 @@ class Pendaftaran extends Model
         'qr_options',
     ];
 
+    protected $with = [
+        'peserta',
+        'kategori',
+        'pembayaran',
+    ];
+
     public function uniqueIds(): array
     {
         return ['uuid_pendaftaran'];
