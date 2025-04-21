@@ -155,7 +155,6 @@ class PendaftaranResource extends Resource
                             ->required(),
                         Qr::make('qr_url')
                             ->label('QR Code')
-                            ->asSlideOver()
                             ->optionsColumn('qr_options')
                             ->actionIcon('heroicon-s-building-library'),
                         Forms\Components\ToggleButtons::make('status_pengambilan')
@@ -269,6 +268,14 @@ class PendaftaranResource extends Resource
                     TextEntry::make('pembayaran.status_transaksi')
                         ->label('Status Transaksi')->badge(),
                 ])->columns(2),
+                Section::make('E-Tiket')->schema([
+                    TextEntry::make('qr_url')
+                        ->hiddenLabel()
+                        ->formatStateUsing(fn(string $state, $record) => \LaraZeus\Qr\Facades\Qr::render(
+                            data: $state,
+                            options: $record->options,
+                        )),
+                ])->columns(1),
             ])->columns(1),
         ])->columns(3);
     }

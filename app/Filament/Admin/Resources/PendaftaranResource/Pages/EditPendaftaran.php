@@ -23,13 +23,13 @@ class EditPendaftaran extends EditRecord
         ];
     }
 
-    protected function handleRecordUpdate(Model $record, array $data): Model
-    {
-        $record->update($data);
-        $record->pembayaran()->update([
-            'ukuran_jersey' => $data['ukuran_jersey'],
-            'kategori_lomba' => $data['kategori_lomba'],
-        ]);
-        return $record;
-    }
+    //    protected function handleRecordUpdate(Model $record, array $data): Model
+    //    {
+    //        $record->update($data);
+    //        $record->pembayaran()->update([
+    //            'ukuran_jersey' => $data['ukuran_jersey'],
+    //            'kategori_lomba' => $data['kategori_lomba'],
+    //        ]);
+    //        return $record;
+    //    }
 }

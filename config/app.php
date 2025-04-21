@@ -22,7 +22,7 @@ return [
 
     'default_user' => [
         'name' => env('DEFAULT_USER_NAME', 'Administrator'),
-        'email' => env('DEFAULT_USER_EMAIL', 'admin@bantaengtrailrun.com'),
+        'email' => env('DEFAULT_USER_EMAIL', 'admin@registrasi.test'),
         'password' => env('DEFAULT_USER_PASSWORD', 'password'),
     ],
 
