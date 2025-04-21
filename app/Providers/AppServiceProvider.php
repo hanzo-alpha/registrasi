@@ -52,7 +52,7 @@ class AppServiceProvider extends ServiceProvider
     {
         Model::shouldBeStrict($this->app->isProduction());
 
-        Model::automaticallyEagerLoadRelationships();
+        Model::automaticallyEagerLoadRelationships($this->app->isProduction());
 
         Model::unguard();
     }

@@ -10,6 +10,7 @@ use App\Enums\UkuranJersey;
 use App\Traits\HasWilayah;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Pendaftaran extends Model
@@ -49,9 +50,9 @@ class Pendaftaran extends Model
         return 'uuid_pendaftaran';
     }
 
-    public function pembayaran(): BelongsTo
+    public function pembayaran(): HasOne
     {
-        return $this->belongsTo(Pembayaran::class, 'pendaftaran_id', 'id');
+        return $this->hasOne(Pembayaran::class, 'pendaftaran_id', 'id');
     }
 
     public function peserta(): BelongsTo
