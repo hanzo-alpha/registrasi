@@ -10,6 +10,7 @@ use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Hasnayeen\Themes\ThemesPlugin;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -64,6 +65,7 @@ class AppPanelProvider extends PanelProvider
                     ->myProfile(
                         navigationGroup: 'Pengaturan',
                     ),
+                ThemesPlugin::make(),
             ])
             ->discoverResources(in: app_path('Filament/App/Resources'), for: 'App\\Filament\\App\\Resources')
             ->discoverPages(in: app_path('Filament/App/Pages'), for: 'App\\Filament\\App\\Pages')
@@ -86,7 +88,6 @@ class AppPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
 
-            ])
-            ->viteTheme('resources/css/filament/app/theme.css');
+            ]);
     }
 }

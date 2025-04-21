@@ -42,7 +42,7 @@ class KategoriLombaResource extends Resource
                     ->options(StatusPendaftaran::class)
                     ->label('Kategori')
                     ->inline()
-                    ->default(StatusPendaftaran::BELUM)
+                    ->default(StatusPendaftaran::NORMAL)
                     ->required(),
                 Forms\Components\Select::make('kabupaten')
                     ->multiple()
