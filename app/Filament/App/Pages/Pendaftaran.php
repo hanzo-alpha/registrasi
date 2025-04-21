@@ -201,13 +201,13 @@ class Pendaftaran extends Page implements HasForms
     public function form(Form $form): Form
     {
         return $form
-//            ->schema(static::formOtomatis())
-            ->schema([
-                Shout::make('Pendaftaran Ditutup')
-                    ->icon('heroicon-o-lock-closed')
-                    ->content('Pendaftaran Bantaeng Trail Run Sudah Di Tutup. Silahkan hubungi panitia untuk Pendaftaran Offline')
-                    ->columnSpanFull(),
-            ])
+            ->schema(static::formOtomatis())
+//            ->schema([
+//                Shout::make('Pendaftaran Ditutup')
+//                    ->icon('heroicon-o-lock-closed')
+//                    ->content('Pendaftaran Bantaeng Trail Run Sudah Di Tutup. Silahkan hubungi panitia untuk Pendaftaran Offline')
+//                    ->columnSpanFull(),
+//            ])
             ->columns(2);
     }
 
@@ -538,8 +538,10 @@ class Pendaftaran extends Page implements HasForms
                 ->required(),
             Forms\Components\TextInput::make('no_bib')
                 ->label('Nomor BIB Peserta')
+                ->hidden()
                 ->default(generateNomorBib()),
             Forms\Components\TextInput::make('nama_bib')
+                ->hidden()
                 ->label('Nama BIB Peserta'),
         ];
     }

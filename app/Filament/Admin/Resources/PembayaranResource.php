@@ -216,13 +216,13 @@ class PembayaranResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: false),
-                Tables\Columns\TextColumn::make('pendaftaran.no_bib')
-                    ->label('No. BIB Peserta')
+                Tables\Columns\TextColumn::make('pendaftaran.peserta.nama_lengkap')
+                    ->label('Nama Peserta')
                     ->searchable()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: false),
-                Tables\Columns\TextColumn::make('pendaftaran.nama_bib')
-                    ->label('Nama BIB Peserta')
+                Tables\Columns\TextColumn::make('pendaftaran.peserta.nomor_kartu_identitas')
+                    ->label('Nomor Identitas Peserta')
                     ->searchable()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: false),

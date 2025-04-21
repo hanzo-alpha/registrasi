@@ -1,6 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Filament\App\Pages\Pendaftaran;
+use App\Mail\PembayaranBerhasil;
 use Illuminate\Support\Facades\Route;
 
 //Route::get('/', function () {
@@ -8,11 +11,9 @@ use Illuminate\Support\Facades\Route;
 //});
 
 Route::get('/', Pendaftaran::class)->name('home');
-Route::get('/notifikasi', Pendaftaran::class)->name('tripay.notifikasi');
 
 Route::webhooks('registrasi-webhook', 'registrasi-webhook');
 Route::webhooks('resend-notification', 'resend-webhook');
-Route::webhooks('tripay-notification', 'tripay-webhook');
 
 
 Route::get('/mailable', function () {
