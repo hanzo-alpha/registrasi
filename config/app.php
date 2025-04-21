@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
 
     /*
@@ -17,6 +19,12 @@ return [
     'description' => env('APP_DESCRIPTION', 'Sistem Informasi Manajemen Event'),
     'brand' => env('APP_BRAND', 'Soppeng Berlari'),
     'event' => env('APP_EVENT', 'Soppeng Berlari & Konser 2025 '),
+
+    'default_user' => [
+        'name' => env('DEFAULT_USER_NAME', 'Administrator'),
+        'email' => env('DEFAULT_USER_EMAIL', 'admin@bantaengtrailrun.com'),
+        'password' => env('DEFAULT_USER_PASSWORD', 'password'),
+    ],
 
     /*
     |--------------------------------------------------------------------------
@@ -104,7 +112,7 @@ return [
 
     'previous_keys' => [
         ...array_filter(
-            explode(',', env('APP_PREVIOUS_KEYS', ''))
+            explode(',', env('APP_PREVIOUS_KEYS', '')),
         ),
     ],
 
