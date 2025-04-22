@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources;
 
-use App\Enums\JenisKelamin;
 use App\Enums\StatusPendaftaran;
 use App\Enums\StatusRegistrasi;
 use App\Enums\UkuranJersey;
@@ -409,10 +408,6 @@ class PendaftaranResource extends Resource
                 Tables\Filters\SelectFilter::make('status_pendaftaran')
                     ->label('Status Pendaftaran')
                     ->options(StatusPendaftaran::class)
-                    ->searchable(),
-                Tables\Filters\SelectFilter::make('peserta.jenis_kelamin')
-                    ->label('Jenis Kelamin')
-                    ->options(JenisKelamin::class)
                     ->searchable(),
                 Tables\Filters\SelectFilter::make('kategori_lomba')
                     ->label('Kategori Lomba')
