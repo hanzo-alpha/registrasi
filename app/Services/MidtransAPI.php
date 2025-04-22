@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Enums\PaymentStatus;
 use App\Enums\StatusBayar;
+use App\Enums\StatusDaftar;
 use App\Enums\StatusRegistrasi;
 use App\Enums\TipeBayar;
 use App\Models\Pembayaran;
@@ -72,7 +73,7 @@ class MidtransAPI
         int $amount,
         string $serverKey,
     ): bool {
-        $signature = $orderId.$statusCode.$amount.$serverKey;
+        $signature = $orderId . $statusCode . $amount . $serverKey;
         $hash = hash('sha512', $signature);
         return hash_equals($signatureKey, $hash);
     }
@@ -88,8 +89,8 @@ class MidtransAPI
 
         if ($orderId) {
             $url = config('midtrans.is_production')
-                ? 'https://api.midtrans.com/v2/'.$orderId.'/status'
-                : 'https://api.sandbox.midtrans.com/v2/'.$orderId.'/status';
+                ? 'https://api.midtrans.com/v2/' . $orderId . '/status'
+                : 'https://api.sandbox.midtrans.com/v2/' . $orderId . '/status';
 
             $response = config('midtrans.is_production')
                 ? Http::acceptJson()->withBasicAuth(config('midtrans.production.server_key'), '')->get($url)
@@ -110,7 +111,7 @@ class MidtransAPI
         if (empty($responseData)) {
             return [
                 'status' => 'danger',
-                'status_message' => 'Transaksi Dengan Order ID : '.$orderId.' tidak ditemukan',
+                'status_message' => 'Transaksi Dengan Order ID : ' . $orderId . ' tidak ditemukan',
             ];
         }
 
@@ -121,6 +122,7 @@ class MidtransAPI
         $details = collect($responseData)->except(['id'])->toArray();
         $pembayaran = Pembayaran::query()->where('order_id', $order_id)->first();
         $registrasi = $pembayaran?->pendaftaran;
+        $peserta = $registrasi?->peserta;
 
         $responseCode = ['201', '200', '407', '202'];
 
@@ -128,6 +130,7 @@ class MidtransAPI
         if (in_array($details['status_code'], $responseCode)) {
             $pembayaran->detail_transaksi = $details;
             $pembayaran->tipe_pembayaran = $paymentType;
+            $peserta->status_peserta = StatusDaftar::TERDAFTAR;
             $statusData = self::handleTransactionStatus(
                 $transactionStatus,
                 $responseData['payment_type'] ?? null,
@@ -138,9 +141,11 @@ class MidtransAPI
             if (null === $statusData['status_message']) {
                 $pembayaran->delete();
                 $registrasi->delete();
+                $peserta->delete();
             } else {
                 $pembayaran->save();
                 $registrasi->save();
+                $peserta->save();
             }
 
             return [
@@ -207,7 +212,7 @@ class MidtransAPI
         $baseUrl = config('midtrans.is_production')
             ? 'https://api.midtrans.com/v2/'
             : 'https://api.sandbox.midtrans.com/v2/';
-        return $baseUrl.$orderId.'/status';
+        return $baseUrl . $orderId . '/status';
     }
 
     private static function fetchMidtransResponse($url): array
@@ -298,7 +303,7 @@ class MidtransAPI
 
         return [
             'status' => 'success',
-            'status_message' => 'Transaksi order_id: '.$pembayaran->order_id.' '.$messageSuffix.' menggunakan '.$type,
+            'status_message' => 'Transaksi order_id: ' . $pembayaran->order_id . ' ' . $messageSuffix . ' menggunakan ' . $type,
         ];
     }
 
@@ -318,7 +323,7 @@ class MidtransAPI
 
         return [
             'status' => $status,
-            'status_message' => 'Pembayaran menggunakan '.$type.' untuk transaksi order_id: '.$pembayaran->order_id.' '.$messageSuffix.'.',
+            'status_message' => 'Pembayaran menggunakan ' . $type . ' untuk transaksi order_id: ' . $pembayaran->order_id . ' ' . $messageSuffix . '.',
         ];
     }
 
