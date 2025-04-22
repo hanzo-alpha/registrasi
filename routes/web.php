@@ -17,7 +17,7 @@ Route::webhooks('resend-notification', 'resend-webhook');
 
 
 Route::get('/mailable', function () {
-    $invoice = App\Models\Pembayaran::find(1);
+    $invoice = App\Models\Pembayaran::find(1)->withRelationshipAutoloading();
 
     return new App\Mail\PembayaranBerhasil($invoice);
 });

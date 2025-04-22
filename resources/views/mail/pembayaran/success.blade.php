@@ -143,44 +143,25 @@
                                                                 <tr>
                                                                     <td align="center"
                                                                         style="border:0px solid #FFFFFF;">
-                                                                        <img class="auto-width"
-                                                                             style="display:block;width:50%;
-                                                                             max-width:100%;"
-                                                                             data-image-edit data-url
-                                                                             data-label="Picture" width="230"
-                                                                             src="{{ asset('frontend/qrcode-pendaftaran-trailrun.png') }}"
-                                                                             border="0"
-                                                                             editable="true" alt="picture">
+                                                                        @php
+                                                                            $renderQr =
+                                                                            \LaraZeus\Qr\Facades\Qr::render(data:
+                                                                            $pembayaran->pendaftaran->qr_url,
+                                                                            options:
+                                                                            $pembayaran->pendaftaran->qr_options,
+                                                                            downloadable: false )
+                                                                        @endphp
+                                                                        {!! $renderQr !!}
+                                                                        {{--                                                                        <img class="auto-width"--}}
+                                                                        {{--                                                                             style="display:block;width:50%;--}}
+                                                                        {{--                                                                             max-width:100%;"--}}
+                                                                        {{--                                                                             data-image-edit data-url--}}
+                                                                        {{--                                                                             data-label="Picture" width="230"--}}
+                                                                        {{--                                                                             src="{{ asset('frontend/qrcode-pendaftaran-trailrun.png') }}"--}}
+                                                                        {{--                                                                             border="0"--}}
+                                                                        {{--                                                                             editable="true" alt="picture">--}}
                                                                     </td>
                                                                 </tr>
-                                                                {{--                                                                @if($pembayaran->status_pendaftaran === StatusPendaftaran::EARLYBIRD)--}}
-                                                                {{--                                                                    <tr>--}}
-                                                                {{--                                                                        <td align="center"--}}
-                                                                {{--                                                                            style="border:12px solid #FFFFFF;">--}}
-                                                                {{--                                                                            <img class="auto-width"--}}
-                                                                {{--                                                                                 style="display:block;width:100%;max-width:100%;"--}}
-                                                                {{--                                                                                 data-image-edit data-url--}}
-                                                                {{--                                                                                 data-label="Picture" width="460"--}}
-                                                                {{--                                                                                 src="{{ asset('frontend/running/8K Wall.png') }}"--}}
-                                                                {{--                                                                                 border="0"--}}
-                                                                {{--                                                                                 editable="true" alt="picture">--}}
-                                                                {{--                                                                        </td>--}}
-                                                                {{--                                                                    </tr>--}}
-                                                                {{--                                                                @else--}}
-                                                                {{--                                                                    <tr>--}}
-                                                                {{--                                                                        <td align="center"--}}
-                                                                {{--                                                                            style="border:12px solid #FFFFFF;">--}}
-                                                                {{--                                                                            <img class="auto-width"--}}
-                                                                {{--                                                                                 style="display:block;width:100%;max-width:100%;"--}}
-                                                                {{--                                                                                 data-image-edit data-url--}}
-                                                                {{--                                                                                 data-label="Picture" width="460"--}}
-                                                                {{--                                                                                 src="{{ asset('frontend/running/15K Wall.png') }}"--}}
-                                                                {{--                                                                                 border="0"--}}
-                                                                {{--                                                                                 editable="true" alt="picture">--}}
-                                                                {{--                                                                        </td>--}}
-                                                                {{--                                                                    </tr>--}}
-                                                                {{--                                                                @endif--}}
-
                                                             </table>
                                                             <!-- Picture -->
                                                         </td>
@@ -344,7 +325,8 @@
                                                                         style="font-family:'Poppins',Arial,Helvetica,sans-serif;font-size:16px;line-height:20px;font-weight:400;font-style:normal;color:#E38529;text-decoration:none;letter-spacing:0px;">
                                                                         <singleline>
                                                                             <div mc:edit data-text-edit>
-                                                                                {{ $pembayaran->kategori->nama }}
+                                                                                {{
+                                                                                $pembayaran->pendaftaran->kategori->nama }}
                                                                             </div>
                                                                         </singleline>
                                                                     </td>
@@ -428,7 +410,8 @@
                                                                         style="font-family:'Poppins',Arial,Helvetica,sans-serif;font-size:16px;line-height:20px;font-weight:400;font-style:normal;color:#666666;text-decoration:none;letter-spacing:0px;">
                                                                         <singleline>
                                                                             <div mc:edit data-text-edit>
-                                                                                {{ $pembayaran->status_daftar->getLabel() }}
+                                                                                {{
+                                                                                $pembayaran->pendaftaran->status_pendaftaran->getLabel() }}
                                                                             </div>
                                                                         </singleline>
                                                                     </td>
