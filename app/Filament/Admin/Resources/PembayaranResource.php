@@ -290,9 +290,8 @@ class PembayaranResource extends Resource
                 Tables\Filters\SelectFilter::make('status_transaksi')
                     ->options(PaymentStatus::class)
                     ->searchable(),
-                Tables\Filters\SelectFilter::make('kategori_lomba')
-                    ->relationship('kategori', 'nama')
-                    ->preload()
+                Tables\Filters\SelectFilter::make('tipe_pembayaran')
+                    ->options(TipeBayar::class)
                     ->searchable(),
                 Tables\Filters\TrashedFilter::make(),
             ])
