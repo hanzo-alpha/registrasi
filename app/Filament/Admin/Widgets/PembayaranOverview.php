@@ -23,7 +23,6 @@ class PembayaranOverview extends BaseWidget
     protected function getStats(): array
     {
         $totalBayarLunas = $this->getPageTableQuery()
-            ->whereHas('pendaftaran', fn($query) => $query->whereHas('kategori', fn($query) => $query->where('kategori', 'early_bird')))
             ->where('status_pembayaran', StatusBayar::SUDAH_BAYAR)
             ->sum('total_harga');
 
@@ -39,8 +38,6 @@ class PembayaranOverview extends BaseWidget
 
         $totalBayarLunasEarlybird = $this->getPageTableQuery()->where('status_pembayaran', StatusBayar::PENDING)
             ->sum('total_harga');
-        $totalBayarLunasNormal = $this->getPageTableQuery()->where('status_pembayaran', StatusBayar::BELUM_BAYAR)
-            ->sum('total_harga');
 
         return [
             Stat::make('Total Pembayaran Lunas', Number::format($totalBayarLunas, 0, null, 'id'))
@@ -49,9 +46,6 @@ class PembayaranOverview extends BaseWidget
             Stat::make('Total Pembayaran Pending', Number::format($totalBayarLunasEarlybird, 0, null, 'id'))
                 ->description('Jumlah Pembayaran Pending')
                 ->color('yellow'),
-            //            Stat::make('Total Belum Membayar', Number::format($totalBayarLunasNormal, 0, null, 'id'))
-            //                ->description('Jumlah Belum Membayar')
-            //                ->color('secondary'),
             Stat::make('Total Pembayaran Earlybird', Number::format($totalEarlyBird, 0, null, 'id'))
                 ->description('Kategori Earlybird')
                 ->color('success'),

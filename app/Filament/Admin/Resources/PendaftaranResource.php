@@ -268,7 +268,7 @@ class PendaftaranResource extends Resource
                         ->label('Tipe Bayar')->badge(),
                     TextEntry::make('pembayaran.status_pembayaran')
                         ->label('Status Pembayaran')->badge(),
-                    TextEntry::make('pembayaran.status_pendaftaran')
+                    TextEntry::make('pembayaran.detail_transaksi')
                         ->label('Status Pendaftaran')->badge(),
                     TextEntry::make('pembayaran.total_harga')
                         ->label('Total Bayar')
