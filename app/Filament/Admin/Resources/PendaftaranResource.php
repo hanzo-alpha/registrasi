@@ -228,6 +228,10 @@ class PendaftaranResource extends Resource
                         ->color('secondary'),
                     TextEntry::make('peserta.golongan_darah')->badge()
                         ->label('Golongan Darah'),
+                    TextEntry::make('peserta.komunitas')->badge()
+                        ->label('Komunitas'),
+                    TextEntry::make('peserta.status_peserta')->badge()
+                        ->label('Status Peserta'),
                 ])->columns(2),
                 Section::make('Data Alamat')->schema([
                     TextEntry::make('alamat')
@@ -249,11 +253,16 @@ class PendaftaranResource extends Resource
                 ])->columns(2),
             ])->columnSpan(2),
             Group::make()->schema([
-                Section::make('Status Peserta')->schema([
-                    TextEntry::make('ukuran_jersey')->badge(),
+                Section::make('Status Pendaftaran')->schema([
                     TextEntry::make('kategori.nama')->badge(),
-                    TextEntry::make('komunitas')->badge(),
+                    TextEntry::make('status_pendaftaran')->badge(),
                     TextEntry::make('status_registrasi')->badge(),
+                    TextEntry::make('status_pengambilan')
+                        ->formatStateUsing(fn(
+                            $state,
+                        ) => $state ? 'Sudah mengambil racepack' : 'Belum mengambil racepack')
+                        ->color(fn($state) => $state ? 'success' : 'danger')
+                        ->badge(),
                 ])->columns(2),
                 Section::make('Pembayaran')->schema([
                     TextEntry::make('pembayaran.tipe_pembayaran')
@@ -292,74 +301,93 @@ class PendaftaranResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('peserta.nama_lengkap')
+                    ->label('Nama Lengkap')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('peserta.email')
+                    ->label('Email')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('peserta.no_telp')
+                    ->label('No. Telp')
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('peserta.jenis_kelamin')
+                    ->label('Jenis Kelamin')
                     ->searchable()
                     ->sortable()
                     ->badge()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('peserta.tempat_lahir')
+                    ->label('Tempat Lahir')
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('peserta.tanggal_lahir')
-                    ->date()
+                    ->label('Tanggal Lahir')
+                    ->date('d M Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('alamat')
+                    ->label('Alamat')
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('negara')
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('prov.name')
+                    ->label('Provinsi')
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('kab.name')
+                    ->label('Kabupaten')
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('kec.name')
+                    ->label('Kecamatan')
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('peserta.tipe_kartu_identitas')
+                    ->label('Tipe Kartu Identitas')
                     ->searchable()
                     ->sortable()
                     ->badge()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('peserta.nomor_kartu_identitas')
+                    ->label('Nomor Kartu Identitas')
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('peserta.nama_kontak_darurat')
+                    ->label('Nama Kontak Darurat')
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('peserta.nomor_kontak_darurat')
+                    ->label('Nomor Kontak Darurat')
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('peserta.golongan_darah')
+                    ->label('Golongan Darah')
                     ->searchable()
                     ->sortable()
                     ->badge()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('ukuran_jersey')
+                    ->label('Ukuran Jersey')
                     ->searchable()
                     ->sortable()
                     ->badge()
                     ->alignCenter()
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('kategori.nama')
+                    ->label('Kategori Lomba')
                     ->searchable()
                     ->sortable()
                     ->badge()
                     ->alignCenter()
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('peserta.komunitas')
+                    ->label('Komunitas')
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('status_registrasi')
+                    ->label('Status Registrasi')
                     ->searchable()
                     ->sortable()
                     ->badge()
@@ -371,27 +399,23 @@ class PendaftaranResource extends Resource
                     ->sortable()
                     ->badge()
                     ->alignCenter()
-                    ->toggleable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('status_registrasi')
+                    ->label('Status Registrasi')
                     ->options(StatusRegistrasi::class)
                     ->searchable(),
                 Tables\Filters\SelectFilter::make('status_pendaftaran')
+                    ->label('Status Pendaftaran')
                     ->options(StatusPendaftaran::class)
                     ->searchable(),
                 Tables\Filters\SelectFilter::make('peserta.jenis_kelamin')
+                    ->label('Jenis Kelamin')
                     ->options(JenisKelamin::class)
                     ->searchable(),
                 Tables\Filters\SelectFilter::make('kategori_lomba')
+                    ->label('Kategori Lomba')
                     ->relationship('kategori', 'nama')
                     ->preload()
                     ->searchable(),
