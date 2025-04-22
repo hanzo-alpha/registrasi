@@ -9,10 +9,13 @@ use App\Filament\Admin\Widgets\PendaftaranOverview;
 use App\Filament\Exports\PendaftaranExporter;
 use Filament\Actions;
 use Filament\Actions\Exports\Enums\ExportFormat;
+use Filament\Pages\Concerns\ExposesTableToWidgets;
 use Filament\Resources\Pages\ListRecords;
 
 class ListPendaftarans extends ListRecords
 {
+    use ExposesTableToWidgets;
+
     protected static string $resource = PendaftaranResource::class;
 
     protected function getHeaderWidgets(): array

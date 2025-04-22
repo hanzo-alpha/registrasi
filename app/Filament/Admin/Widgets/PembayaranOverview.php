@@ -5,33 +5,41 @@ declare(strict_types=1);
 namespace App\Filament\Admin\Widgets;
 
 use App\Enums\StatusBayar;
-use App\Models\Pembayaran;
+use App\Filament\Admin\Resources\PembayaranResource\Pages\ListPembayarans;
+use Filament\Widgets\Concerns\InteractsWithPageTable;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Number;
 
 class PembayaranOverview extends BaseWidget
 {
+    use InteractsWithPageTable;
+
+    protected function getTablePage(): string
+    {
+        return ListPembayarans::class;
+    }
+
     protected function getStats(): array
     {
-        $totalBayarLunas = Pembayaran::query()
+        $totalBayarLunas = $this->getPageTableQuery()
             ->whereHas('pendaftaran', fn($query) => $query->whereHas('kategori', fn($query) => $query->where('kategori', 'early_bird')))
             ->where('status_pembayaran', StatusBayar::SUDAH_BAYAR)
             ->sum('total_harga');
 
-        $totalEarlyBird = Pembayaran::query()
+        $totalEarlyBird = $this->getPageTableQuery()
             ->whereHas('pendaftaran', fn($query) => $query->whereHas('kategori', fn($query) => $query->where('kategori', 'early_bird')))
             ->where('status_pembayaran', StatusBayar::SUDAH_BAYAR)
             ->sum('total_harga');
 
-        $totalNormal = Pembayaran::query()
+        $totalNormal = $this->getPageTableQuery()
             ->whereHas('pendaftaran', fn($query) => $query->whereHas('kategori', fn($query) => $query->where('kategori', 'normal')))
             ->where('status_pembayaran', StatusBayar::SUDAH_BAYAR)
             ->sum('total_harga');
 
-        $totalBayarLunasEarlybird = Pembayaran::where('status_pembayaran', StatusBayar::PENDING)
+        $totalBayarLunasEarlybird = $this->getPageTableQuery()->where('status_pembayaran', StatusBayar::PENDING)
             ->sum('total_harga');
-        $totalBayarLunasNormal = Pembayaran::where('status_pembayaran', StatusBayar::BELUM_BAYAR)
+        $totalBayarLunasNormal = $this->getPageTableQuery()->where('status_pembayaran', StatusBayar::BELUM_BAYAR)
             ->sum('total_harga');
 
         return [

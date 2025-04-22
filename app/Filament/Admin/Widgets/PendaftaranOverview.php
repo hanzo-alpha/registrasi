@@ -5,18 +5,33 @@ declare(strict_types=1);
 namespace App\Filament\Admin\Widgets;
 
 use App\Enums\StatusRegistrasi;
+use App\Filament\Admin\Resources\PendaftaranResource\Pages\ListPendaftarans;
 use App\Models\Pendaftaran;
+use Filament\Widgets\Concerns\InteractsWithPageTable;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Number;
 
 class PendaftaranOverview extends BaseWidget
 {
+    use InteractsWithPageTable;
+
+    protected function getTablePage(): string
+    {
+        return ListPendaftarans::class;
+    }
+
     protected function getStats(): array
     {
-        $countEarly = Pendaftaran::whereHas('kategori', fn($query) => $query->where('kategori', 'early_bird'))->count();
-        $countNormal = Pendaftaran::whereHas('kategori', fn($query) => $query->where('kategori', 'normal'))->count();
-        $countAll = Pendaftaran::count();
+        $countEarly = $this->getPageTableQuery()->whereHas(
+            'kategori',
+            fn($query) => $query->where('kategori', 'early_bird'),
+        )->count();
+        $countNormal = $this->getPageTableQuery()->whereHas(
+            'kategori',
+            fn($query) => $query->where('kategori', 'normal'),
+        )->count();
+        $countAll = $this->getPageTableQuery()->count();
 
         $totalPending = Pendaftaran::query()
             ->whereIn('status_registrasi', [
