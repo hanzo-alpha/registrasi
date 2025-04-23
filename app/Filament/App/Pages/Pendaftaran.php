@@ -533,8 +533,11 @@ class Pendaftaran extends Page implements HasForms
             Forms\Components\Select::make('ukuran_jersey')
                 ->label('Ukuran Jersey')
                 ->native(false)
+                ->disabled()
                 ->options(UkuranJersey::class)
                 ->enum(UkuranJersey::class)
+                ->default(UkuranJersey::ALL_SIZE)
+                ->dehydrated()
                 ->required(),
             Forms\Components\TextInput::make('no_bib')
                 ->label('Nomor BIB Peserta')
