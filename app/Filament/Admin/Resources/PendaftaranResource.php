@@ -54,7 +54,7 @@ class PendaftaranResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
-    protected static ?string $recordTitleAttribute = 'nama_bib';
+    protected static ?string $recordTitleAttribute = 'uuid_pendaftaran';
 
     public static function formPendaftaran(): array
     {
@@ -84,11 +84,9 @@ class PendaftaranResource extends Resource
                             ->searchable(),
                         Forms\Components\TextInput::make('no_bib')
                             ->label('Nomor BIB Lari')
-                            ->required(),
+                            ->default(generateNomorBib()),
                         Forms\Components\TextInput::make('nama_bib')
-                            ->label('Nama BIB Lari')
-                            ->required(),
-
+                            ->label('Nama BIB Lari'),
                         Forms\Components\Select::make('kategori_lomba')
                             ->label('Kategori Lomba')
                             ->relationship('kategori', 'nama')
@@ -253,10 +251,13 @@ class PendaftaranResource extends Resource
             ])->columnSpan(2),
             Group::make()->schema([
                 Section::make('Status Pendaftaran')->schema([
-                    TextEntry::make('kategori.nama')->badge(),
-                    TextEntry::make('status_pendaftaran')->badge(),
-                    TextEntry::make('status_registrasi')->badge(),
+                    TextEntry::make('no_bib')->label('No. BIB')->badge(),
+                    TextEntry::make('nama_bib')->label('Nama BIB')->badge(),
+                    TextEntry::make('kategori.nama')->label('Kategori')->badge(),
+                    TextEntry::make('status_pendaftaran')->label('Status Pendaftaran')->badge(),
+                    TextEntry::make('status_registrasi')->label('Status Registrasi')->badge(),
                     TextEntry::make('status_pengambilan')
+                        ->label('Status Pengambilan')
                         ->formatStateUsing(fn(
                             $state,
                         ) => $state ? 'Sudah mengambil racepack' : 'Belum mengambil racepack')
@@ -268,7 +269,7 @@ class PendaftaranResource extends Resource
                         ->label('Tipe Bayar')->badge(),
                     TextEntry::make('pembayaran.status_pembayaran')
                         ->label('Status Pembayaran')->badge(),
-                    TextEntry::make('pembayaran.detail_transaksi')
+                    TextEntry::make('status_pendaftaran')
                         ->label('Status Pendaftaran')->badge(),
                     TextEntry::make('pembayaran.total_harga')
                         ->label('Total Bayar')

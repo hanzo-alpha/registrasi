@@ -14,10 +14,16 @@ if ( ! function_exists('date_format')) {
     }
 }
 
-if (!function_exists('generateNomorBib')) {
-    function generateNomorBib($length = 4, $pad = '0'): string
+if ( ! function_exists('generateNomorBib')) {
+    function generateNomorBib($id = null, $length = 4, $pad = '0'): string
     {
         $pad ??= $pad ?? '0';
+
+        if (null !== $id) {
+            $modelClass = Pendaftaran::find($id)->no_bib + $id;
+            return Str::padLeft($modelClass, $length, $pad);
+        }
+
         $modelClass = Pendaftaran::class;
         $max = $modelClass::max('id') + 1;
         return Str::padLeft($max, $length, $pad);
