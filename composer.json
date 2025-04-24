@@ -14,6 +14,7 @@
     "require": {
         "php": "^8.2",
         "awcodes/shout": "^2.0",
+        "aymanalhattami/filament-slim-scrollbar": "^2.1",
         "bezhansalleh/filament-shield": "^3.3",
         "coderflex/filament-turnstile": "^2.3",
         "croustibat/filament-jobs-monitor": "^2.6",
