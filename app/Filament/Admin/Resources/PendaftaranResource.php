@@ -42,6 +42,8 @@ class PendaftaranResource extends Resource
 
     protected static ?string $label = 'Pendaftaran';
 
+    protected static ?string $slug = 'pendaftaran';
+
     protected static ?string $modelLabel = 'Pendaftaran';
 
     protected static ?string $pluralLabel = 'Pendaftaran';

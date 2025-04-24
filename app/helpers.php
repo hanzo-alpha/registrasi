@@ -30,6 +30,13 @@ if ( ! function_exists('generateNomorBib')) {
     }
 }
 
+if ( ! function_exists('generateUuid')) {
+    function generateUuid(): string
+    {
+        return Str::uuid()->toString();
+    }
+}
+
 if ( ! function_exists('getPembayaranRelationshipLabel')) {
     function getPembayaranRelationshipLabel(): string
     {

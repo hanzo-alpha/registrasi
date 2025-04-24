@@ -22,6 +22,7 @@ class PesertaResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-user';
     protected static ?string $label = 'Peserta';
+    protected static ?string $slug = 'peserta';
     protected static ?string $modelLabel = 'Peserta';
     protected static ?string $pluralLabel = 'Peserta';
     protected static ?string $pluralModelLabel = 'Peserta';

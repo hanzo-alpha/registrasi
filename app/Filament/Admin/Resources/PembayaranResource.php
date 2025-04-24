@@ -35,6 +35,8 @@ class PembayaranResource extends Resource
 
     protected static ?string $label = 'Pembayaran';
 
+    protected static ?string $slug = 'pembayaran';
+
     protected static ?string $modelLabel = 'Pembayaran';
 
     protected static ?string $pluralLabel = 'Pembayaran';
