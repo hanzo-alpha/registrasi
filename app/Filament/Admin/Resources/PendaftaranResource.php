@@ -225,12 +225,17 @@ class PendaftaranResource extends Resource
                     TextEntry::make('peserta.nomor_kontak_darurat')
                         ->label('Nomor Kontak Darurat')
                         ->color('secondary'),
-                    TextEntry::make('peserta.golongan_darah')->badge()
-                        ->label('Golongan Darah'),
-                    TextEntry::make('peserta.komunitas')->badge()
-                        ->label('Komunitas'),
-                    TextEntry::make('peserta.status_peserta')->badge()
-                        ->label('Status Peserta'),
+                    TextEntry::make('peserta.golongan_darah')
+                        ->label('Golongan Darah')
+                        ->badge()
+                        ->color('secondary'),
+                    TextEntry::make('peserta.komunitas')
+                        ->label('Komunitas')
+                        ->badge()
+                        ->color('secondary'),
+                    TextEntry::make('peserta.status_peserta')
+                        ->label('Status Peserta')
+                        ->badge(),
                 ])->columns(2),
                 Section::make('Data Alamat')->schema([
                     TextEntry::make('alamat')
@@ -253,11 +258,23 @@ class PendaftaranResource extends Resource
             ])->columnSpan(2),
             Group::make()->schema([
                 Section::make('Status Pendaftaran')->schema([
-                    TextEntry::make('no_bib')->label('No. BIB')->badge(),
-                    TextEntry::make('nama_bib')->label('Nama BIB')->badge(),
-                    TextEntry::make('kategori.nama')->label('Kategori')->badge(),
-                    TextEntry::make('status_pendaftaran')->label('Status Pendaftaran')->badge(),
-                    TextEntry::make('status_registrasi')->label('Status Registrasi')->badge(),
+                    TextEntry::make('no_bib')
+                        ->label('No. BIB')
+                        ->badge()
+                        ->color('secondary'),
+                    TextEntry::make('nama_bib')
+                        ->label('Nama BIB')
+                        ->badge()
+                        ->color('secondary'),
+                    TextEntry::make('kategori.nama')
+                        ->label('Kategori')
+                        ->badge(),
+                    TextEntry::make('status_pendaftaran')
+                        ->label('Status Pendaftaran')
+                        ->badge(),
+                    TextEntry::make('status_registrasi')
+                        ->label('Status Registrasi')
+                        ->badge(),
                     TextEntry::make('status_pengambilan')
                         ->label('Status Pengambilan')
                         ->formatStateUsing(fn(
@@ -285,7 +302,7 @@ class PendaftaranResource extends Resource
                         ->hiddenLabel()
                         ->formatStateUsing(fn(string $state, $record) => \LaraZeus\Qr\Facades\Qr::render(
                             data: $state,
-                            options: $record->options,
+                            options: $record->qr_options,
                         )),
                 ])->columns(1),
             ])->columns(1),

@@ -12,6 +12,9 @@ use App\Filament\Admin\Resources\PesertaResource\Pages;
 use App\Models\Peserta;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -101,6 +104,67 @@ class PesertaResource extends Resource
                     ->required(),
             ])->columns(2),
         ];
+    }
+
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist->schema([
+            Section::make('Detail Peserta')
+                ->schema([
+                    TextEntry::make('uuid_peserta')
+                        ->label('ID Peserta')
+                        ->badge()
+                        ->copyable()
+                        ->color('primary'),
+                    TextEntry::make('nama_lengkap')
+                        ->label('Nama Lengkap')
+                        ->color('primary'),
+                    TextEntry::make('email')
+                        ->label('Email')
+                        ->copyable()
+                        ->color('primary'),
+                    TextEntry::make('no_telp')
+                        ->label('No. Telp')
+                        ->copyable()
+                        ->color('primary'),
+                    TextEntry::make('jenis_kelamin')
+                        ->label('Jenis Kelamin')
+                        ->badge(),
+                    TextEntry::make('tempat_lahir')
+                        ->label('Tempat Lahir')
+                        ->color('primary'),
+                    TextEntry::make('tanggal_lahir')
+                        ->label('Tgl. Lahir')
+                        ->date('d M Y')
+                        ->formatStateUsing(fn($record) => $record->tanggal_lahir->format('d M Y') . ' (' . $record->tanggal_lahir->age . ' Tahun' . ')')
+                        ->color('primary'),
+                    TextEntry::make('tipe_kartu_identitas')
+                        ->label('Tipe Kartu Identitas')
+                        ->badge()
+                        ->color('primary'),
+                    TextEntry::make('nomor_kartu_identitas')
+                        ->label('Nomor Kartu Identitas')
+                        ->copyable()
+                        ->color('primary'),
+                    TextEntry::make('nomor_kontak_darurat')
+                        ->label('Nomor Kontak Darurat')
+                        ->copyable()
+                        ->color('primary'),
+                    TextEntry::make('nama_kontak_darurat')
+                        ->label('Nama Kontak Darurat')
+                        ->color('primary'),
+                    TextEntry::make('golongan_darah')
+                        ->label('Golongan Darah')
+                        ->badge()
+                        ->color('primary'),
+                    TextEntry::make('komunitas')
+                        ->label('Komunitas')
+                        ->color('primary'),
+                    TextEntry::make('status_peserta')
+                        ->label('Status Peserta')
+                        ->badge(),
+                ])->inlineLabel()->columns(2),
+        ]);
     }
 
     public static function table(Table $table): Table
