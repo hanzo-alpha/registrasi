@@ -214,6 +214,7 @@ class PembayaranResource extends Resource
                 Tables\Columns\TextColumn::make('order_id')
                     ->label('Order ID')
                     ->searchable()
+                    ->copyable()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('pendaftaran.peserta.nama_lengkap')
@@ -225,7 +226,7 @@ class PembayaranResource extends Resource
                     ->label('Nomor Identitas Peserta')
                     ->searchable()
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('nama_kegiatan')
                     ->searchable()
                     ->sortable()
@@ -234,7 +235,7 @@ class PembayaranResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->badge()
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('jumlah')
                     ->numeric()
                     ->sortable()

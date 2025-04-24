@@ -119,7 +119,7 @@ class PesertaResource extends Resource
                 Tables\Columns\TextColumn::make('email')
                     ->label('Email')
                     ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('no_telp')
                     ->label('No. Telp')
                     ->searchable()
@@ -171,7 +171,18 @@ class PesertaResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: false),
             ])
             ->filters([
-
+                Tables\Filters\SelectFilter::make('status_peserta')
+                    ->label('Status Peserta')
+                    ->options(StatusDaftar::class)
+                    ->native(false),
+                Tables\Filters\SelectFilter::make('jenis_kelamin')
+                    ->label('Jenis Kelamin')
+                    ->options(JenisKelamin::class)
+                    ->native(false),
+                Tables\Filters\SelectFilter::make('golongan_darah')
+                    ->label('Golongan Darah')
+                    ->options(GolonganDarah::class)
+                    ->native(false),
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([

@@ -55,7 +55,7 @@ enum PaymentStatus: string implements HasLabel, HasDescription, HasColor
         return match ($this) {
             self::AUTHORIZE => 'indigo',
             self::SETTLEMENT => 'success',
-            self::CAPTURE => 'blue',
+            self::CAPTURE => 'sky',
             self::DENY => 'secondary',
             self::PENDING => 'violet',
             self::REFUND => 'purple',
