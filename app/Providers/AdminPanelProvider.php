@@ -83,25 +83,6 @@ class AdminPanelProvider extends PanelProvider
             ->darkModeBrandLogo(asset('frontend/running/Logo_8.png'))
             ->brandLogoHeight('2.5em')
             ->favicon(asset('frontend/running/favicon.png'))
-            ->plugins([
-                BreezyCore::make()
-                    ->myProfile(
-                        navigationGroup: 'Settings',
-                    ),
-                FilamentJobsMonitorPlugin::make(),
-                PhosphorIconReplacement::make(),
-                FilamentWebhookClientPlugin::make(),
-                ThemesPlugin::make(),
-                FilamentBackgroundsPlugin::make(),
-                FilamentSettingsPlugin::make()
-                    ->pages([
-                        Settings::class,
-                    ]),
-                EasyFooterPlugin::make()
-                    ->withLoadTime('Halaman ini dimuat dalam ')
-                    ->withGithub()
-                    ->withSentence(config('app.brand') . ' - ' . config('app.event')),
-            ])
             ->discoverResources(in: app_path('Filament/Admin/Resources'), for: 'App\\Filament\\Admin\\Resources')
             ->discoverPages(in: app_path('Filament/Admin/Pages'), for: 'App\\Filament\\Admin\\Pages')
             ->pages([
@@ -128,9 +109,22 @@ class AdminPanelProvider extends PanelProvider
             ->plugins([
                 FilamentShieldPlugin::make(),
                 BreezyCore::make()
-                    ->myProfile(shouldRegisterUserMenu: true),
-                FilamentBackgroundsPlugin::make(),
+                    ->myProfile(
+                        navigationGroup: 'Settings',
+                    ),
+                FilamentJobsMonitorPlugin::make(),
+                PhosphorIconReplacement::make(),
+                FilamentWebhookClientPlugin::make(),
                 ThemesPlugin::make(),
+                FilamentBackgroundsPlugin::make(),
+                FilamentSettingsPlugin::make()
+                    ->pages([
+                        Settings::class,
+                    ]),
+                EasyFooterPlugin::make()
+                    ->withLoadTime('Halaman ini dimuat dalam ')
+                    ->withGithub()
+                    ->withSentence(config('app.brand') . ' - ' . config('app.event')),
             ])
             ->authMiddleware([
                 Authenticate::class,

@@ -112,6 +112,7 @@ class PendaftaranExporter extends Exporter
                         UkuranJersey::L_WOMEN->value => UkuranJersey::L_WOMEN->value,
                         UkuranJersey::S_MEN->value => UkuranJersey::S_MEN->value,
                         UkuranJersey::S_WOMEN->value => UkuranJersey::S_WOMEN->value,
+                        UkuranJersey::ALL_SIZE->value => UkuranJersey::ALL_SIZE->value,
                     };
                 }),
             ExportColumn::make('kategori.nama')
