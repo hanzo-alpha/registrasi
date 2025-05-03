@@ -201,13 +201,13 @@ class Pendaftaran extends Page implements HasForms
     public function form(Form $form): Form
     {
         return $form
-            ->schema(static::formOtomatis())
-//            ->schema([
-//                Shout::make('Pendaftaran Ditutup')
-//                    ->icon('heroicon-o-lock-closed')
-//                    ->content('Pendaftaran Bantaeng Trail Run Sudah Di Tutup. Silahkan hubungi panitia untuk Pendaftaran Offline')
-//                    ->columnSpanFull(),
-//            ])
+//            ->schema(static::formOtomatis())
+            ->schema([
+                Shout::make('Pendaftaran Ditutup')
+                    ->icon('heroicon-o-lock-closed')
+                    ->content('Kegiatan Bantaeng Trail Run Sudah Selesai dilaksanakan. ')
+                    ->columnSpanFull(),
+            ])
             ->columns(2);
     }
 
